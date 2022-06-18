@@ -11,8 +11,10 @@ struct ProjectEditor: View {
             List {
                 DisclosureGroup("Open Files", isExpanded: $viewOpenFiles) {
                     ForEach($project.openDocuments) { $doc in
-                        NavigationLink(destination: PageEditor(html: $doc.html)) {
-                            Text(doc.id.uuidString)
+                        NavigationLink(destination: PageEditor(html: $doc.html)
+                            .navigationTitle(doc.filename)
+                            .navigationBarTitleDisplayMode(.inline)) {
+                            Text(doc.filename)
                         }
                     }
                 }
