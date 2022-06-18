@@ -35,8 +35,14 @@ struct ProjectEditor: View {
                         Image(systemName: "doc.badge.plus")
                     }
                 }
-            }
-            Image(systemName: "questionmark.folder")
+            }.navigationBarTitleDisplayMode(.inline)
+            ZStack {
+                Color(UIColor.secondarySystemBackground)
+                VStack {
+                    Image(systemName: "questionmark.folder").font(.system(size: 180, weight: .medium))
+                    Text("Please select a file.")
+                }
+            }.navigationBarHidden(true)
         }
     }
 }
