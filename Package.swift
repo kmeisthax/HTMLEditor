@@ -10,13 +10,14 @@ import AppleProductTypes
 let package = Package(
     name: "HTML Editor",
     platforms: [
-        .iOS("15.2")
+        .iOS("15.2"),
+        .macOS("11.0")
     ],
     products: [
         .iOSApplication(
             name: "HTML Editor",
             targets: ["AppModule"],
-            displayVersion: "0.1",
+            displayVersion: "0.1.1",
             bundleVersion: "1",
             appIcon: .placeholder(icon: .paper),
             accentColor: .presetColor(.purple),
@@ -40,7 +41,10 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "AppModule",
-            path: "."
+            path: ".",
+            resources: [
+                .process("Resources")
+            ]
         )
     ]
 )
