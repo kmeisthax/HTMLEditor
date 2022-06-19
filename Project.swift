@@ -6,7 +6,16 @@ import SwiftUI
  * There is a one-to-one correspondance between Projects and scenes in the app.
  */
 class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
+    /**
+     * All the open documents in the project, including ones that are not
+     * part of the project directory.
+     */
     @Published var openDocuments: [Page];
+    
+    /**
+     * The open project directory.
+     */
+    var projectDirectory: URL?;
     
     var lastSuccessCallback: (([URL]) -> Void)?;
     var lastCancelCallback: (() -> Void)?;
