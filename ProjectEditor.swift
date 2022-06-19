@@ -18,17 +18,17 @@ struct ProjectEditor: View {
                         }
                     }
                 }
-            }.toolbar {
+            }.listStyle(SidebarListStyle()).toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Menu {
                         Button {
                             project.addNewPage()
                         } label: {
-                            Text("Add New Page")
+                            Text("New page")
                             Image(systemName: "doc.badge.plus")
                         }
                         Button {
-                            project.openPage(scene: sceneDelegate.scene!)
+                            project.openPage(scene: sceneDelegate.scene!);
                         } label: {
                             Text("Open file...")
                             Image(systemName: "doc.text")
@@ -44,7 +44,7 @@ struct ProjectEditor: View {
                     Image(systemName: "questionmark.folder").font(.system(size: 180, weight: .medium))
                     Text("Please select a file.")
                 }
-            }.navigationBarHidden(true)
+            }.navigationBarTitleDisplayMode(.inline)
         }
     }
 }
