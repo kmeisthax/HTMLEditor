@@ -1,5 +1,6 @@
 import SwiftUI
 import Foundation
+import Combine
 
 /**
  * Viewmodel class for individual HTML files in a project.
@@ -28,8 +29,28 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     
     @Published var html: String = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
     
+    var c: [AnyCancellable] = [];
+    
     override init() {
         id = UUID.init()
+        
+        super.init()
+        
+        $html.sink(receiveValue: { [weak self] html in
+            if let url = self?.presentedItemURL {
+                let coordinator = NSFileCoordinator.init(filePresenter: self);
+                
+                print(url);
+                
+                coordinator.coordinate(with: [.writingIntent(with: url)], queue: self!.presentedItemOperationQueue) { error in
+                    if let error = error {
+                        print (error);
+                    }
+                    
+                    self!.doActualSave(url: url, html: html);
+                }
+            }
+        }).store(in: &c);
     }
     
     class func fromSecurityScopedUrl(url: URL) -> Page {
@@ -70,5 +91,23 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         } else {
             print("No URL")
         }
+    }
+    
+    private func doActualSave(url: URL, html: String) {
+        if !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+            //panic! at the disco
+            print("Cannot access URL")
+        }
+        
+        do {
+            print("About to save");
+            try html.write(to: url, atomically: true, encoding: .utf8);
+            print("Saved");
+        } catch {
+            //panic?!
+            print("Error writing URL")
+        }
+        
+        CFURLStopAccessingSecurityScopedResource(url as CFURL);
     }
 }
