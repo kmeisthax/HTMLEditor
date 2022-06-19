@@ -25,7 +25,7 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
     }
     
     func addNewPage() {
-        openDocuments.append(Page())
+        openDocuments.append(Page.fromTemporaryStorage())
     }
     
     func openPage(scene: UIWindowScene) {

@@ -3,6 +3,21 @@ import Foundation
 import Combine
 
 /**
+ * Who owns a given file.
+ */
+enum FileOwnership {
+    /**
+     * File is owned by the app.
+     */
+    case AppOwned;
+    
+    /**
+     * File is owned by the system and we are borrowing it.
+     */
+    case SecurityScoped;
+}
+
+/**
  * Viewmodel class for individual HTML files in a project.
  * 
  * Intended to be owned by a Project viewmodel. Also adopts NSFilePresenter
@@ -12,10 +27,12 @@ import Combine
  * View code should not create pages directly; views should ask their
  * associated Project to create a Page and then access it from there.
  */
-class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
+class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocumentPickerDelegate {
     var id: UUID;
     
     @Published var presentedItemURL: URL?;
+    
+    @Published var ownership: FileOwnership = .AppOwned;
     
     var filename: String {
         if let url = presentedItemURL {
@@ -56,6 +73,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     class func fromSecurityScopedUrl(url: URL) -> Page {
         let page = Page();
         page.presentedItemURL = url;
+        page.ownership = .SecurityScoped;
         
         let coordinator = NSFileCoordinator.init(filePresenter: page);
         
@@ -73,9 +91,20 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return page;
     }
     
+    class func fromTemporaryStorage() -> Page {
+        let name = UUID().uuidString + ".html";
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0];
+        
+        let page = Page();
+        page.presentedItemURL = url.appendingPathComponent(name);
+        page.ownership = .AppOwned;
+        
+        return page;
+    }
+    
     func presentedItemDidChange() {
         if let url = self.presentedItemURL {
-            if !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+            if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
                 //panic! at the disco
                 print("Cannot access URL")
             }
@@ -87,14 +116,16 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 print("Error reading URL")
             }
             
-            CFURLStopAccessingSecurityScopedResource(url as CFURL);
+            if self.ownership == .SecurityScoped {
+                CFURLStopAccessingSecurityScopedResource(url as CFURL);
+            }
         } else {
             print("No URL")
         }
     }
     
     private func doActualSave(url: URL, html: String) {
-        if !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+        if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
             //panic! at the disco
             print("Cannot access URL")
         }
@@ -108,6 +139,29 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             print("Error writing URL")
         }
         
-        CFURLStopAccessingSecurityScopedResource(url as CFURL);
+        if self.ownership == .SecurityScoped {
+            CFURLStopAccessingSecurityScopedResource(url as CFURL);
+        }
+    }
+    
+    func pickLocationForAppOwnedFile(scene: UIWindowScene) {
+        if let url = self.presentedItemURL {
+            self.doActualSave(url: url, html: self.html);
+            
+            let documentPicker = UIDocumentPickerViewController(forExporting: [url], asCopy: false);
+            
+            documentPicker.delegate = self;
+            
+            scene.keyWindow?.rootViewController?.present(documentPicker, animated: true);
+        }
+    }
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        self.presentedItemURL = urls[0];
+        self.ownership = .SecurityScoped;
+    }
+    
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        
     }
 }
