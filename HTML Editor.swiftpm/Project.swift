@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /**
  * An entire HTML Editor project containing multiple open editors.
@@ -17,6 +18,22 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
      */
     var projectDirectory: URL?;
     
+    /**
+     * The open project directory in FileLocation format.
+     */
+    var projectLocation: FileLocation {
+        get {
+            if let pd = projectDirectory {
+                return FileLocation(urls: [pd], contentTypes: [.folder]);
+            } else {
+                return FileLocation(contentTypes: [.folder]);
+            }
+        }
+        set {
+            projectDirectory = newValue.pickedUrls.first;
+        }
+    }
+    
     var lastSuccessCallback: (([URL]) -> Void)?;
     var lastCancelCallback: (() -> Void)?;
     
@@ -29,19 +46,19 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
     }
     
     func openPage(scene: UIWindowScene) {
-        openPage(scene: scene) { [self] urls in
+        pickDocument(scene: scene, types: [.html]) { [self] urls in
             for url in urls {
                 openDocuments.append(Page.fromSecurityScopedUrl(url: url))
             }
         }
     }
     
-    func openPage(scene: UIWindowScene, success: @escaping ([URL]) -> Void) {
-        openPage(scene: scene, success: success, cancel: nil);
+    private func pickDocument(scene: UIWindowScene, types: [UTType], success: @escaping ([URL]) -> Void) {
+        pickDocument(scene: scene, types: types, success: success, cancel: nil);
     }
     
-    func openPage(scene: UIWindowScene, success: @escaping ([URL]) -> Void, cancel: (() -> Void)?) {
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.html]);
+    private func pickDocument(scene: UIWindowScene, types: [UTType], success: @escaping ([URL]) -> Void, cancel: (() -> Void)?) {
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: types);
         
         documentPicker.delegate = self;
         

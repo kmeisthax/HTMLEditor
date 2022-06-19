@@ -5,6 +5,7 @@ struct ProjectEditor: View {
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     
     @State var viewOpenFiles: Bool = true;
+    @State var showSettings: Bool = false;
     
     var body: some View {
         NavigationView {
@@ -36,6 +37,11 @@ struct ProjectEditor: View {
                     } label: {
                         Image(systemName: "doc.badge.plus")
                     }
+                    Button {
+                        self.showSettings = true;
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
                 }
             }.navigationBarTitleDisplayMode(.inline)
             ZStack {
@@ -45,6 +51,9 @@ struct ProjectEditor: View {
                     Text("Please select a file.")
                 }
             }.navigationBarTitleDisplayMode(.inline)
+        }.sheet(isPresented: $showSettings) {
+            ProjectSettings(project: project, directory: project.projectLocation)
         }
     }
 }
+
