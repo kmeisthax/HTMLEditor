@@ -9,17 +9,21 @@ struct ProjectEditor: View {
     var body: some View {
         NavigationView {
             List {
-                Section("Open Files") {
-                    ForEach($project.openDocuments) { $doc in
-                        NavigationLink(destination: PageEditor(page: doc)
-                            .navigationTitle(doc.filename)
-                            .navigationBarTitleDisplayMode(.inline)) {
-                            Label(doc.filename, systemImage: "doc.richtext")
+                if project.openDocuments.count > 0 {
+                    Section("Open Files") {
+                        ForEach($project.openDocuments) { $doc in
+                            NavigationLink(destination: PageEditor(page: doc)
+                                .navigationTitle(doc.filename)
+                                .navigationBarTitleDisplayMode(.inline)) {
+                                Label(doc.filename, systemImage: "doc.richtext")
+                            }
                         }
                     }
                 }
-                Section("Project Files") {
-                    DirectoryListing(entries: $project.projectFiles)
+                if project.projectFiles.count > 0 {
+                    Section("Project Files") {
+                        DirectoryListing(entries: $project.projectFiles)
+                    }
                 }
             }.listStyle(SidebarListStyle()).toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
