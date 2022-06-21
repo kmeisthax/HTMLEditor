@@ -70,6 +70,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         }).store(in: &c);
     }
     
+    deinit {
+        NSFileCoordinator.removeFilePresenter(self);
+    }
+    
     class func fromSecurityScopedUrl(url: URL) -> Page {
         let page = Page();
         page.presentedItemURL = url;
@@ -83,6 +87,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
                 print (error);
             }
             
+            NSFileCoordinator.addFilePresenter(page);
+            
+            //We have to kick off the load ourselves, so let's just
+            //pretend to be a file coordinator and notify ourselves.
             page.presentedItemDidChange();
         };
         
@@ -99,6 +107,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         page.presentedItemURL = url.appendingPathComponent(name);
         page.ownership = .AppOwned;
         
+        //This is an app-owned file, so we don't need to coordinate
+        //as we created the file and it can't exist elsewhere
+        NSFileCoordinator.addFilePresenter(page);
+        
         return page;
     }
     
@@ -110,7 +122,14 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
             }
             
             do {
-                self.html = try String(contentsOf: url);
+                let new_html = try String(contentsOf: url);
+                
+                // We only update HTML if the file contents have actually
+                // changed. Otherwise, we can wind up in a loop of constantly
+                // updating SwiftUI and pinging ourselves about the file change
+                if new_html != html {
+                    html = new_html;
+                }
             } catch {
                 //panic?!
                 print("Error reading URL")
