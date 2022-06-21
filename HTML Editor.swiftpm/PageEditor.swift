@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PageEditor: View {
-    @Binding var page: Page
+    @ObservedObject var page: Page
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     
     var body: some View {

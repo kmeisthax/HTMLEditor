@@ -36,7 +36,7 @@ struct ProjectFileEntry: Hashable, Identifiable {
                     let elem = ProjectFileEntry(location: child, children: grandchildren);
                     files.append(elem);
                 } else if vals.isRegularFile! {
-                    files.append(ProjectFileEntry(location: child));
+                    files.append(ProjectFileEntry(location: child, contents: Page.fromSecurityScopedUrl(url: child)));
                 }
                 
                 //TODO: Do we even care about symlinks?

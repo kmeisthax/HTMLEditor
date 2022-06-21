@@ -11,7 +11,7 @@ struct ProjectEditor: View {
             List {
                 Section("Open Files") {
                     ForEach($project.openDocuments) { $doc in
-                        NavigationLink(destination: PageEditor(page: $doc)
+                        NavigationLink(destination: PageEditor(page: doc)
                             .navigationTitle(doc.filename)
                             .navigationBarTitleDisplayMode(.inline)) {
                             Text(doc.filename)
