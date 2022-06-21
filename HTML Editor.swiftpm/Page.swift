@@ -30,6 +30,12 @@ enum FileOwnership {
 class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocumentPickerDelegate {
     var id: UUID;
     
+    /**
+     * A scoped-storage URL that can be used to unlock the presented item
+     * for reading or writing.
+     */
+    var accessURL: URL?;
+    
     @Published var presentedItemURL: URL?;
     
     @Published var ownership: FileOwnership = .AppOwned;
@@ -74,8 +80,9 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         NSFileCoordinator.removeFilePresenter(self);
     }
     
-    class func fromSecurityScopedUrl(url: URL) -> Page {
+    class func fromSecurityScopedUrl(url: URL, accessURL: URL) -> Page {
         let page = Page();
+        page.accessURL = accessURL;
         page.presentedItemURL = url;
         page.ownership = .SecurityScoped;
         
@@ -93,8 +100,6 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
             //pretend to be a file coordinator and notify ourselves.
             page.presentedItemDidChange();
         };
-        
-        print("Opened");
         
         return page;
     }
@@ -116,7 +121,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
     
     func presentedItemDidChange() {
         if let url = self.presentedItemURL {
-            if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+            if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
                 //panic! at the disco
                 print("Cannot access URL")
             }
@@ -136,7 +141,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
             }
             
             if self.ownership == .SecurityScoped {
-                CFURLStopAccessingSecurityScopedResource(url as CFURL);
+                CFURLStopAccessingSecurityScopedResource(self.accessURL! as CFURL);
             }
         } else {
             print("No URL")
@@ -144,7 +149,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
     }
     
     private func doActualSave(url: URL, html: String) {
-        if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+        if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
             //panic! at the disco
             print("Cannot access URL")
         }
@@ -159,7 +164,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         }
         
         if self.ownership == .SecurityScoped {
-            CFURLStopAccessingSecurityScopedResource(url as CFURL);
+            CFURLStopAccessingSecurityScopedResource(self.accessURL! as CFURL);
         }
     }
     
@@ -176,6 +181,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        self.accessURL = urls[0];
         self.presentedItemURL = urls[0];
         self.ownership = .SecurityScoped;
     }

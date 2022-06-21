@@ -59,7 +59,7 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
     func openPage(scene: UIWindowScene) {
         pickDocument(scene: scene, types: [.html]) { [self] urls in
             for url in urls {
-                openDocuments.append(Page.fromSecurityScopedUrl(url: url))
+                openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url))
             }
         }
     }
