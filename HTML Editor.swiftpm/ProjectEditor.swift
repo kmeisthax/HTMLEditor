@@ -4,13 +4,12 @@ struct ProjectEditor: View {
     @ObservedObject var project: Project;
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     
-    @State var viewOpenFiles: Bool = true;
     @State var showSettings: Bool = false;
     
     var body: some View {
         NavigationView {
             List {
-                DisclosureGroup("Open Files", isExpanded: $viewOpenFiles) {
+                Section("Open Files") {
                     ForEach($project.openDocuments) { $doc in
                         NavigationLink(destination: PageEditor(page: $doc)
                             .navigationTitle(doc.filename)
@@ -18,6 +17,9 @@ struct ProjectEditor: View {
                             Text(doc.filename)
                         }
                     }
+                }
+                Section("Project Files") {
+                    DirectoryListing(entries: $project.projectFiles)
                 }
             }.listStyle(SidebarListStyle()).toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {

@@ -30,7 +30,7 @@ struct ProjectSettings: View {
                 }
                 ToolbarItemGroup(placement: .confirmationAction) {
                     Button("Save") {
-                        project.projectDirectory = directory.pickedUrls.first;
+                        project.projectLocation = directory;
                         
                         self.presentation.wrappedValue.dismiss()
                     }

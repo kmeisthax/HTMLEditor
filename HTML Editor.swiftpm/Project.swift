@@ -16,7 +16,7 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
     /**
      * The open project directory.
      */
-    var projectDirectory: URL?;
+    @Published var projectDirectory: URL?;
     
     /**
      * The open project directory in FileLocation format.
@@ -31,6 +31,17 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
         }
         set {
             projectDirectory = newValue.pickedUrls.first;
+            republishDirectoryContents();
+        }
+    }
+    
+    @Published var projectFiles: [ProjectFileEntry] = [];
+    
+    func republishDirectoryContents() {
+        if let url = projectDirectory {
+            projectFiles = ProjectFileEntry.fromDirectoryContents(at: url);
+        } else {
+            projectFiles = [];
         }
     }
     
