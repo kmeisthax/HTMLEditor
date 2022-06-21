@@ -14,7 +14,7 @@ struct ProjectEditor: View {
                         NavigationLink(destination: PageEditor(page: doc)
                             .navigationTitle(doc.filename)
                             .navigationBarTitleDisplayMode(.inline)) {
-                            Text(doc.filename)
+                            Label(doc.filename, systemImage: "doc.richtext")
                         }
                     }
                 }

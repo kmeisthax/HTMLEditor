@@ -9,10 +9,10 @@ struct DirectoryListing: View {
                 NavigationLink(destination: PageEditor(page: contents)                   
                     .navigationTitle(contents.filename)
                     .navigationBarTitleDisplayMode(.inline)) {
-                        Text(contents.filename)
+                        Label(contents.filename, systemImage: "doc.richtext")
                     }
             } else {
-                Text(entry.location.lastPathComponent)
+                Label(entry.location.lastPathComponent, systemImage: "folder")
             }
         }
     }
