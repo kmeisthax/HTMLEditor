@@ -71,6 +71,9 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
      */
     var htmlOnDisk: String? = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
     
+    /**
+     * Autosave event storage
+     */
     var c: [AnyCancellable] = [];
     
     override init() {
