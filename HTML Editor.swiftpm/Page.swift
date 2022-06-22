@@ -52,6 +52,14 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
     
     @Published var html: String = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
     
+    /**
+     * Flags if html was recently changed as the result of a file load or initialization.
+     * 
+     * This property defaults to true because $html had a habit of saving over files
+     * before we could coordinate loading them.
+     */
+    var justLoaded = true;
+    
     var c: [AnyCancellable] = [];
     
     override init() {
@@ -59,18 +67,22 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         
         super.init()
         
-        $html.sink(receiveValue: { [weak self] html in
+        $html.throttle(for: 1.0, scheduler: presentedItemOperationQueue, latest: true).sink(receiveValue: { [weak self] _ in
+            if self?.justLoaded == true {
+                self?.justLoaded = false;
+                return;
+            }
+            
             if let url = self?.presentedItemURL {
                 let coordinator = NSFileCoordinator.init(filePresenter: self);
+                let scheduled_html = self!.html;
                 
-                print(url);
-                
-                coordinator.coordinate(with: [.writingIntent(with: url)], queue: self!.presentedItemOperationQueue) { error in
+                coordinator.coordinate(with: [.writingIntent(with: url)], queue: self!.presentedItemOperationQueue) { [self] error in
                     if let error = error {
                         print (error);
                     }
                     
-                    self!.doActualSave(url: url, html: html);
+                    self!.doActualSave(url: url, html: scheduled_html);
                 }
             }
         }).store(in: &c);
@@ -133,6 +145,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
                 // changed. Otherwise, we can wind up in a loop of constantly
                 // updating SwiftUI and pinging ourselves about the file change
                 if new_html != html {
+                    justLoaded = true;
                     html = new_html;
                 }
             } catch {
