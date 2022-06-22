@@ -142,6 +142,32 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         return page;
     }
     
+    class func newFileInScopedStorage(withName: String, accessURL: URL) -> Page {
+        let untitledName = accessURL.appendingPathComponent(withName, conformingTo: .html)
+        
+        let page = Page();
+        page.accessURL = accessURL;
+        page.presentedItemURL = untitledName;
+        page.ownership = .SecurityScoped;
+        
+        let coordinator = NSFileCoordinator.init(filePresenter: page);
+        
+        coordinator.coordinate(with: [.writingIntent(with: untitledName)], queue: page.presentedItemOperationQueue) { error in
+            //TODO: Error handling.
+            if let error = error {
+                print (error);
+            }
+            
+            NSFileCoordinator.addFilePresenter(page);
+            
+            //We have to kick off the load ourselves, so let's just
+            //pretend to be a file coordinator and notify ourselves.
+            page.presentedItemDidChange();
+        };
+        
+        return page;
+    }
+    
     func presentedItemDidChange() {
         if let url = self.presentedItemURL {
             if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {

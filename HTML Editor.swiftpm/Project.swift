@@ -53,7 +53,12 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
     }
     
     func addNewPage() {
-        openDocuments.append(Page.fromTemporaryStorage())
+        if let url = projectDirectory {
+            let untitledPage = Page.newFileInScopedStorage(withName: "Untitled Page", accessURL: url);
+            projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, contents: untitledPage));
+        } else {
+            openDocuments.append(Page.fromTemporaryStorage())
+        }
     }
     
     func openPage(scene: UIWindowScene) {
