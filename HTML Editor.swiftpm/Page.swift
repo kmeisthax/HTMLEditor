@@ -198,6 +198,31 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         }
     }
     
+    func presentedItemDidMove(to newURL: URL) {
+        print("Moved!");
+        print(newURL);
+    }
+    
+    func presentedItemDidChangeUbiquityAttributes(_ attributes: Set<URLResourceKey>) {
+        print("iCloud did a thing!")
+        print(attributes);
+    }
+    
+    func accommodatePresentedItemDeletion(completionHandler: @escaping (Error?) -> Void) {
+        print("deleted");
+        completionHandler(nil);
+    }
+    
+    func relinquishPresentedItem(toReader reader: @escaping ((() -> Void)?) -> Void) {
+        print("begged to read");
+        reader(nil)
+    }
+    
+    func relinquishPresentedItem(toWriter writer: @escaping ((() -> Void)?) -> Void) {
+        print("begged to write");
+        writer(nil)
+    }
+    
     private func doActualSave(url: URL, html: String) {
         if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
             //panic! at the disco
