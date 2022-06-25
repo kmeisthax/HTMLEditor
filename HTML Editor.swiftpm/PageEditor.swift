@@ -18,6 +18,16 @@ struct PageEditor: View {
                     }
                 }
             }
+            ToolbarItemGroup(placement: .principal, content: {
+                VStack {
+                    Text(page.filename).fontWeight(.bold)
+                    if page.ownership == .AppOwned {
+                        Text("Temporary file")
+                            .foregroundColor(.secondary)
+                            .font(.footnote)
+                    }
+                }
+            })
         }
     }
 }
