@@ -6,7 +6,9 @@ import UniformTypeIdentifiers
  * 
  * There is a one-to-one correspondance between Projects and scenes in the app.
  */
-class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
+class Project : NSObject, UIDocumentPickerDelegate, ObservableObject, Identifiable {
+    var id: UUID;
+    
     /**
      * All the open documents in the project, including ones that are not
      * part of the project directory.
@@ -49,6 +51,7 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject {
     var lastCancelCallback: (() -> Void)?;
     
     override init() {
+        id = UUID.init()
         self.openDocuments = []
     }
     

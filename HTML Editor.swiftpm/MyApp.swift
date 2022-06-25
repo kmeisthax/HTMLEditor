@@ -6,7 +6,7 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ProjectEditor(project: Project())
+            ShoeboxSelector(shoebox: Shoebox())
         }
     }
 }

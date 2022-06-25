@@ -6,6 +6,8 @@ struct ProjectEditor: View {
     
     @State var showSettings: Bool = false;
     
+    var goBack: (() -> Void)?;
+    
     var body: some View {
         NavigationView {
             List {
@@ -26,6 +28,15 @@ struct ProjectEditor: View {
                     }
                 }
             }.listStyle(SidebarListStyle()).toolbar {
+                ToolbarItemGroup(placement: .cancellationAction) {
+                    if let gb = goBack {
+                        Button {
+                            gb()
+                        } label: {
+                            Label("Back", systemImage: "xmark")
+                        }
+                    }
+                }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Menu {
                         Button {
@@ -57,7 +68,7 @@ struct ProjectEditor: View {
                     Text("Please select a file.")
                 }
             }.navigationBarTitleDisplayMode(.inline)
-        }.sheet(isPresented: $showSettings) {
+        }.navigationViewStyle(.columns).sheet(isPresented: $showSettings) {
             ProjectSettings(project: project, directory: project.projectLocation)
         }
     }
