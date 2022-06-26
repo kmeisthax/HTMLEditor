@@ -24,9 +24,18 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
      */
     var label: () -> LabelContent;
     
+    /**
+     * Action for when the link is clicked.
+     * 
+     * If specified, the button action will replace the default link functionality.
+     * The callback will be able to determine if the link should open or not by
+     * returning true or false.
+     */
+    var onAction: () -> Bool = { true };
+    
     var body: some View {
         Button {
-            isPresented = true;
+            isPresented = onAction();
         } label: {
             label()
         }.fullScreenCover(isPresented: $isPresented, onDismiss: {
