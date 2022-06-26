@@ -48,6 +48,36 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         }
     };
     
+    var path: String? {
+        if let self_components = presentedItemURL?.pathComponents {
+            if let access_components = accessURL?.pathComponents {
+                print(self_components)
+                print(access_components)
+                
+                var lastCommonComponent = 0;
+                
+                for (self_i, self_component) in self_components.enumerated() {
+                    if self_i < access_components.count {
+                        if self_component == access_components[self_i] {
+                            lastCommonComponent = self_i;
+                        }
+                    }
+                }
+                
+                var common_components = self_components.suffix(from: lastCommonComponent);
+                
+                common_components.removeFirst();
+                common_components.removeLast();
+                
+                if common_components.count > 0 {
+                    return common_components.joined(separator: "/");
+                }
+            }
+        }
+        
+        return nil;
+    }
+    
     lazy var presentedItemOperationQueue: OperationQueue = OperationQueue.main;
     
     /**

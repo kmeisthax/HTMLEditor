@@ -25,6 +25,10 @@ struct PageEditor: View {
                         Text("Temporary file")
                             .foregroundColor(.secondary)
                             .font(.footnote)
+                    } else if let path = page.path {
+                        Text(path)
+                            .foregroundColor(.secondary)
+                            .font(.footnote)
                     }
                 }
             })
