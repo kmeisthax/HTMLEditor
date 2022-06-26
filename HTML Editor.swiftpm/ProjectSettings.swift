@@ -7,6 +7,8 @@ struct ProjectSettings: View {
     @ObservedObject var project: Project;
     @StateObject var directory: FileLocation;
     
+    var onSave: (() -> Void)?;
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -31,6 +33,10 @@ struct ProjectSettings: View {
                 ToolbarItemGroup(placement: .confirmationAction) {
                     Button("Save") {
                         project.projectLocation = directory;
+                        
+                        if let onSave = onSave {
+                            onSave();
+                        }
                         
                         self.presentation.wrappedValue.dismiss()
                     }
