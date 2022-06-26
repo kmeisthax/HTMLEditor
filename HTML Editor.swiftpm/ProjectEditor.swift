@@ -23,7 +23,7 @@ struct ProjectEditor: View {
                     }
                 }
                 if project.projectFiles.count > 0 {
-                    Section("Project Files") {
+                    Section(project.projectName) {
                         DirectoryListing(entries: $project.projectFiles)
                     }
                 }
@@ -60,7 +60,8 @@ struct ProjectEditor: View {
                         Image(systemName: "gearshape")
                     }
                 }
-            }.navigationBarTitleDisplayMode(.inline)
+            }
+            .navigationBarTitleDisplayMode(.inline)
             ZStack {
                 Color(UIColor.secondarySystemBackground)
                 VStack {

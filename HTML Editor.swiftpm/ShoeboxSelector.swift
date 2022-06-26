@@ -13,15 +13,10 @@ struct ShoeboxSelector: View {
                 ForEach($shoebox.projects) { $project in
                     FullscreenLink { goBack in
                         return ProjectEditor(project: project, goBack: goBack);
-                    } label: { () -> Text in 
-                        var text = "Project Name Here";
-                        
-                        if project.projectDirectory != nil {
-                            text = project.projectLocation.displayName
+                    } label: { () -> Text in
+                        return Text(project.projectName);
                         }
                         
-                        return Text(text);
-                    }
                 }
             }
             .toolbar {

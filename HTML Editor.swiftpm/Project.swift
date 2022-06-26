@@ -37,6 +37,16 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject, Identifiab
         }
     }
     
+    var projectName: String {
+        var text = "Untitled Project";
+        
+        if self.projectDirectory != nil {
+            text = self.projectLocation.displayName
+        }
+        
+        return text;
+    }
+    
     @Published var projectFiles: [ProjectFileEntry] = [];
     
     func republishDirectoryContents() {
