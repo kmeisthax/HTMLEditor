@@ -4,9 +4,11 @@ import SwiftUI
 struct MyApp: App {
     @UIApplicationDelegateAdaptor(OldschoolAppDelegate.self) var appDelegate;
     
+    @StateObject var shoebox: Shoebox = Shoebox();
+    
     var body: some Scene {
         WindowGroup {
-            ShoeboxSelector(shoebox: Shoebox())
+            ShoeboxSelector(shoebox: shoebox)
         }
     }
 }
