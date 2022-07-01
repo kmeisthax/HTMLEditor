@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import Combine
 
 /**
  * An entire HTML Editor project containing multiple open editors.
@@ -60,9 +61,80 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject, Identifiab
     var lastSuccessCallback: (([URL]) -> Void)?;
     var lastCancelCallback: (() -> Void)?;
     
+    weak var shoebox: Shoebox?;
+    
+    private var c: [AnyCancellable] = [];
+    
     override init() {
         id = UUID.init()
         self.openDocuments = []
+        
+        super.init();
+        
+        $openDocuments.sink(receiveValue: { [weak self] _ in
+            if let self = self {
+                for openDocument in self.openDocuments {
+                    openDocument.shoebox = self.shoebox;
+                }
+            }
+            
+            self?.shoebox?.nestedStateDidChange()
+        }).store(in: &c);
+        
+        $projectDirectory.sink(receiveValue: { [weak self] _ in
+            self?.shoebox?.nestedStateDidChange()
+        }).store(in: &c);
+        
+        //NOTE: We intentionally do not hook projectDocuments as that state
+        //is derived from the filesystem and not persisted in shoebox.json
+    }
+    
+    func intoState() -> ProjectState {
+        var projectBookmark: Data? = nil;
+        
+        if let url = projectDirectory {
+            do {
+                projectBookmark = try url.bookmarkData();
+            } catch {
+                print("Bookmark lost!");
+            }
+        }
+        
+        var openFiles: [PageState] = [];
+        
+        for page in openDocuments {
+            do {
+                openFiles.append(try page.intoState());
+            } catch {
+                print("Page could not be saved")
+            }
+        }
+        
+        return ProjectState(projectBookmark: projectBookmark, openFiles: openFiles);
+    }
+    
+    class func fromState(state: ProjectState) -> Project {
+        var isStale = false; //todo: error handling for stale projects
+        var projectDirectory: URL? = nil;
+        if let bookmark = state.projectBookmark {
+            do {
+                projectDirectory = try URL(resolvingBookmarkData: bookmark, options: .init(), relativeTo: nil, bookmarkDataIsStale: &isStale);
+            } catch {
+                print("cant hydrate bookmark into access url");
+            }
+        }
+        
+        var openDocuments: [Page] = [];
+        for pageState in state.openFiles {
+            openDocuments.append(Page.fromState(state: pageState));
+        }
+        
+        let project = Project();
+        
+        project.projectDirectory = projectDirectory;
+        project.openDocuments = openDocuments;
+        
+        return project;
     }
     
     func addNewPage() {

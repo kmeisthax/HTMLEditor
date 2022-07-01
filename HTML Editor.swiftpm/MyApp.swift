@@ -4,7 +4,7 @@ import SwiftUI
 struct MyApp: App {
     @UIApplicationDelegateAdaptor(OldschoolAppDelegate.self) var appDelegate;
     
-    @StateObject var shoebox: Shoebox = Shoebox();
+    @StateObject var shoebox: Shoebox = Shoebox.fromState(state: ShoeboxState.restoreFromDisk());
     
     var body: some Scene {
         WindowGroup {

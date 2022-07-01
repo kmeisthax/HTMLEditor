@@ -5,7 +5,7 @@ import Combine
 /**
  * Who owns a given file.
  */
-enum FileOwnership {
+enum FileOwnership: Codable {
     /**
      * File is owned by the app.
      */
@@ -51,9 +51,6 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
     var path: String? {
         if let self_components = presentedItemURL?.pathComponents {
             if let access_components = accessURL?.pathComponents {
-                print(self_components)
-                print(access_components)
-                
                 var lastCommonComponent = 0;
                 
                 for (self_i, self_component) in self_components.enumerated() {
@@ -106,6 +103,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
      */
     var c: [AnyCancellable] = [];
     
+    weak var shoebox: Shoebox?;
+    
     override init() {
         id = UUID.init()
         
@@ -126,6 +125,14 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
                     }
                 }
             }
+        }).store(in: &c);
+        
+        $ownership.sink(receiveValue: { [weak self] _ in
+            self?.shoebox?.nestedStateDidChange()
+        }).store(in: &c);
+        
+        $presentedItemURL.sink(receiveValue: { [weak self] _ in
+            self?.shoebox?.nestedStateDidChange()
         }).store(in: &c);
     }
     
@@ -194,6 +201,43 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
             //pretend to be a file coordinator and notify ourselves.
             page.presentedItemDidChange();
         };
+        
+        return page;
+    }
+    
+    func intoState() throws -> PageState {
+        return PageState(ownership: self.ownership,
+                         accessBookmark: try self.accessURL?.bookmarkData(),
+                         locationBookmark: try self.presentedItemURL!.bookmarkData())
+    }
+    
+    class func fromState(state: PageState) -> Page {
+        let ownership = state.ownership;
+        var accessUrl: URL? = nil;
+        var fileUrl: URL? = nil;
+        
+        var isAccessUrlStale = false; //TODO: error handling for stale URLs
+        var isFileUrlStale = false;
+        
+        if let accessBookmark = state.accessBookmark {
+            do {
+                accessUrl = try URL.init(resolvingBookmarkData: accessBookmark, bookmarkDataIsStale: &isAccessUrlStale);
+            } catch {
+                print("Access bookmark invalid");
+            }
+        }
+        
+        do {
+            fileUrl = try URL.init(resolvingBookmarkData: state.locationBookmark, bookmarkDataIsStale: &isFileUrlStale);
+        } catch {
+            print("Location bookmark invalid");
+        }
+        
+        let page = Page();
+        
+        page.ownership = ownership;
+        page.accessURL = accessUrl;
+        page.presentedItemURL = fileUrl;
         
         return page;
     }
