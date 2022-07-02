@@ -117,7 +117,7 @@ class Project : NSObject, ObservableObject, Identifiable {
         var projectDirectory: URL? = nil;
         if let bookmark = state.projectBookmark {
             do {
-                projectDirectory = try URL(resolvingBookmarkData: bookmark, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale);
+                projectDirectory = try URL(resolvingBookmarkData: bookmark, options: .init(), relativeTo: nil, bookmarkDataIsStale: &isStale);
             } catch {
                 print("cant hydrate bookmark into access url");
             }

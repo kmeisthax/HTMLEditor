@@ -233,7 +233,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         
         if let accessBookmark = state.accessBookmark {
             do {
-                accessUrl = try URL.init(resolvingBookmarkData: accessBookmark, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isAccessUrlStale);
+                accessUrl = try URL.init(resolvingBookmarkData: accessBookmark, options: .init(), relativeTo: nil, bookmarkDataIsStale: &isAccessUrlStale);
             } catch {
                 print("Access bookmark invalid");
             }
