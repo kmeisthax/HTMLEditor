@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ShoeboxSelector: View {
-    var items: [GridItem] = Array(repeating: .init(.flexible(minimum: 50, maximum: 100), spacing: 15, alignment: .center), count: 5);
+    var items: [GridItem] = Array(repeating: .init(.adaptive(minimum: 225, maximum: 375), spacing: 20, alignment: .top), count: 1);
     
     @ObservedObject var shoebox: Shoebox;
     
@@ -12,26 +12,44 @@ struct ShoeboxSelector: View {
     
     var body: some View {
         NavigationView {
-            LazyVGrid(columns: items) {
-                ForEach($shoebox.projects) { $project in
-                    let isSelected = projectSelection.contains(project);
-                    
-                    FullscreenLink { goBack in
-                        return ProjectEditor(project: project, goBack: goBack);
-                    } label: { () -> Text in
-                        return Text(project.projectName);
-                    } onAction: {
-                        if editMode {
-                            if projectSelection.contains(project) {
-                                projectSelection.remove(project)
-                            } else {
-                                projectSelection.insert(project)
-                            }
-                        }
+            ScrollView(.vertical) {
+                LazyVGrid(columns: items) {
+                    ForEach($shoebox.projects) { $project in
+                        let isSelected = projectSelection.contains(project);
                         
-                        return !editMode;
-                    }.background(isSelected ? Color.accentColor : Color.clear)
-                }
+                        FullscreenLink { goBack in
+                            return ProjectEditor(project: project, goBack: goBack);
+                        } label: {
+                            return VStack {
+                                    Spacer()
+                                    Text(project.projectName)
+                                        .foregroundColor(.primary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(5)
+                                        .background(Color(UIColor.systemBackground))
+                                        .cornerRadius(10, corners: [.bottomLeft, .bottomRight])
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 200)
+                                .background(.tertiary)
+                                .cornerRadius(10)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(.primary, lineWidth: 1)
+                                )
+                                .padding(.vertical, 10);
+                        } onAction: {
+                            if editMode {
+                                if projectSelection.contains(project) {
+                                    projectSelection.remove(project)
+                                } else {
+                                    projectSelection.insert(project)
+                                }
+                            }
+                            
+                            return !editMode;
+                        }.background(isSelected ? Color.accentColor : Color.clear)
+                    }
+                }.padding(.horizontal, 20)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -60,7 +78,7 @@ struct ShoeboxSelector: View {
                         }
                     }
                 }
-            }
+            }.navigationBarTitleDisplayMode(.inline)
         }
         .navigationViewStyle(.stack)
         .sheet(item: $newProject) { project in
