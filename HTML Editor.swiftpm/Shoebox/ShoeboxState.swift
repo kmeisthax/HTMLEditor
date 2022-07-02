@@ -27,7 +27,7 @@ struct ShoeboxState : Codable {
     static func restoreFromDisk() -> Self {
         let coder = JSONDecoder();
         do {
-            var state = try coder.decode(Self.self, from: Data.init(contentsOf: Self.shoeboxFileLoc));
+            let state = try coder.decode(Self.self, from: Data.init(contentsOf: Self.shoeboxFileLoc));
             
             return state;
         } catch {
