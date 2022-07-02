@@ -250,8 +250,27 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         page.ownership = ownership;
         page.accessURL = accessUrl;
         page.presentedItemURL = fileUrl;
+        page.triggerFileLoad();
         
         return page;
+    }
+    
+    /**
+     * Trigger a file load using coordinated access.
+     */
+    func triggerFileLoad() {
+        let coordinator = NSFileCoordinator.init(filePresenter: self);
+        
+        if let url = self.presentedItemURL {
+            coordinator.coordinate(with: [.readingIntent(with: url)], queue: self.presentedItemOperationQueue) { error in
+                //TODO: Error handling.
+                if let error = error {
+                    print (error);
+                }
+                
+                self.presentedItemDidChange();
+            };
+        }
     }
     
     func presentedItemDidChange() {
