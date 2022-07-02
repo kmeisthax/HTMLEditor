@@ -1,5 +1,6 @@
 import SwiftUI
 
+#if os(iOS)
 /**
  * View extension for specific rounded corners.
  * 
@@ -21,3 +22,4 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
+#endif

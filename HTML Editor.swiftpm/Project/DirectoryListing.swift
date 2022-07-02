@@ -8,7 +8,10 @@ struct DirectoryListing: View {
             if let contents = entry.contents {
                 NavigationLink(destination: PageEditor(page: contents)                   
                     .navigationTitle(contents.filename)
-                    .navigationBarTitleDisplayMode(.inline)) {
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    ) {
                         Label(contents.filename, systemImage: "doc.richtext")
                     }
             } else {

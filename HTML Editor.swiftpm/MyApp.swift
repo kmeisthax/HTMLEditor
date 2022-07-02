@@ -2,9 +2,11 @@ import SwiftUI
 
 @main
 struct MyApp: App {
-    @UIApplicationDelegateAdaptor(OldschoolAppDelegate.self) var appDelegate;
-    
     @StateObject var shoebox: Shoebox = Shoebox.fromState(state: ShoeboxState.restoreFromDisk());
+    
+    #if os(iOS)
+    @UIApplicationDelegateAdaptor(OldschoolAppDelegate.self) var appDelegate;
+    #endif
     
     var body: some Scene {
         WindowGroup {
@@ -13,6 +15,7 @@ struct MyApp: App {
     }
 }
 
+#if os(iOS)
 class OldschoolAppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role);
@@ -31,3 +34,4 @@ class OldschoolSceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject 
         self.scene = windowScene
     }
 }
+#endif

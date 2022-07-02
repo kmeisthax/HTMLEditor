@@ -34,6 +34,7 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
     var onAction: () -> Bool = { true };
     
     var body: some View {
+        #if os(iOS)
         Button {
             isPresented = onAction();
         } label: {
@@ -45,5 +46,18 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
                 isPresented = false;
             })
         }
+        #elseif (macOS)
+        Button {
+            isPresented = onAction();
+        } label: {
+            label()
+        }.sheet(isPresented: $isPresented, onDismiss: {
+            isPresented = false;
+        }) {
+            content({
+                isPresented = false;
+            })
+        }
+        #endif
     }
 }

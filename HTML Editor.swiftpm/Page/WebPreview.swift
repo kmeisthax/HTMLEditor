@@ -1,13 +1,16 @@
 import SwiftUI
 import WebKit
 
-struct WebPreview: UIViewRepresentable {
+struct WebPreview {
     @Binding var html: String;
     
     func makeCoordinator() -> WebPreviewCoordinator {
         WebPreviewCoordinator(owner: self, html: self.html)
     }
-    
+}
+
+#if os(iOS)
+extension WebPreview: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration();
         
@@ -35,6 +38,36 @@ struct WebPreview: UIViewRepresentable {
         }
     }
 }
+#endif
+
+#if os(macOS)
+extension WebPreview: NSViewRepresentable {
+    func makeNSView(context: Context) -> WKWebView {
+        let config = WKWebViewConfiguration();
+        
+        let myWorld = WKContentWorld.world(name: "PrivateWorld");
+        
+        do {
+            let jsurl = Bundle.main.url(forResource: "content", withExtension: "js")!;
+            let js = try String.init(contentsOf: jsurl);
+        
+            config.userContentController = WKUserContentController();
+            config.userContentController.addUserScript(WKUserScript(source: js, injectionTime: WKUserScriptInjectionTime.atDocumentStart, forMainFrameOnly: true, in: myWorld));
+            config.userContentController.add(context.coordinator, contentWorld: myWorld, name: "wysiwygChanged");
+        } catch {
+            print("what;")
+        }
+        
+        return WKWebView(frame: .zero, configuration: config);
+    }
+    
+    func updateNSView(_ webView: WKWebView, context: Context) {
+        if html != context.coordinator.htmlInSafari {
+            webView.loadHTMLString(html, baseURL: nil);
+        }
+    }
+}
+#endif
 
 class WebPreviewCoordinator : NSObject, WKScriptMessageHandler {
     var owner: WebPreview;

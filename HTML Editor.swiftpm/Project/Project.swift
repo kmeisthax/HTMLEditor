@@ -155,7 +155,10 @@ class Project : NSObject, ObservableObject, Identifiable {
     
     private var picker_c: [AnyCancellable] = [];
     private var pagePickerLocation: FileLocation?;
-    
+}
+
+#if os(iOS)
+extension Project {
     /**
      * Open an individual page separate from any project ownership.
      */
@@ -178,3 +181,4 @@ class Project : NSObject, ObservableObject, Identifiable {
         location.pick(scene: scene);
     }
 }
+#endif

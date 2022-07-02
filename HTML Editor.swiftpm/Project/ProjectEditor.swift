@@ -2,7 +2,10 @@ import SwiftUI
 
 struct ProjectEditor: View {
     @ObservedObject var project: Project;
+    
+    #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
+    #endif
     
     @State var showSettings: Bool = false;
     
@@ -16,7 +19,10 @@ struct ProjectEditor: View {
                         ForEach($project.openDocuments) { $doc in
                             NavigationLink(destination: PageEditor(page: doc)
                                 .navigationTitle(doc.filename)
-                                .navigationBarTitleDisplayMode(.inline)) {
+                                #if os(iOS)
+                                .navigationBarTitleDisplayMode(.inline)
+                                #endif
+                            ) {
                                 Label(doc.filename, systemImage: "doc.richtext")
                             }
                         }
@@ -28,6 +34,11 @@ struct ProjectEditor: View {
                     }
                 }
             }.listStyle(SidebarListStyle()).toolbar {
+                #if os(iOS)
+                let primaryPlacement = ToolbarItemPlacement.navigationBarTrailing;
+                #else
+                let primaryPlacement = ToolbarItemPlacement.primaryAction;
+                #endif
                 ToolbarItemGroup(placement: .cancellationAction) {
                     if let gb = goBack {
                         Button {
@@ -37,7 +48,7 @@ struct ProjectEditor: View {
                         }
                     }
                 }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: primaryPlacement) {
                     Menu {
                         Button {
                             project.addNewPage()
@@ -46,7 +57,9 @@ struct ProjectEditor: View {
                             Image(systemName: "doc.badge.plus")
                         }
                         Button {
+                            #if os(iOS)
                             project.openPage(scene: sceneDelegate.scene!);
+                            #endif
                         } label: {
                             Text("Open file...")
                             Image(systemName: "doc.text")
@@ -61,14 +74,21 @@ struct ProjectEditor: View {
                     }
                 }
             }
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             ZStack {
+                #if os(iOS)
                 Color(UIColor.secondarySystemBackground)
+                #endif
                 VStack {
                     Image(systemName: "questionmark.folder").font(.system(size: 180, weight: .medium))
                     Text("Please select a file.")
                 }
-            }.navigationBarTitleDisplayMode(.inline)
+            }
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
         }.navigationViewStyle(.columns).sheet(isPresented: $showSettings) {
             ProjectSettings(project: project, directory: project.projectLocation)
         }

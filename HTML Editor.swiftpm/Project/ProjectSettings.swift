@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct ProjectSettings: View {
+    #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
+    #endif
+    
     @Environment(\.presentationMode) var presentation;
     
     @ObservedObject var project: Project;
@@ -18,7 +21,9 @@ struct ProjectSettings: View {
                             Text(directory.displayName)
                         }
                         Button(role: .destructive) {
+                            #if os(iOS)
                             directory.pick(scene: self.sceneDelegate.scene!)
+                            #endif
                         } label: {
                             Text("Link new directory")
                         }
@@ -42,7 +47,9 @@ struct ProjectSettings: View {
                     }
                 }
             }.navigationTitle("Project Settings")
-                .navigationBarTitleDisplayMode(.inline)
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
         }
     }
 }

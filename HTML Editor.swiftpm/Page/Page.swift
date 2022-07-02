@@ -27,7 +27,7 @@ enum FileOwnership: Codable {
  * View code should not create pages directly; views should ask their
  * associated Project to create a Page and then access it from there.
  */
-class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocumentPickerDelegate {
+class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     var id: UUID;
     
     /**
@@ -348,7 +348,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
             CFURLStopAccessingSecurityScopedResource(self.accessURL! as CFURL);
         }
     }
-    
+}
+
+#if os(iOS)
+extension Page: UIDocumentPickerDelegate {
     func pickLocationForAppOwnedFile(scene: UIWindowScene) {
         if let url = self.presentedItemURL {
             self.doActualSave(url: url, html: self.html);
@@ -371,3 +374,4 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         
     }
 }
+#endif

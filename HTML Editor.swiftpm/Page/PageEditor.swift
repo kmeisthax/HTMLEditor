@@ -2,7 +2,10 @@ import SwiftUI
 
 struct PageEditor: View {
     @ObservedObject var page: Page
+    
+    #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
+    #endif
     
     var body: some View {
         HStack {
@@ -12,7 +15,9 @@ struct PageEditor: View {
             ToolbarItemGroup(placement: .navigation) {
                 if page.ownership == .AppOwned {
                     Button {
+                        #if os(iOS)
                         page.pickLocationForAppOwnedFile(scene: sceneDelegate.scene!);
+                        #endif
                     } label: {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
                     }

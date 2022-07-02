@@ -26,8 +26,10 @@ struct ShoeboxSelector: View {
                                         .foregroundColor(.primary)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(5)
+                                        #if os(iOS)
                                         .background(Color(UIColor.systemBackground))
                                         .cornerRadius(10, corners: [.bottomLeft, .bottomRight])
+                                        #endif
                                 }
                                 .frame(maxWidth: .infinity, minHeight: 200)
                                 .background(.tertiary)
@@ -52,7 +54,12 @@ struct ShoeboxSelector: View {
                 }.padding(.horizontal, 20)
             }
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
+                #if os(iOS)
+                var createPlacement = ToolbarItemPlacement.navigationBarLeading;
+                #elseif os(macOS)
+                var createPlacement = ToolbarItemPlacement.cancellationAction;
+                #endif
+                ToolbarItemGroup(placement: createPlacement) {
                     if editMode {
                     } else {
                         Button {
@@ -78,9 +85,14 @@ struct ShoeboxSelector: View {
                         }
                     }
                 }
-            }.navigationBarTitleDisplayMode(.inline)
+            }
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
         }
+        #if os(iOS)
         .navigationViewStyle(.stack)
+        #endif
         .sheet(item: $newProject) { project in
             ProjectSettings(project: project, directory: project.projectLocation, onSave: {
                 shoebox.projects.append(newProject!);

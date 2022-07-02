@@ -4,7 +4,7 @@ import UniformTypeIdentifiers;
 /**
  * A location that can be changed by the user.
  */
-class FileLocation: NSObject, UIDocumentPickerDelegate, ObservableObject {
+class FileLocation: NSObject, ObservableObject {
     @Published var pickedUrls: [URL];
     
     var allowedContentTypes: [UTType];
@@ -26,7 +26,10 @@ class FileLocation: NSObject, UIDocumentPickerDelegate, ObservableObject {
         self.pickedUrls = urls;
         self.allowedContentTypes = contentTypes;
     }
-    
+}
+
+#if os(iOS)
+extension FileLocation: UIDocumentPickerDelegate {
     /**
      * Open a document picker to change the location.
      */
@@ -52,3 +55,4 @@ class FileLocation: NSObject, UIDocumentPickerDelegate, ObservableObject {
         
     }
 }
+#endif
