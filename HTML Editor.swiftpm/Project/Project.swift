@@ -7,7 +7,7 @@ import Combine
  * 
  * There is a one-to-one correspondance between Projects and scenes in the app.
  */
-class Project : NSObject, UIDocumentPickerDelegate, ObservableObject, Identifiable {
+class Project : NSObject, ObservableObject, Identifiable {
     var id: UUID;
     
     /**
@@ -57,9 +57,6 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject, Identifiab
             projectFiles = [];
         }
     }
-    
-    var lastSuccessCallback: (([URL]) -> Void)?;
-    var lastCancelCallback: (() -> Void)?;
     
     weak var shoebox: Shoebox?;
     
@@ -137,6 +134,12 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject, Identifiab
         return project;
     }
     
+    /**
+     * Add a new page to the project.
+     * 
+     * If this project is not linked to a directory yet, we create a page in
+     * temporary storage that is owned by the app.
+     */
     func addNewPage() {
         if let url = projectDirectory {
             let untitledPage = Page.newFileInScopedStorage(withName: "Untitled Page", accessURL: url);
@@ -146,44 +149,28 @@ class Project : NSObject, UIDocumentPickerDelegate, ObservableObject, Identifiab
         }
     }
     
+    private var picker_c: [AnyCancellable] = [];
+    private var pagePickerLocation: FileLocation?;
+    
+    /**
+     * Open an individual page separate from any project ownership.
+     */
     func openPage(scene: UIWindowScene) {
-        pickDocument(scene: scene, types: [.html]) { [self] urls in
-            for url in urls {
-                openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url))
+        let location = FileLocation(contentTypes: [.html]);
+        
+        location.$pickedUrls.sink(receiveValue: { [weak self] urls in
+            if let self = self {
+                for url in urls {
+                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url))
+                }
+                
+                // Cancel ourselves now that location picking is done
+                self.picker_c = [];
+                self.pagePickerLocation = nil;
             }
-        }
-    }
-    
-    private func pickDocument(scene: UIWindowScene, types: [UTType], success: @escaping ([URL]) -> Void) {
-        pickDocument(scene: scene, types: types, success: success, cancel: nil);
-    }
-    
-    private func pickDocument(scene: UIWindowScene, types: [UTType], success: @escaping ([URL]) -> Void, cancel: (() -> Void)?) {
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: types);
+        }).store(in: &picker_c);
         
-        documentPicker.delegate = self;
-        
-        self.lastSuccessCallback = success;
-        self.lastCancelCallback = cancel;
-        
-        scene.keyWindow?.rootViewController?.present(documentPicker, animated: true);
-    }
-    
-    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        if let success = lastSuccessCallback {
-            success(urls)
-        }
-        
-        lastSuccessCallback = nil;
-        lastCancelCallback = nil;
-    }
-    
-    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-        if let cancel = lastCancelCallback {
-            cancel()
-        }
-        
-        lastSuccessCallback = nil;
-        lastCancelCallback = nil;
+        pagePickerLocation = location;
+        location.pick(scene: scene);
     }
 }
