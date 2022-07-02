@@ -129,11 +129,11 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
             }
         }).store(in: &c);
         
-        $ownership.sink(receiveValue: { [weak self] _ in
+        $ownership.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             self?.shoebox?.nestedStateDidChange()
         }).store(in: &c);
         
-        $presentedItemURL.sink(receiveValue: { [weak self] _ in
+        $presentedItemURL.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             self?.shoebox?.nestedStateDidChange()
         }).store(in: &c);
     }
@@ -208,9 +208,19 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
     }
     
     func intoState() throws -> PageState {
-        return PageState(ownership: self.ownership,
+        if self.ownership == .SecurityScoped, let accessURL = self.accessURL {
+            CFURLStartAccessingSecurityScopedResource(accessURL as CFURL);
+        }
+        
+        let state = PageState(ownership: self.ownership,
                          accessBookmark: try self.accessURL?.bookmarkData(),
                          locationBookmark: try self.presentedItemURL!.bookmarkData())
+        
+        if self.ownership == .SecurityScoped, let accessURL = self.accessURL {
+            CFURLStopAccessingSecurityScopedResource(accessURL as CFURL);
+        }
+        
+        return state;
     }
     
     class func fromState(state: PageState) -> Page {
@@ -223,7 +233,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter, UIDocume
         
         if let accessBookmark = state.accessBookmark {
             do {
-                accessUrl = try URL.init(resolvingBookmarkData: accessBookmark, bookmarkDataIsStale: &isAccessUrlStale);
+                accessUrl = try URL.init(resolvingBookmarkData: accessBookmark, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isAccessUrlStale);
             } catch {
                 print("Access bookmark invalid");
             }

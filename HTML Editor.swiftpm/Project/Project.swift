@@ -68,7 +68,7 @@ class Project : NSObject, ObservableObject, Identifiable {
         
         super.init();
         
-        $openDocuments.sink(receiveValue: { [weak self] _ in
+        $openDocuments.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             if let self = self {
                 for openDocument in self.openDocuments {
                     openDocument.shoebox = self.shoebox;
@@ -78,7 +78,7 @@ class Project : NSObject, ObservableObject, Identifiable {
             self?.shoebox?.nestedStateDidChange()
         }).store(in: &c);
         
-        $projectDirectory.sink(receiveValue: { [weak self] _ in
+        $projectDirectory.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             self?.shoebox?.nestedStateDidChange()
         }).store(in: &c);
         
@@ -91,9 +91,11 @@ class Project : NSObject, ObservableObject, Identifiable {
         
         if let url = projectDirectory {
             do {
+                CFURLStartAccessingSecurityScopedResource(url as CFURL);
                 projectBookmark = try url.bookmarkData();
+                CFURLStopAccessingSecurityScopedResource(url as CFURL);
             } catch {
-                print("Bookmark lost!");
+                print("Bookmark lost due to \(error)");
             }
         }
         
@@ -103,7 +105,7 @@ class Project : NSObject, ObservableObject, Identifiable {
             do {
                 openFiles.append(try page.intoState());
             } catch {
-                print("Page could not be saved")
+                print("Page could not be saved due to \(error)")
             }
         }
         
@@ -115,7 +117,7 @@ class Project : NSObject, ObservableObject, Identifiable {
         var projectDirectory: URL? = nil;
         if let bookmark = state.projectBookmark {
             do {
-                projectDirectory = try URL(resolvingBookmarkData: bookmark, options: .init(), relativeTo: nil, bookmarkDataIsStale: &isStale);
+                projectDirectory = try URL(resolvingBookmarkData: bookmark, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale);
             } catch {
                 print("cant hydrate bookmark into access url");
             }
@@ -130,6 +132,8 @@ class Project : NSObject, ObservableObject, Identifiable {
         
         project.projectDirectory = projectDirectory;
         project.openDocuments = openDocuments;
+        
+        project.republishDirectoryContents();
         
         return project;
     }
