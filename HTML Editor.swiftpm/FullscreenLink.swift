@@ -11,6 +11,9 @@ import SwiftUI
 struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelContent: View {
     @State var isPresented = false;
     
+    @State var isTapped = false;
+    @Binding var isEditMode: Bool;
+    
     /**
      * Content builder function.
      * 
@@ -40,10 +43,21 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
         VStack {
             label()
         }
-        .onLongPressGesture(perform: onLongPress)
+        .opacity(isTapped ? 0.5 : 1.0)
+        .onLongPressGesture(perform: {
+            isTapped = false;
+            onLongPress()
+        })
         .onLongPressGesture(minimumDuration: 0, maximumDistance: 10, perform: {
-            isPresented = onAction()
-        }, onPressingChanged: nil)
+            isTapped = false;
+            isPresented = onAction();
+        }, onPressingChanged: { _ in
+            if !self.isEditMode {
+                withAnimation(.easeIn(duration: 0.1), {
+                    isTapped = true;
+                })
+            }
+        })
         .fullScreenCover(isPresented: $isPresented, onDismiss: {
             isPresented = false;
         }) {

@@ -9,7 +9,7 @@ struct ShoeboxProject: View {
     var body: some View {
         let isSelected = projectSelection.contains(project);
         
-        FullscreenLink { goBack in
+        FullscreenLink(isEditMode: $editMode) { goBack in
             return ProjectEditor(project: project, goBack: goBack);
         } label: {
             return VStack {
