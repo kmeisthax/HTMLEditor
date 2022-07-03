@@ -55,9 +55,9 @@ struct ShoeboxSelector: View {
             }
             .toolbar {
                 #if os(iOS)
-                var createPlacement = ToolbarItemPlacement.navigationBarLeading;
+                let createPlacement = ToolbarItemPlacement.navigationBarLeading;
                 #elseif os(macOS)
-                var createPlacement = ToolbarItemPlacement.cancellationAction;
+                let createPlacement = ToolbarItemPlacement.cancellationAction;
                 #endif
                 ToolbarItemGroup(placement: createPlacement) {
                     if editMode {
