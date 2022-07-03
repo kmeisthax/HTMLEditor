@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ShoeboxSelector: View {
+struct ShoeboxBrowser: View {
     var items: [GridItem] = Array(repeating: .init(.adaptive(minimum: 225, maximum: 375), spacing: 20, alignment: .top), count: 1);
     
     @ObservedObject var shoebox: Shoebox;
@@ -15,41 +15,7 @@ struct ShoeboxSelector: View {
             ScrollView(.vertical) {
                 LazyVGrid(columns: items) {
                     ForEach($shoebox.projects) { $project in
-                        let isSelected = projectSelection.contains(project);
-                        
-                        FullscreenLink { goBack in
-                            return ProjectEditor(project: project, goBack: goBack);
-                        } label: {
-                            return VStack {
-                                    Spacer()
-                                    Text(project.projectName)
-                                        .foregroundColor(.primary)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(5)
-                                        #if os(iOS)
-                                        .background(Color(UIColor.systemBackground))
-                                        .cornerRadius(10, corners: [.bottomLeft, .bottomRight])
-                                        #endif
-                                }
-                                .frame(maxWidth: .infinity, minHeight: 200)
-                                .background(.tertiary)
-                                .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(.primary, lineWidth: 1)
-                                )
-                                .padding(.vertical, 10);
-                        } onAction: {
-                            if editMode {
-                                if projectSelection.contains(project) {
-                                    projectSelection.remove(project)
-                                } else {
-                                    projectSelection.insert(project)
-                                }
-                            }
-                            
-                            return !editMode;
-                        }.background(isSelected ? Color.accentColor : Color.clear)
+                        ShoeboxProject(project: project, editMode: $editMode, projectSelection: $projectSelection)
                     }
                 }.padding(.horizontal, 20)
             }

@@ -10,7 +10,7 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ShoeboxSelector(shoebox: shoebox)
+            ShoeboxBrowser(shoebox: shoebox)
         }
     }
 }

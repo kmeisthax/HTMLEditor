@@ -33,13 +33,18 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
      */
     var onAction: () -> Bool = { true };
     
+    var onLongPress: () -> Void = {};
+    
     var body: some View {
         #if os(iOS)
-        Button {
-            isPresented = onAction();
-        } label: {
+        VStack {
             label()
-        }.fullScreenCover(isPresented: $isPresented, onDismiss: {
+        }
+        .onLongPressGesture(perform: onLongPress)
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: 10, perform: {
+            isPresented = onAction()
+        }, onPressingChanged: nil)
+        .fullScreenCover(isPresented: $isPresented, onDismiss: {
             isPresented = false;
         }) {
             content({
