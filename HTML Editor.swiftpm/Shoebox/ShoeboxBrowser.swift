@@ -10,6 +10,8 @@ struct ShoeboxBrowser: View {
     @State var editMode = false;
     @State var projectSelection: Set<Project> = [];
     
+    @State var isPresentingDeletionConfirm = false;
+    
     var body: some View {
         NavigationView {
             ScrollView(.vertical) {
@@ -43,17 +45,26 @@ struct ShoeboxBrowser: View {
                 }
                 ToolbarItemGroup(placement: .primaryAction) {
                     if editMode {
-                        Button {
-                            for project in projectSelection {
-                                shoebox.projects.removeAll(where: { other in
-                                    other == project
-                                })
+                        if projectSelection.count > 0 {
+                            Button {
+                                isPresentingDeletionConfirm = true;
+                            } label: {
+                                Text("Close").fontWeight(.bold).foregroundColor(.red)
+                            }.confirmationDialog("Are you sure?", isPresented: $isPresentingDeletionConfirm) {
+                                Button("Close Projects", role: .destructive) {
+                                    for project in projectSelection {
+                                        shoebox.projects.removeAll(where: { other in
+                                            other == project
+                                        })
+                                    }
+                                    
+                                    editMode = false;
+                                    projectSelection = [];
+                                    isPresentingDeletionConfirm = false;
+                                }
+                            } message: {
+                                Text("Are you sure you want to close these projects?")
                             }
-                            
-                            editMode.toggle();
-                            projectSelection = [];
-                        } label: {
-                            Text("Close").fontWeight(.bold).foregroundColor(.red)
                         }
                     } else {
                         Button {
