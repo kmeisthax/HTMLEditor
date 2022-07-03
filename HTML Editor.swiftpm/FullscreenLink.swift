@@ -12,6 +12,8 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
     @State var isPresented = false;
     
     @State var isTapped = false;
+    @GestureState var isLongPressed = false;
+    
     @Binding var isEditMode: Bool;
     
     /**
@@ -44,20 +46,30 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
             label()
         }
         .opacity(isTapped ? 0.5 : 1.0)
-        .onLongPressGesture(perform: {
-            isTapped = false;
-            onLongPress()
-        })
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: 10, perform: {
-            isTapped = false;
-            isPresented = onAction();
-        }, onPressingChanged: { _ in
-            if !self.isEditMode {
-                withAnimation(.easeIn(duration: 0.1), {
-                    isTapped = true;
+        .scaleEffect(isLongPressed && !isEditMode ? 0.9 : 1.0)
+        .animation(.easeInOut(duration: 0.3).delay(0.5), value: isLongPressed && !isEditMode ? 0.9 : 1.0)
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.5)
+                .updating($isLongPressed, body: { value, state, transaction in
+                    state = value;
                 })
-            }
-        })
+                .onEnded({ _ in
+                    isTapped = false;
+                    onLongPress()
+                })
+                .onChanged {_ in
+                    withAnimation(.easeIn(duration: 0.1), {
+                        isTapped = true;
+                    })
+                }
+                .exclusively(before: LongPressGesture(minimumDuration: 0)
+                        .onEnded({ _ in
+                            isTapped = false;
+                            isPresented = onAction();
+                        })
+                          ) //Misformatting enforced by Swift Playgrounds
+                           
+        )
         .fullScreenCover(isPresented: $isPresented, onDismiss: {
             isPresented = false;
         }) {
