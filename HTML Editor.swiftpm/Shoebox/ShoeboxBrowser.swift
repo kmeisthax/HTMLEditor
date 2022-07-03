@@ -27,6 +27,12 @@ struct ShoeboxBrowser: View {
                 #endif
                 ToolbarItemGroup(placement: createPlacement) {
                     if editMode {
+                        Button {
+                            editMode.toggle();
+                            projectSelection = [];
+                        } label: {
+                            Text("Cancel")
+                        }
                     } else {
                         Button {
                             newProject = Project()
@@ -38,10 +44,16 @@ struct ShoeboxBrowser: View {
                 ToolbarItemGroup(placement: .primaryAction) {
                     if editMode {
                         Button {
+                            for project in projectSelection {
+                                shoebox.projects.removeAll(where: { other in
+                                    other == project
+                                })
+                            }
+                            
                             editMode.toggle();
                             projectSelection = [];
                         } label: {
-                            Text("Done").fontWeight(.bold)
+                            Text("Close").fontWeight(.bold).foregroundColor(.red)
                         }
                     } else {
                         Button {
