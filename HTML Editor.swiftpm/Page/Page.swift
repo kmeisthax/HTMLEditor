@@ -292,7 +292,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 }
             } catch {
                 //panic?!
-                print("Error reading URL")
+                print("Error reading URL: \(error)")
             }
             
             if self.ownership == .SecurityScoped {
