@@ -10,6 +10,8 @@ struct PageEditor: View {
     var body: some View {
         HStack {
             TextEditor(text: $page.html)
+                .font(.system(.body).monospaced())
+                .disableAutocorrection(true)
             WebPreview(html: $page.html)
         }.toolbar {
             ToolbarItemGroup(placement: .navigation) {
