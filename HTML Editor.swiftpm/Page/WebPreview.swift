@@ -5,7 +5,7 @@ struct WebPreview {
     @Binding var html: String;
     
     func makeCoordinator() -> WebPreviewCoordinator {
-        WebPreviewCoordinator(owner: self, html: self.html)
+        WebPreviewCoordinator(owner: self, html: "")
     }
 }
 
