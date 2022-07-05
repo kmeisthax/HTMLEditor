@@ -12,6 +12,7 @@ struct PageEditor: View {
             TextEditor(text: $page.html)
                 .font(.system(.body).monospaced())
                 .disableAutocorrection(true)
+                .padding(1)
             WebPreview(html: $page.html)
         }.toolbar {
             ToolbarItemGroup(placement: .navigation) {
