@@ -8,6 +8,7 @@ struct ProjectEditor: View {
     #endif
     
     @State var showSettings: Bool = false;
+    @State var openPageID: UUID? = nil;
     
     var goBack: (() -> Void)?;
     
@@ -17,12 +18,13 @@ struct ProjectEditor: View {
                 if project.openDocuments.count > 0 {
                     Section("Open Files") {
                         ForEach($project.openDocuments) { $doc in
-                            NavigationLink(destination: PageEditor(page: doc)
-                                .navigationTitle(doc.filename)
-                                #if os(iOS)
-                                .navigationBarTitleDisplayMode(.inline)
-                                #endif
-                            ) {
+                            NavigationLink(tag: doc.id, selection: $openPageID) {
+                                PageEditor(page: doc)
+                                    .navigationTitle(doc.filename)
+                                    #if os(iOS)
+                                    .navigationBarTitleDisplayMode(.inline)
+                                    #endif
+                            } label: {
                                 Label(doc.filename, systemImage: "doc.richtext")
                             }
                         }
@@ -30,7 +32,7 @@ struct ProjectEditor: View {
                 }
                 if project.projectFiles.count > 0 {
                     Section(project.projectName) {
-                        DirectoryListing(entries: $project.projectFiles)
+                        DirectoryListing(entries: $project.projectFiles, openPageID: $openPageID)
                     }
                 }
             }.listStyle(SidebarListStyle()).toolbar {

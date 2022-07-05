@@ -3,6 +3,8 @@ import SwiftUI
 struct DirectoryItem: View {
     @Binding var entry: ProjectFileEntry;
     
+    @Binding var openPageID: UUID?;
+    
     @State var isRenaming = false;
     @State var renameTo = "";
     
@@ -10,12 +12,13 @@ struct DirectoryItem: View {
     
     var body: some View {
         if let contents = entry.contents {
-            NavigationLink(destination: PageEditor(page: contents)                   
-                .navigationTitle(contents.filename)
-                           #if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-                           #endif
-            ) {
+            NavigationLink(tag: contents.id, selection: $openPageID) {
+                PageEditor(page: contents)
+                    .navigationTitle(contents.filename)
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+            } label: {
                 if isRenaming {
                     HStack {
                         Image(systemName: "doc.richtext")
