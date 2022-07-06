@@ -42,27 +42,39 @@ struct PageEditor: View {
             }
             
             Button {
-                withAnimation(.easeInOut(duration: 0.5)) {
+                withAnimation(.easeInOut(duration: 0.25)) {
                     self.wysiwygState = .Source;
                 }
             } label: {
-                Image(systemName: "rectangle.lefthalf.filled")
+                if self.wysiwygState == .Source {
+                    Image(systemName: "curlybraces.square.fill")
+                } else {
+                    Image(systemName: "curlybraces.square")
+                }
             }
             
             Button {
-                withAnimation(.easeInOut(duration: 0.5)) {
+                withAnimation(.easeInOut(duration: 0.25)) {
                     self.wysiwygState = .Split;
                 }
             } label: {
-                Image(systemName: "rectangle.split.2x1")
+                if self.wysiwygState == .Split {
+                    Image(systemName: "rectangle.split.2x1.fill")
+                } else {
+                    Image(systemName: "rectangle.split.2x1")
+                }
             }
             
             Button {
-                withAnimation(.easeInOut(duration: 0.5)) {
+                withAnimation(.easeInOut(duration: 0.25)) {
                     self.wysiwygState = .WYSIWYG;
                 }
             } label: {
-                Image(systemName: "rectangle.righthalf.filled")
+                if self.wysiwygState == .WYSIWYG {
+                    Image(systemName: "doc.richtext.fill")
+                } else {
+                    Image(systemName: "doc.richtext")
+                }
             }
         }
         let principalToolbar = ToolbarItemGroup(placement: .principal, content: {
