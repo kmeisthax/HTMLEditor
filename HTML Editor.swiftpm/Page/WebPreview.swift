@@ -35,6 +35,7 @@ extension WebPreview: UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {
         if html != context.coordinator.htmlInSafari {
             webView.loadHTMLString(html, baseURL: nil);
+            context.coordinator.htmlInSafari = html;
         }
     }
 }
@@ -64,6 +65,7 @@ extension WebPreview: NSViewRepresentable {
     func updateNSView(_ webView: WKWebView, context: Context) {
         if html != context.coordinator.htmlInSafari {
             webView.loadHTMLString(html, baseURL: nil);
+            context.coordinator.htmlInSafari = html;
         }
     }
 }
