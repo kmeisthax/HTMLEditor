@@ -6,10 +6,12 @@ struct ShoeboxProject: View {
     @Binding var editMode: Bool;
     @Binding var projectSelection: Set<Project>;
     
+    @Binding var openProject: UUID?;
+    
     var body: some View {
         let isSelected = projectSelection.contains(project);
         
-        FullscreenLink(isEditMode: $editMode) { goBack in
+        FullscreenLink(selection: $openProject, tag: project.id, isEditMode: $editMode) { goBack in
             return ProjectEditor(project: project, goBack: goBack);
         } label: {
             return VStack {

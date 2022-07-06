@@ -8,7 +8,23 @@ import SwiftUI
  * Contains a view hierarchy inside of a floating layer that is opened
  * when the associated label view is pressed.
  */
-struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelContent: View {
+struct FullscreenLink<Content, LabelContent, Selection>: View where Content: View, LabelContent: View, Selection: Equatable {
+    /**
+     * Binding to the state variable for what link is currently active.
+     */
+    @Binding var selection: Selection?;
+    
+    /**
+     * Selection value that identifies this link as currently selected.
+     */
+    var tag: Selection;
+    
+    /**
+     * Internal state variable for being presented.
+     * 
+     * Only used to satiate fullScreenCover which doesn't accept the selection/tag
+     * pattern for link activation.
+     */
     @State var isPresented = false;
     
     @State var isTapped = false;
@@ -65,29 +81,37 @@ struct FullscreenLink<Content, LabelContent>: View where Content: View, LabelCon
                 .exclusively(before: LongPressGesture(minimumDuration: 0)
                         .onEnded({ _ in
                             isTapped = false;
-                            isPresented = onAction();
+                            if onAction() {
+                                selection = tag;
+                            }
                         })
                           ) //Misformatting enforced by Swift Playgrounds
                            
         )
         .fullScreenCover(isPresented: $isPresented, onDismiss: {
-            isPresented = false;
+            selection = nil;
         }) {
             content({
-                isPresented = false;
+                selection = nil;
             })
+        }.onChange(of: selection) { selection in
+            isPresented = selection == tag;
         }
         #elseif (macOS)
         Button {
-            isPresented = onAction();
+            if onAction() {
+                selection = tag;
+            }
         } label: {
             label()
         }.sheet(isPresented: $isPresented, onDismiss: {
-            isPresented = false;
+            selection = nil;
         }) {
             content({
-                isPresented = false;
+                selection = nil;
             })
+        }.onChange(of: selection) { selection in
+            isPresented = selection == tag;
         }
         #endif
     }

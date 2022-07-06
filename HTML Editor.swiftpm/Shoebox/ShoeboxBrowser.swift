@@ -5,6 +5,8 @@ struct ShoeboxBrowser: View {
     
     @ObservedObject var shoebox: Shoebox;
     
+    @State var openProject: UUID? = nil;
+    
     @State var newProject: Project? = nil;
     
     @State var editMode = false;
@@ -17,7 +19,7 @@ struct ShoeboxBrowser: View {
             ScrollView(.vertical) {
                 LazyVGrid(columns: items) {
                     ForEach($shoebox.projects) { $project in
-                        ShoeboxProject(project: project, editMode: $editMode, projectSelection: $projectSelection)
+                        ShoeboxProject(project: project, editMode: $editMode, projectSelection: $projectSelection, openProject: $openProject)
                     }
                 }.padding(.horizontal, 20)
             }
