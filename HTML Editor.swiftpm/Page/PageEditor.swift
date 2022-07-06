@@ -92,8 +92,6 @@ struct PageEditor: View {
             }
         });
         
-        //TODO: I replaced the Hstack with explicit geometry calculations, but they
-        //are very much incomplete.
         GeometryReader { geo_outer in
             TextEditor(text: $page.html)
                 .font(.system(.body).monospaced())
@@ -102,6 +100,7 @@ struct PageEditor: View {
                 .offset(x: wysiwygState == .WYSIWYG ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth: 
                         wysiwygState == .Split ? geo_outer.size.width / 2 : .infinity)
+                .overlay(Rectangle().frame(width: 1, height: nil, alignment: .trailing).foregroundColor(.secondary), alignment: .trailing)
             WebPreview(html: $page.html)
                 .offset(x: wysiwygState == .Source ? geo_outer.size.width * 1.0 :
                             wysiwygState == .Split ? geo_outer.size.width * 0.5 : 0.0)
