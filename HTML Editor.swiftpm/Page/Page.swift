@@ -273,6 +273,39 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
     }
     
+    /**
+     * Rename the file to a new name in the same directory.
+     */
+    func renameFile(to: String) {
+        let coordinator = NSFileCoordinator.init(filePresenter: self);
+        
+        if let url = self.presentedItemURL {
+            coordinator.coordinate(with: [.writingIntent(with: url, options: .forMoving)], queue: self.presentedItemOperationQueue) { error in
+                //TODO: Error handling.
+                if let error = error {
+                    print (error);
+                }
+                
+                if self.ownership == .SecurityScoped {
+                    CFURLStartAccessingSecurityScopedResource(self.accessURL as CFURL?);
+                }
+                
+                let newItemUrl = url.deletingLastPathComponent().appendingPathComponent(to);
+                
+                do {
+                    try FileManager.default.moveItem(at: url, to: newItemUrl);
+                    self.presentedItemURL = newItemUrl;
+                } catch let error as NSError {
+                    print("Rename failed because \(error)")
+                }
+                
+                if self.ownership == .SecurityScoped {
+                    CFURLStopAccessingSecurityScopedResource(self.accessURL as CFURL?);
+                }
+            }
+        }
+    }
+    
     func presentedItemDidChange() {
         if let url = self.presentedItemURL {
             if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {

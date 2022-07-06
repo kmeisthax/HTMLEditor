@@ -8,8 +8,6 @@ struct DirectoryItem: View {
     @State var isRenaming = false;
     @State var renameTo = "";
     
-    @FocusState var isRenameFocused;
-    
     var body: some View {
         if let contents = entry.contents {
             NavigationLink(tag: contents.id, selection: $openPageID) {
@@ -25,28 +23,26 @@ struct DirectoryItem: View {
                         TextField("", text: $renameTo, onEditingChanged: { (isChanged) in
                             if !isChanged {
                                 isRenaming = false;
-                                print(renameTo);
                             }
+                        }, onCommit: {
+                            contents.renameFile(to: renameTo);
                         })
-                        .focused($isRenameFocused)
-                        .onChange(of: isRenameFocused) { newValue in 
-                            if !newValue {
-                                isRenaming = false;
-                            }
+                        .onChange(of: openPageID) { _ in
+                            isRenaming = false;
                         }
                     }
                 } else {
                     Label(contents.filename, systemImage: "doc.richtext")
                 }
             }
-            .contextMenu(ContextMenu {
+            .contextMenu{
                 Button {
                     isRenaming = true;
                     renameTo = contents.filename;
                 } label: {
                     Label("Rename", systemImage: "pencil")
                 }
-            })
+            }
         } else {
             Label(entry.location.lastPathComponent, systemImage: "folder")
         }
