@@ -16,6 +16,8 @@ enum WYSIWYGState {
     
     /**
      * Both preview and source are shown, side-by-side.
+     *
+     * This mode is unavailable on compact views and instead becomes the WYSIWYG state.
      */
     case Split;
 }
@@ -28,6 +30,20 @@ struct PageEditor: View {
     #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     #endif
+    
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass;
+    
+    var isSplit: Bool {
+        wysiwygState == .Split && horizontalSizeClass != .compact; 
+    }
+    
+    var isSource: Bool {
+        wysiwygState == .Source;
+    }
+    
+    var isWysiwyg: Bool {
+        wysiwygState == .WYSIWYG || (wysiwygState == .Split && horizontalSizeClass == .compact);
+    }
     
     var body: some View {
         let navToolbar = ToolbarItemGroup(placement: .navigation) {
@@ -43,7 +59,11 @@ struct PageEditor: View {
             
             Button {
                 withAnimation(.easeInOut(duration: 0.25)) {
-                    self.wysiwygState = .Source;
+                    if self.wysiwygState != .Source {
+                        self.wysiwygState = .Source;
+                    } else {
+                        self.wysiwygState = .Split;
+                    }
                 }
             } label: {
                 if self.wysiwygState == .Source {
@@ -53,27 +73,22 @@ struct PageEditor: View {
                 }
             }
             
-            Button {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    self.wysiwygState = .Split;
-                }
-            } label: {
-                if self.wysiwygState == .Split {
-                    Image(systemName: "rectangle.split.2x1.fill")
-                } else {
-                    Image(systemName: "rectangle.split.2x1")
-                }
-            }
-            
-            Button {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    self.wysiwygState = .WYSIWYG;
-                }
-            } label: {
-                if self.wysiwygState == .WYSIWYG {
-                    Image(systemName: "doc.richtext.fill")
-                } else {
-                    Image(systemName: "doc.richtext")
+            if horizontalSizeClass != .compact {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        if self.wysiwygState != .WYSIWYG {
+                            self.wysiwygState = .WYSIWYG;
+                        } else {
+                            self.wysiwygState = .Split;
+                        }
+                        
+                    }
+                } label: {
+                    if self.wysiwygState == .WYSIWYG {
+                        Image(systemName: "doc.richtext.fill")
+                    } else {
+                        Image(systemName: "doc.richtext")
+                    }
                 }
             }
         }
@@ -97,16 +112,16 @@ struct PageEditor: View {
                 .font(.system(.body).monospaced())
                 .disableAutocorrection(true)
                 .padding(1)
-                .offset(x: wysiwygState == .WYSIWYG ? geo_outer.size.width * -1.0 : 0.0)
+                .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth: 
-                        wysiwygState == .Split ? geo_outer.size.width / 2 : .infinity)
+                        isSplit ? geo_outer.size.width / 2 : .infinity)
                 .overlay(Rectangle().frame(width: 1, height: nil, alignment: .trailing).foregroundColor(.secondary), alignment: .trailing)
             WebPreview(html: $page.html)
-                .offset(x: wysiwygState == .Source ? geo_outer.size.width * 1.0 :
-                            wysiwygState == .Split ? geo_outer.size.width * 0.5 : 0.0)
+                .offset(x: isSource ? geo_outer.size.width * 1.0 :
+                            isSplit ? geo_outer.size.width * 0.5 : 0.0)
                 .frame(maxWidth:
-                        wysiwygState == .Split ? geo_outer.size.width / 2 :
-                        wysiwygState == .Source ? geo_outer.size.width : .infinity)
+                        isSplit ? geo_outer.size.width / 2 :
+                        isSource ? geo_outer.size.width : .infinity)
         }.toolbar {
             navToolbar
             principalToolbar
