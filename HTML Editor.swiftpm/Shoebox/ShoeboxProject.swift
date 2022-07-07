@@ -11,7 +11,7 @@ struct ShoeboxProject: View {
     var body: some View {
         let isSelected = projectSelection.contains(project);
         
-        FullscreenLink(selection: $openProject, tag: project.id.uuidString, isEditMode: $editMode) { goBack in
+        FullscreenLink(selection: $openProject, tag: project.id.uuidString, isPresented: openProject == project.id.uuidString, isEditMode: $editMode) { goBack in
             return ProjectEditor(project: project, goBack: goBack);
         } label: {
             return VStack {

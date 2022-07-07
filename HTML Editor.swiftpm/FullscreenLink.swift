@@ -23,9 +23,10 @@ struct FullscreenLink<Content, LabelContent, Selection>: View where Content: Vie
      * Internal state variable for being presented.
      * 
      * Only used to satiate fullScreenCover which doesn't accept the selection/tag
-     * pattern for link activation.
+     * pattern for link activation. We can't initialize it here because onChange does
+     * not trigger at first initialization and thus it breaks state initialization
      */
-    @State var isPresented = false;
+    @State var isPresented: Bool;
     
     @State var isTapped = false;
     @GestureState var isLongPressed = false;
