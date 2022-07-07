@@ -5,6 +5,13 @@ import SwiftUI
  */
 struct ProjectState : Codable {
     /**
+     * The ID of the project.
+     *
+     * Used by scene storage for state restoration, must not change.
+     */
+    var id: UUID?;
+    
+    /**
      * The location of the project's files on disk.
      * 
      * Intended to be a security-scoped URL.

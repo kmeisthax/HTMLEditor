@@ -109,7 +109,7 @@ class Project : NSObject, ObservableObject, Identifiable {
             }
         }
         
-        return ProjectState(projectBookmark: projectBookmark, openFiles: openFiles);
+        return ProjectState(id: id, projectBookmark: projectBookmark, openFiles: openFiles);
     }
     
     class func fromState(state: ProjectState) -> Project {
@@ -130,6 +130,7 @@ class Project : NSObject, ObservableObject, Identifiable {
         
         let project = Project();
         
+        project.id = state.id ?? UUID();
         project.projectDirectory = projectDirectory;
         project.openDocuments = openDocuments;
         
