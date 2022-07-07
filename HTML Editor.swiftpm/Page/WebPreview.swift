@@ -4,6 +4,8 @@ import WebKit
 struct WebPreview {
     @Binding var html: String;
     
+    @Binding var title: String?;
+    
     func makeCoordinator() -> WebPreviewCoordinator {
         WebPreviewCoordinator(owner: self, html: "")
     }
@@ -29,7 +31,11 @@ extension WebPreview: UIViewRepresentable {
             print("what;")
         }
         
-        return WKWebView(frame: .zero, configuration: config);
+        let view = WKWebView(frame: .zero, configuration: config);
+        
+        context.coordinator.view = view;
+        
+        return view;
     }
     
     func updateUIView(_ webView: WKWebView, context: Context) {
@@ -59,7 +65,11 @@ extension WebPreview: NSViewRepresentable {
             print("what;")
         }
         
-        return WKWebView(frame: .zero, configuration: config);
+        let view = WKWebView(frame: .zero, configuration: config);
+        
+        context.coordinator.view = view;
+        
+        return view;
     }
     
     func updateNSView(_ webView: WKWebView, context: Context) {
@@ -76,9 +86,35 @@ class WebPreviewCoordinator : NSObject, WKScriptMessageHandler {
     
     var htmlInSafari: String;
     
+    private var _viewStorage: WKWebView? = nil;
+    private var _viewKvo: NSKeyValueObservation? = nil;
+    
+    var view: WKWebView? {
+        get {
+            self._viewStorage
+        }
+        set {
+            self._viewStorage = newValue;
+            
+            if let oldkvo = _viewKvo {
+                oldkvo.invalidate();
+            }
+            
+            _viewKvo = newValue?.observe(\.title, options: [.new]) { [self] _, change in
+                owner.title = change.newValue!!;
+            }
+            
+            owner.title = newValue?.title;
+        }
+    };
+    
     init(owner: WebPreview, html: String) {
         self.owner = owner;
         self.htmlInSafari = html;
+    }
+    
+    deinit {
+        self._viewKvo?.invalidate()
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {

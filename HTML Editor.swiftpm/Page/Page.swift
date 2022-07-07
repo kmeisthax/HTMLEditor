@@ -65,7 +65,6 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                     var common_components = self_components.suffix(from: lastCommonComponent);
                     
                     common_components.removeFirst();
-                    common_components.removeLast();
                     
                     if common_components.count > 0 {
                         return common_components.joined(separator: "/");
@@ -95,7 +94,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                     }
                     
                     if self_components.count > lastCommonComponent + 1 {
-                        var common_components = self_components.suffix(from: lastCommonComponent);
+                        let common_components = self_components.suffix(from: lastCommonComponent);
                         
                         if common_components.count > 0 {
                             return common_components.joined(separator: "/");

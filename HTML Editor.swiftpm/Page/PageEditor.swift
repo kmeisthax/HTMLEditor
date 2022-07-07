@@ -36,6 +36,7 @@ struct PageEditor: View {
     @ObservedObject var page: Page;
     
     @State var wysiwygState = WYSIWYGState.Split;
+    @State var pageTitle: String? = nil;
     
     @Environment(\.dismiss) var dismiss;
     
@@ -107,12 +108,14 @@ struct PageEditor: View {
         }
         let principalToolbar = ToolbarItemGroup(placement: .principal, content: {
             VStack {
-                Text(page.filename).fontWeight(.bold)
+                let pageTitleField = pageTitle ?? page.filename;
+                Text(pageTitleField).fontWeight(.bold)
+                
                 if page.ownership == .AppOwned {
                     Text("Temporary file")
                         .foregroundColor(.secondary)
                         .font(.footnote)
-                } else if let path = page.path {
+                } else if let path = page.path, path != pageTitleField {
                     Text(path)
                         .foregroundColor(.secondary)
                         .font(.footnote)
@@ -137,13 +140,14 @@ struct PageEditor: View {
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth: 
                         isSplit ? geo_outer.size.width / 2 : .infinity)
-                .overlay(Rectangle().frame(width: 1, height: nil, alignment: .trailing).foregroundColor(.secondary), alignment: .trailing)
-            WebPreview(html: $page.html)
+            WebPreview(html: $page.html, title: $pageTitle)
+                .overlay(Rectangle().frame(width: 1, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
                 .offset(x: isSource ? geo_outer.size.width * 1.0 :
                             isSplit ? geo_outer.size.width * 0.5 : 0.0)
                 .frame(maxWidth:
                         isSplit ? geo_outer.size.width / 2 :
                         isSource ? geo_outer.size.width : .infinity)
+                .edgesIgnoringSafeArea(.all)
         }.toolbar {
             navToolbar
             principalToolbar
