@@ -22,6 +22,8 @@ struct ProjectSettings: View {
                     Button(role: .destructive) {
                         #if os(iOS)
                         directory.pick(scene: self.sceneDelegate.scene!)
+                        #elseif os(macOS)
+                        directory.pick()
                         #endif
                     } label: {
                         Text("Link new directory")

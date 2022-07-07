@@ -55,4 +55,22 @@ extension FileLocation: UIDocumentPickerDelegate {
         
     }
 }
+#elseif os(macOS)
+extension FileLocation {
+    func pick() {
+        let panel = NSOpenPanel()
+        
+        panel.nameFieldLabel = "Link project location";
+        panel.canCreateDirectories = true;
+        panel.allowedContentTypes = self.allowedContentTypes;
+        panel.canChooseDirectories = true;
+        panel.canSelectHiddenExtension = true;
+        
+        panel.begin { response in
+            if response == NSApplication.ModalResponse.OK, let fileURL = panel.url {
+                self.pickedUrls = [fileURL];
+            }
+        }
+    }
+}
 #endif

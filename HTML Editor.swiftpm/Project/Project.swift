@@ -182,4 +182,28 @@ extension Project {
         location.pick(scene: scene);
     }
 }
+#elseif os(macOS)
+extension Project {
+    /**
+     * Open an individual page separate from any project ownership.
+     */
+    func openPage() {
+        let location = FileLocation(contentTypes: [.html]);
+        
+        location.$pickedUrls.sink(receiveValue: { [weak self] urls in
+            if let self = self {
+                for url in urls {
+                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url))
+                }
+                
+                // Cancel ourselves now that location picking is done
+                self.picker_c = [];
+                self.pagePickerLocation = nil;
+            }
+        }).store(in: &picker_c);
+        
+        pagePickerLocation = location;
+        location.pick();
+    }
+}
 #endif
