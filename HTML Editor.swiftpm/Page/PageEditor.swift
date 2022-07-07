@@ -22,6 +22,16 @@ enum WYSIWYGState {
     case Split;
 }
 
+#if os(macOS)
+/**
+ * Fake size class variable to make AppKit happy.
+ */
+enum HorizontalSizeClass {
+    case normal;
+    case compact;
+}
+#endif
+
 struct PageEditor: View {
     @ObservedObject var page: Page;
     
@@ -31,12 +41,13 @@ struct PageEditor: View {
     
     #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass;
+    #elseif os(macOS)
+    @State var horizontalSizeClass = HorizontalSizeClass.normal;
     #endif
     
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass;
-    
     var isSplit: Bool {
-        wysiwygState == .Split && horizontalSizeClass != .compact; 
+        wysiwygState == .Split && horizontalSizeClass != .compact;
     }
     
     var isSource: Bool {
@@ -137,6 +148,9 @@ struct PageEditor: View {
             navToolbar
             principalToolbar
             backToolbar
-        }.navigationBarBackButtonHidden(true)
+        }
+        #if os(iOS)
+        .navigationBarBackButtonHidden(true)
+        #endif
     }
 }
