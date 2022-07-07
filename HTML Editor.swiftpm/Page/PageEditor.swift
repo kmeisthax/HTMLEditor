@@ -59,8 +59,27 @@ struct PageEditor: View {
         wysiwygState == .WYSIWYG || (wysiwygState == .Split && horizontalSizeClass == .compact);
     }
     
+    var windowTitle: String {
+        pageTitle ?? page.filename
+    }
+    
+    var windowSubtitle: String? {
+        if page.ownership == .AppOwned {
+            return "Temporary file";
+        } else if let path = page.path, path != windowTitle {
+            return path;
+        } else {
+            return nil;
+        }
+    }
+    
     var body: some View {
-        let navToolbar = ToolbarItemGroup(placement: .primaryAction) {
+        #if os(iOS)
+        let paneToolbarPlacement = ToolbarItemPlacement.primaryAction;
+        #elseif os(macOS)
+        let paneToolbarPlacement = ToolbarItemPlacement.confirmationAction;
+        #endif
+        let paneToolbar = ToolbarItemGroup(placement: paneToolbarPlacement) {
             if page.ownership == .AppOwned {
                 Button {
                     #if os(iOS)
@@ -106,22 +125,20 @@ struct PageEditor: View {
                 }
             }
         }
-        let principalToolbar = ToolbarItemGroup(placement: .principal, content: {
+        
+        #if os(iOS)
+        let titleToolbar = ToolbarItemGroup(placement: .principal, content: {
             VStack {
-                let pageTitleField = pageTitle ?? page.filename;
-                Text(pageTitleField).fontWeight(.bold)
-                
-                if page.ownership == .AppOwned {
-                    Text("Temporary file")
-                        .foregroundColor(.secondary)
-                        .font(.footnote)
-                } else if let path = page.path, path != pageTitleField {
-                    Text(path)
+                Text(windowTitle).fontWeight(.bold)
+                if let subtitle = windowSubtitle {
+                    Text(subtitle)
                         .foregroundColor(.secondary)
                         .font(.footnote)
                 }
             }
         });
+        #endif
+        
         let backToolbar = ToolbarItemGroup(placement: .cancellationAction, content: {
             if horizontalSizeClass == .compact { //custom back buttons are borked on large for some reason
                 Button {
@@ -149,12 +166,20 @@ struct PageEditor: View {
                         isSource ? geo_outer.size.width : .infinity)
                 .edgesIgnoringSafeArea(.all)
         }.toolbar {
-            navToolbar
-            principalToolbar
+            paneToolbar
+            
+            #if os(iOS)
+            titleToolbar
+            #endif
+            
             backToolbar
         }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
+        #endif
+        #if os(macOS)
+        .navigationTitle(windowTitle)
+        .navigationSubtitle(windowSubtitle ?? "")
         #endif
     }
 }
