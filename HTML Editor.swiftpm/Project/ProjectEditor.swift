@@ -35,12 +35,23 @@ struct ProjectEditor: View {
                         DirectoryListing(entries: $project.projectFiles, openPageID: $openPageID)
                     }
                 }
-            }.listStyle(SidebarListStyle()).toolbar {
+            }.listStyle(.sidebar).toolbar {
                 #if os(iOS)
                 let primaryPlacement = ToolbarItemPlacement.navigationBarTrailing;
-                #else
+                #elseif os(macOS)
                 let primaryPlacement = ToolbarItemPlacement.primaryAction;
                 #endif
+                
+                #if os(macOS)
+                ToolbarItemGroup(placement: .automatic) {
+                    Button {
+                        NSApp.keyWindow?.firstResponder?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
+                    } label: {
+                        Image(systemName: "sidebar.leading")
+                    }
+                }
+                #endif
+                
                 ToolbarItemGroup(placement: .cancellationAction) {
                     if let gb = goBack {
                         Button {
