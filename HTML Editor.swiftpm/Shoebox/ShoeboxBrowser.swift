@@ -5,7 +5,10 @@ struct ShoeboxBrowser: View {
     
     @ObservedObject var shoebox: Shoebox;
     
-    @State var openProject: UUID? = nil;
+    /**
+     * Annoying hack to get around the fact that you can't stick a UUID? in scene storage
+     */
+    @SceneStorage("ShoeboxBrowser.openProject") var openProject: String?;
     
     @State var newProject: Project? = nil;
     

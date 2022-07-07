@@ -3,14 +3,14 @@ import SwiftUI
 struct DirectoryItem: View {
     @Binding var entry: ProjectFileEntry;
     
-    @Binding var openPageID: UUID?;
+    @Binding var openPageID: String?;
     
     @State var isRenaming = false;
     @State var renameTo = "";
     
     var body: some View {
         if let contents = entry.contents {
-            NavigationLink(tag: contents.id, selection: $openPageID) {
+            NavigationLink(tag: contents.id.uuidString, selection: $openPageID) {
                 PageEditor(page: contents)
                     .navigationTitle(contents.filename)
                     #if os(iOS)

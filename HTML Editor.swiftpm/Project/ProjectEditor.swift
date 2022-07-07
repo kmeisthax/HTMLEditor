@@ -8,7 +8,7 @@ struct ProjectEditor: View {
     #endif
     
     @State var showSettings: Bool = false;
-    @State var openPageID: UUID? = nil;
+    @SceneStorage("ProjectEditor.openPageID") var openPageID: String?;
     
     var goBack: (() -> Void)?;
     
@@ -18,7 +18,7 @@ struct ProjectEditor: View {
                 if project.openDocuments.count > 0 {
                     Section("Open Files") {
                         ForEach($project.openDocuments) { $doc in
-                            NavigationLink(tag: doc.id, selection: $openPageID) {
+                            NavigationLink(tag: doc.id.uuidString, selection: $openPageID) {
                                 PageEditor(page: doc)
                                     .navigationTitle(doc.filename)
                                     #if os(iOS)
