@@ -77,4 +77,10 @@ class Shoebox: ObservableObject {
         
         return shoebox;
     }
+    
+    func project(fromStateName: String?) -> Project? {
+        self.projects.first(where: { elem in
+            elem.id.uuidString == fromStateName
+        })
+    }
 }

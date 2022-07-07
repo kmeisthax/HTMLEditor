@@ -9,9 +9,17 @@ struct MyApp: App {
     #endif
     
     var body: some Scene {
+        #if os(iOS)
         WindowGroup {
             ShoeboxBrowser(shoebox: shoebox)
         }
+        #elseif os(macOS)
+        WindowGroup {
+            ForEach(shoebox.projects, id: \.id) { project in
+                NotAShoebox(shoebox: shoebox, openProject: project.id.uuidString)
+            }
+        }
+        #endif
     }
 }
 
