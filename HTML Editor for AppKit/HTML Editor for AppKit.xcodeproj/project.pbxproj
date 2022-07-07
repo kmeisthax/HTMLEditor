@@ -11,13 +11,11 @@
 		4E1867732870F9A800046C66 /* FullscreenLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E18676D2870F9A800046C66 /* FullscreenLink.swift */; };
 		4E1867742870F9A800046C66 /* FileLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E18676E2870F9A800046C66 /* FileLocation.swift */; };
 		4E1867762870F9A800046C66 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1867702870F9A800046C66 /* MyApp.swift */; };
-		4E1867792870F9CF00046C66 /* Preview Content in Resources */ = {isa = PBXBuildFile; fileRef = 4E1867782870F9CF00046C66 /* Preview Content */; };
 		4E58B5232870EE5F00567826 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E58B5222870EE5F00567826 /* Assets.xcassets */; };
 		4E611B0F2870FC2C00CF484B /* PageState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E611B082870FC2C00CF484B /* PageState.swift */; };
 		4E611B102870FC2C00CF484B /* WebPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E611B092870FC2C00CF484B /* WebPreview.swift */; };
 		4E611B112870FC2C00CF484B /* PageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E611B0A2870FC2C00CF484B /* PageEditor.swift */; };
 		4E611B122870FC2C00CF484B /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E611B0B2870FC2C00CF484B /* Page.swift */; };
-		4E611B142870FC3500CF484B /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 4E611B132870FC3500CF484B /* Resources */; };
 		4ED03D072876923F00A0D461 /* Shoebox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D032876923F00A0D461 /* Shoebox.swift */; };
 		4ED03D082876923F00A0D461 /* ShoeboxProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D042876923F00A0D461 /* ShoeboxProject.swift */; };
 		4ED03D092876923F00A0D461 /* ShoeboxBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D052876923F00A0D461 /* ShoeboxBrowser.swift */; };
@@ -30,41 +28,22 @@
 		4ED03D172876935D00A0D461 /* DirectoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D102876935D00A0D461 /* DirectoryItem.swift */; };
 		4ED03D182876935D00A0D461 /* DirectoryListing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D112876935D00A0D461 /* DirectoryListing.swift */; };
 		4ED03D1A287693DD00A0D461 /* NotAShoebox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D19287693DD00A0D461 /* NotAShoebox.swift */; };
+		4ED03D1E28769ECA00A0D461 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 4ED03D1C28769ECA00A0D461 /* content.js */; };
+		4ED03D1F28769ECA00A0D461 /* host.html in Resources */ = {isa = PBXBuildFile; fileRef = 4ED03D1D28769ECA00A0D461 /* host.html */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		4E58B52D2870EE5F00567826 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4E58B5132870EE5D00567826 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4E58B51A2870EE5D00567826;
-			remoteInfo = "HTML Editor for AppKit";
-		};
-		4E58B5372870EE5F00567826 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4E58B5132870EE5D00567826 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4E58B51A2870EE5D00567826;
-			remoteInfo = "HTML Editor for AppKit";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4E18676B2870F9A800046C66 /* CornerRadius.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CornerRadius.swift; path = "../HTML Editor.swiftpm/CornerRadius.swift"; sourceTree = "<group>"; };
 		4E18676D2870F9A800046C66 /* FullscreenLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FullscreenLink.swift; path = "../HTML Editor.swiftpm/FullscreenLink.swift"; sourceTree = "<group>"; };
 		4E18676E2870F9A800046C66 /* FileLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FileLocation.swift; path = "../HTML Editor.swiftpm/FileLocation.swift"; sourceTree = "<group>"; };
 		4E1867702870F9A800046C66 /* MyApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MyApp.swift; path = "../HTML Editor.swiftpm/MyApp.swift"; sourceTree = "<group>"; };
-		4E1867782870F9CF00046C66 /* Preview Content */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Preview Content"; sourceTree = "<group>"; };
 		4E58B51B2870EE5D00567826 /* HTML Editor for AppKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HTML Editor for AppKit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E58B5222870EE5F00567826 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4E58B5272870EE5F00567826 /* HTML_Editor_for_AppKit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HTML_Editor_for_AppKit.entitlements; sourceTree = "<group>"; };
-		4E58B52C2870EE5F00567826 /* HTML Editor for AppKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "HTML Editor for AppKitTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4E58B5362870EE5F00567826 /* HTML Editor for AppKitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "HTML Editor for AppKitUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E611B082870FC2C00CF484B /* PageState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageState.swift; sourceTree = "<group>"; };
 		4E611B092870FC2C00CF484B /* WebPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebPreview.swift; sourceTree = "<group>"; };
 		4E611B0A2870FC2C00CF484B /* PageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageEditor.swift; sourceTree = "<group>"; };
 		4E611B0B2870FC2C00CF484B /* Page.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
-		4E611B132870FC3500CF484B /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = "../HTML Editor.swiftpm/Resources"; sourceTree = "<group>"; };
 		4ED03D032876923F00A0D461 /* Shoebox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shoebox.swift; sourceTree = "<group>"; };
 		4ED03D042876923F00A0D461 /* ShoeboxProject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoeboxProject.swift; sourceTree = "<group>"; };
 		4ED03D052876923F00A0D461 /* ShoeboxBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoeboxBrowser.swift; sourceTree = "<group>"; };
@@ -77,24 +56,12 @@
 		4ED03D102876935D00A0D461 /* DirectoryItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectoryItem.swift; sourceTree = "<group>"; };
 		4ED03D112876935D00A0D461 /* DirectoryListing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectoryListing.swift; sourceTree = "<group>"; };
 		4ED03D19287693DD00A0D461 /* NotAShoebox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotAShoebox.swift; sourceTree = "<group>"; };
+		4ED03D1C28769ECA00A0D461 /* content.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		4ED03D1D28769ECA00A0D461 /* host.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = host.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		4E58B5182870EE5D00567826 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4E58B5292870EE5F00567826 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4E58B5332870EE5F00567826 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,11 +89,10 @@
 		4E58B5122870EE5D00567826 = {
 			isa = PBXGroup;
 			children = (
-				4E611B132870FC3500CF484B /* Resources */,
+				4ED03D1B28769ECA00A0D461 /* Resources */,
 				4E611B072870FC2C00CF484B /* Page */,
 				4E611B032870FC2C00CF484B /* Shoebox */,
 				4E18677A2870FA7200046C66 /* Project */,
-				4E1867782870F9CF00046C66 /* Preview Content */,
 				4E18676B2870F9A800046C66 /* CornerRadius.swift */,
 				4E18676E2870F9A800046C66 /* FileLocation.swift */,
 				4E18676D2870F9A800046C66 /* FullscreenLink.swift */,
@@ -141,8 +107,6 @@
 			isa = PBXGroup;
 			children = (
 				4E58B51B2870EE5D00567826 /* HTML Editor for AppKit.app */,
-				4E58B52C2870EE5F00567826 /* HTML Editor for AppKitTests.xctest */,
-				4E58B5362870EE5F00567826 /* HTML Editor for AppKitUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,6 +136,16 @@
 			path = "../HTML Editor.swiftpm/Page";
 			sourceTree = "<group>";
 		};
+		4ED03D1B28769ECA00A0D461 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4ED03D1C28769ECA00A0D461 /* content.js */,
+				4ED03D1D28769ECA00A0D461 /* host.html */,
+			);
+			name = Resources;
+			path = "../HTML Editor.swiftpm/Resources";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -192,42 +166,6 @@
 			productReference = 4E58B51B2870EE5D00567826 /* HTML Editor for AppKit.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4E58B52B2870EE5F00567826 /* HTML Editor for AppKitTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4E58B5432870EE5F00567826 /* Build configuration list for PBXNativeTarget "HTML Editor for AppKitTests" */;
-			buildPhases = (
-				4E58B5282870EE5F00567826 /* Sources */,
-				4E58B5292870EE5F00567826 /* Frameworks */,
-				4E58B52A2870EE5F00567826 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4E58B52E2870EE5F00567826 /* PBXTargetDependency */,
-			);
-			name = "HTML Editor for AppKitTests";
-			productName = "HTML Editor for AppKitTests";
-			productReference = 4E58B52C2870EE5F00567826 /* HTML Editor for AppKitTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		4E58B5352870EE5F00567826 /* HTML Editor for AppKitUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4E58B5462870EE5F00567826 /* Build configuration list for PBXNativeTarget "HTML Editor for AppKitUITests" */;
-			buildPhases = (
-				4E58B5322870EE5F00567826 /* Sources */,
-				4E58B5332870EE5F00567826 /* Frameworks */,
-				4E58B5342870EE5F00567826 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4E58B5382870EE5F00567826 /* PBXTargetDependency */,
-			);
-			name = "HTML Editor for AppKitUITests";
-			productName = "HTML Editor for AppKitUITests";
-			productReference = 4E58B5362870EE5F00567826 /* HTML Editor for AppKitUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -241,14 +179,6 @@
 					4E58B51A2870EE5D00567826 = {
 						CreatedOnToolsVersion = 13.4.1;
 						LastSwiftMigration = 1340;
-					};
-					4E58B52B2870EE5F00567826 = {
-						CreatedOnToolsVersion = 13.4.1;
-						TestTargetID = 4E58B51A2870EE5D00567826;
-					};
-					4E58B5352870EE5F00567826 = {
-						CreatedOnToolsVersion = 13.4.1;
-						TestTargetID = 4E58B51A2870EE5D00567826;
 					};
 				};
 			};
@@ -266,8 +196,6 @@
 			projectRoot = "";
 			targets = (
 				4E58B51A2870EE5D00567826 /* HTML Editor for AppKit */,
-				4E58B52B2870EE5F00567826 /* HTML Editor for AppKitTests */,
-				4E58B5352870EE5F00567826 /* HTML Editor for AppKitUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -277,23 +205,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4E1867792870F9CF00046C66 /* Preview Content in Resources */,
+				4ED03D1E28769ECA00A0D461 /* content.js in Resources */,
+				4ED03D1F28769ECA00A0D461 /* host.html in Resources */,
 				4E58B5232870EE5F00567826 /* Assets.xcassets in Resources */,
-				4E611B142870FC3500CF484B /* Resources in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4E58B52A2870EE5F00567826 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4E58B5342870EE5F00567826 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -327,34 +241,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4E58B5282870EE5F00567826 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4E58B5322870EE5F00567826 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4E58B52E2870EE5F00567826 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4E58B51A2870EE5D00567826 /* HTML Editor for AppKit */;
-			targetProxy = 4E58B52D2870EE5F00567826 /* PBXContainerItemProxy */;
-		};
-		4E58B5382870EE5F00567826 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4E58B51A2870EE5D00567826 /* HTML Editor for AppKit */;
-			targetProxy = 4E58B5372870EE5F00567826 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		4E58B53E2870EE5F00567826 /* Debug */ = {
@@ -523,74 +410,6 @@
 			};
 			name = Release;
 		};
-		4E58B5442870EE5F00567826 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.fantranslation.code.HTML-Editor-for-AppKitTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HTML Editor for AppKit.app/Contents/MacOS/HTML Editor for AppKit";
-			};
-			name = Debug;
-		};
-		4E58B5452870EE5F00567826 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.fantranslation.code.HTML-Editor-for-AppKitTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HTML Editor for AppKit.app/Contents/MacOS/HTML Editor for AppKit";
-			};
-			name = Release;
-		};
-		4E58B5472870EE5F00567826 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.fantranslation.code.HTML-Editor-for-AppKitUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "HTML Editor for AppKit";
-			};
-			name = Debug;
-		};
-		4E58B5482870EE5F00567826 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.fantranslation.code.HTML-Editor-for-AppKitUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "HTML Editor for AppKit";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -608,24 +427,6 @@
 			buildConfigurations = (
 				4E58B5412870EE5F00567826 /* Debug */,
 				4E58B5422870EE5F00567826 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4E58B5432870EE5F00567826 /* Build configuration list for PBXNativeTarget "HTML Editor for AppKitTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4E58B5442870EE5F00567826 /* Debug */,
-				4E58B5452870EE5F00567826 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4E58B5462870EE5F00567826 /* Build configuration list for PBXNativeTarget "HTML Editor for AppKitUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4E58B5472870EE5F00567826 /* Debug */,
-				4E58B5482870EE5F00567826 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
