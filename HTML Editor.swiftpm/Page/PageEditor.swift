@@ -48,7 +48,7 @@ struct PageEditor: View {
     }
     
     var body: some View {
-        let navToolbar = ToolbarItemGroup(placement: .navigation) {
+        let navToolbar = ToolbarItemGroup(placement: .primaryAction) {
             if page.ownership == .AppOwned {
                 Button {
                     #if os(iOS)
