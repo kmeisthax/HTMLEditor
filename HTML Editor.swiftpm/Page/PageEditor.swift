@@ -27,6 +27,8 @@ struct PageEditor: View {
     
     @State var wysiwygState = WYSIWYGState.Split;
     
+    @Environment(\.dismiss) var dismiss;
+    
     #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     #endif
@@ -106,6 +108,15 @@ struct PageEditor: View {
                 }
             }
         });
+        let backToolbar = ToolbarItemGroup(placement: .cancellationAction, content: {
+            if horizontalSizeClass == .compact { //custom back buttons are borked on large for some reason
+                Button {
+                    dismiss();
+                } label: {
+                    Image(systemName: "folder")
+                }
+            }
+        });
         
         GeometryReader { geo_outer in
             TextEditor(text: $page.html)
@@ -125,6 +136,7 @@ struct PageEditor: View {
         }.toolbar {
             navToolbar
             principalToolbar
-        }
+            backToolbar
+        }.navigationBarBackButtonHidden(true)
     }
 }
