@@ -10,7 +10,7 @@ struct DirectoryItem: View {
     
     var body: some View {
         if let contents = entry.contents {
-            NavigationLink(tag: contents.id.uuidString, selection: $openPageID) {
+            NavigationLink(tag: contents.linkIdentity, selection: $openPageID) {
                 PageEditor(page: contents)
                     .navigationTitle(contents.filename)
                     #if os(iOS)

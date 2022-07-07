@@ -18,7 +18,7 @@ struct ProjectEditor: View {
                 if project.openDocuments.count > 0 {
                     Section("Open Files") {
                         ForEach($project.openDocuments) { $doc in
-                            NavigationLink(tag: doc.id.uuidString, selection: $openPageID) {
+                            NavigationLink(tag: doc.linkIdentity, selection: $openPageID) {
                                 PageEditor(page: doc)
                                     .navigationTitle(doc.filename)
                                     #if os(iOS)

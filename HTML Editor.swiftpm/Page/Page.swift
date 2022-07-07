@@ -77,6 +77,37 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return nil;
     }
     
+    /**
+     * Get a string that uniquely identifies this file.
+     */
+    var linkIdentity: String {
+        if ownership == .SecurityScoped {
+            if let self_components = presentedItemURL?.pathComponents {
+                if let access_components = accessURL?.pathComponents {
+                    var lastCommonComponent = 0;
+                    
+                    for (self_i, self_component) in self_components.enumerated() {
+                        if self_i < access_components.count {
+                            if self_component == access_components[self_i] {
+                                lastCommonComponent = self_i;
+                            }
+                        }
+                    }
+                    
+                    if self_components.count > lastCommonComponent + 1 {
+                        var common_components = self_components.suffix(from: lastCommonComponent);
+                        
+                        if common_components.count > 0 {
+                            return common_components.joined(separator: "/");
+                        }
+                    }
+                }
+            }
+        }
+        
+        return self.id.uuidString;
+    }
+    
     lazy var presentedItemOperationQueue: OperationQueue = OperationQueue.main;
     
     /**
