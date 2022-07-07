@@ -212,9 +212,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             CFURLStartAccessingSecurityScopedResource(accessURL as CFURL);
         }
         
-        let state = PageState(ownership: self.ownership,
-                         accessBookmark: try self.accessURL?.bookmarkData(),
-                         locationBookmark: try self.presentedItemURL!.bookmarkData())
+        let state = PageState(id: self.id,
+                        ownership: self.ownership,
+                        accessBookmark: try self.accessURL?.bookmarkData(),
+                        locationBookmark: try self.presentedItemURL!.bookmarkData())
         
         if self.ownership == .SecurityScoped, let accessURL = self.accessURL {
             CFURLStopAccessingSecurityScopedResource(accessURL as CFURL);
@@ -247,6 +248,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         
         let page = Page();
         
+        page.id = state.id ?? UUID();
         page.ownership = ownership;
         page.accessURL = accessUrl;
         page.presentedItemURL = fileUrl;

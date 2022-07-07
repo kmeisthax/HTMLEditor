@@ -2,6 +2,11 @@ import SwiftUI
 
 struct PageState: Codable {
     /**
+     * The ID of the page.
+     */
+    var id: UUID?;
+    
+    /**
      * Whether or not a page is owned by the filesystem or by us.
      */
     var ownership: FileOwnership;
