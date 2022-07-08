@@ -2,21 +2,21 @@ import SwiftUI
 
 @main
 struct MyApp: App {
-    @StateObject var shoebox: Shoebox = Shoebox.fromState(state: ShoeboxState.restoreFromDisk());
-    
     #if os(iOS)
     @UIApplicationDelegateAdaptor(OldschoolAppDelegate.self) var appDelegate;
+    #elseif os(macOS)
+    @NSApplicationDelegateAdaptor(OldschoolAppDelegate.self) var appDelegate;
     #endif
     
     var body: some Scene {
         #if os(iOS)
         WindowGroup {
-            ShoeboxBrowser(shoebox: shoebox)
+            ShoeboxBrowser(shoebox: appDelegate.shoebox)
         }
         #elseif os(macOS)
         WindowGroup {
-            ForEach(shoebox.projects, id: \.id) { project in
-                NotAShoebox(shoebox: shoebox, openProject: project.id.uuidString)
+            ForEach(appDelegate.shoebox.projects, id: \.id) { project in
+                NotAShoebox(shoebox: appDelegate.shoebox, openProject: project.id.uuidString)
             }
         }
         #endif
@@ -25,6 +25,8 @@ struct MyApp: App {
 
 #if os(iOS)
 class OldschoolAppDelegate: NSObject, UIApplicationDelegate {
+    var shoebox: Shoebox = Shoebox.fromState(state: ShoeboxState.restoreFromDisk());
+    
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role);
         
@@ -41,5 +43,9 @@ class OldschoolSceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject 
         guard let windowScene = scene as? UIWindowScene else { return }
         self.scene = windowScene
     }
+}
+#elseif os(macOS)
+class OldschoolAppDelegate: NSObject, NSApplicationDelegate {
+    var shoebox: Shoebox = Shoebox.fromState(state: ShoeboxState.restoreFromDisk());
 }
 #endif
