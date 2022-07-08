@@ -158,6 +158,14 @@ struct PageEditor: View {
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth: 
                         isSplit ? geo_outer.size.width / 2 : .infinity)
+                .introspectTextView { editor in
+                    #if os(iOS)
+                    editor.smartQuotesType = UITextSmartQuotesType.no;
+                    editor.autocapitalizationType = .none;
+                    #elseif os(macOS)
+                    editor.isAutomaticQuoteSubstitutionEnabled = false;
+                    #endif
+                }
             WebPreview(html: $page.html, title: $pageTitle)
                 .overlay(Rectangle().frame(width: 1, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
                 .offset(x: isSource ? geo_outer.size.width * 1.0 :
