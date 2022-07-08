@@ -6,6 +6,9 @@ struct WebPreview {
     
     @Binding var title: String?;
     
+    @Binding var fileURL: URL?;
+    @Binding var baseURL: URL?;
+    
     func makeCoordinator() -> WebPreviewCoordinator {
         WebPreviewCoordinator(owner: self, html: "")
     }
@@ -40,7 +43,11 @@ extension WebPreview: UIViewRepresentable {
     
     func updateUIView(_ webView: WKWebView, context: Context) {
         if html != context.coordinator.htmlInSafari {
-            webView.loadHTMLString(html, baseURL: nil);
+            if let fileURL = fileURL, let baseURL = baseURL {
+                webView.loadFileURL(fileURL, allowingReadAccessTo: baseURL);
+            } else {
+                webView.loadHTMLString(html, baseURL: nil)
+            }
             context.coordinator.htmlInSafari = html;
         }
     }
@@ -74,7 +81,11 @@ extension WebPreview: NSViewRepresentable {
     
     func updateNSView(_ webView: WKWebView, context: Context) {
         if html != context.coordinator.htmlInSafari {
-            webView.loadHTMLString(html, baseURL: nil);
+            if let fileURL = fileURL, let baseURL = baseURL {
+                webView.loadFileURL(fileURL, allowingReadAccessTo: baseURL);
+            } else {
+                webView.loadHTMLString(html, baseURL: nil)
+            }
             context.coordinator.htmlInSafari = html;
         }
     }

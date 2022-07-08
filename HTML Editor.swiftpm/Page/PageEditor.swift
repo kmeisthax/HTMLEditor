@@ -166,7 +166,7 @@ struct PageEditor: View {
                     editor.isAutomaticQuoteSubstitutionEnabled = false;
                     #endif
                 }
-            WebPreview(html: $page.html, title: $pageTitle)
+            WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
                 .overlay(Rectangle().frame(width: 1, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
                 .offset(x: isSource ? geo_outer.size.width * 1.0 :
                             isSplit ? geo_outer.size.width * 0.5 : 0.0)
