@@ -369,8 +369,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     func presentedItemDidMove(to newURL: URL) {
-        print("Moved!");
-        print(newURL);
+        self.presentedItemURL = newURL;
     }
     
     func presentedItemDidChangeUbiquityAttributes(_ attributes: Set<URLResourceKey>) {
