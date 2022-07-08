@@ -6,7 +6,12 @@
 	<dict>
 		<key>manifestData</key>
 		<data>
-		eyJkZXBlbmRlbmNpZXMiOltdLCJkaXNwbGF5TmFtZSI6IkhUTUwgRWRpdG9y
+		eyJkZXBlbmRlbmNpZXMiOlt7InNvdXJjZUNvbnRyb2wiOlt7ImlkZW50aXR5
+		Ijoic3dpZnR1aS1pbnRyb3NwZWN0IiwibG9jYXRpb24iOnsicmVtb3RlIjpb
+		Imh0dHBzOlwvXC9naXRodWIuY29tXC9zaXRlbGluZVwvU3dpZnRVSS1JbnRy
+		b3NwZWN0LmdpdCJdfSwicHJvZHVjdEZpbHRlciI6bnVsbCwicmVxdWlyZW1l
+		bnQiOnsicmFuZ2UiOlt7Imxvd2VyQm91bmQiOiIwLjEuNCIsInVwcGVyQm91
+		bmQiOiIxLjAuMCJ9XX19XX1dLCJkaXNwbGF5TmFtZSI6IkhUTUwgRWRpdG9y
 		IiwicGFja2FnZUtpbmQiOnsicm9vdCI6e319LCJwbGF0Zm9ybXMiOlt7Im9w
 		dGlvbnMiOltdLCJwbGF0Zm9ybU5hbWUiOiJpb3MiLCJ2ZXJzaW9uIjoiMTUu
 		MiJ9LHsib3B0aW9ucyI6W10sInBsYXRmb3JtTmFtZSI6Im1hY29zIiwidmVy
@@ -27,18 +32,20 @@
 		ImNvbmRpdGlvbiI6eyJkZXZpY2VGYW1pbGllcyI6WyJwYWQiXX19fV19XX1d
 		LCJ0YXJnZXRzIjpbIkFwcE1vZHVsZSJdLCJ0eXBlIjp7ImV4ZWN1dGFibGUi
 		Om51bGx9fV0sInRhcmdldE1hcCI6eyJBcHBNb2R1bGUiOnsiZGVwZW5kZW5j
-		aWVzIjpbXSwiZXhjbHVkZSI6W10sIm5hbWUiOiJBcHBNb2R1bGUiLCJwYXRo
-		IjoiLiIsInJlc291cmNlcyI6W3sicGF0aCI6IlJlc291cmNlcyIsInJ1bGUi
-		OiJwcm9jZXNzIn1dLCJzZXR0aW5ncyI6W10sInR5cGUiOiJleGVjdXRhYmxl
-		In19LCJ0YXJnZXRzIjpbeyJkZXBlbmRlbmNpZXMiOltdLCJleGNsdWRlIjpb
-		XSwibmFtZSI6IkFwcE1vZHVsZSIsInBhdGgiOiIuIiwicmVzb3VyY2VzIjpb
-		eyJwYXRoIjoiUmVzb3VyY2VzIiwicnVsZSI6InByb2Nlc3MifV0sInNldHRp
-		bmdzIjpbXSwidHlwZSI6ImV4ZWN1dGFibGUifV0sInRvb2xzVmVyc2lvbiI6
-		eyJfdmVyc2lvbiI6IjUuNi4wIn19
+		aWVzIjpbeyJwcm9kdWN0IjpbIkludHJvc3BlY3QiLCJTd2lmdFVJLUludHJv
+		c3BlY3QiLG51bGxdfV0sImV4Y2x1ZGUiOltdLCJuYW1lIjoiQXBwTW9kdWxl
+		IiwicGF0aCI6Ii4iLCJyZXNvdXJjZXMiOlt7InBhdGgiOiJSZXNvdXJjZXMi
+		LCJydWxlIjoicHJvY2VzcyJ9XSwic2V0dGluZ3MiOltdLCJ0eXBlIjoiZXhl
+		Y3V0YWJsZSJ9fSwidGFyZ2V0cyI6W3siZGVwZW5kZW5jaWVzIjpbeyJwcm9k
+		dWN0IjpbIkludHJvc3BlY3QiLCJTd2lmdFVJLUludHJvc3BlY3QiLG51bGxd
+		fV0sImV4Y2x1ZGUiOltdLCJuYW1lIjoiQXBwTW9kdWxlIiwicGF0aCI6Ii4i
+		LCJyZXNvdXJjZXMiOlt7InBhdGgiOiJSZXNvdXJjZXMiLCJydWxlIjoicHJv
+		Y2VzcyJ9XSwic2V0dGluZ3MiOltdLCJ0eXBlIjoiZXhlY3V0YWJsZSJ9XSwi
+		dG9vbHNWZXJzaW9uIjp7Il92ZXJzaW9uIjoiNS42LjAifX0=
 		</data>
 		<key>manifestHash</key>
 		<data>
-		X+val5r68FzKNIGwYxbWIaYTt49UBcCeAF3wmxtwDEw=
+		zcE6cPQ+0vp7ZHfjyEf3L0hw5bE6bM3+YyQenBChEpI=
 		</data>
 		<key>schemaVersion</key>
 		<integer>4</integer>

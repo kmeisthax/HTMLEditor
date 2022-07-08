@@ -1,4 +1,5 @@
 import SwiftUI
+import Introspect
 
 /**
  * Which set of editors are currently visible.
@@ -176,6 +177,9 @@ struct PageEditor: View {
         }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
+        .introspectNavigationController { navigationController in
+            navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
+        }
         #endif
         #if os(macOS)
         .navigationTitle(windowTitle)
