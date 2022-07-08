@@ -30,6 +30,7 @@
 		4ED03D1A287693DD00A0D461 /* NotAShoebox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D19287693DD00A0D461 /* NotAShoebox.swift */; };
 		4ED03D1E28769ECA00A0D461 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 4ED03D1C28769ECA00A0D461 /* content.js */; };
 		4ED03D1F28769ECA00A0D461 /* host.html in Resources */ = {isa = PBXBuildFile; fileRef = 4ED03D1D28769ECA00A0D461 /* host.html */; };
+		4EDCCCCF2878B22D007E0F02 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 4EDCCCCE2878B22D007E0F02 /* Introspect */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 		4ED03D19287693DD00A0D461 /* NotAShoebox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotAShoebox.swift; sourceTree = "<group>"; };
 		4ED03D1C28769ECA00A0D461 /* content.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
 		4ED03D1D28769ECA00A0D461 /* host.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = host.html; sourceTree = "<group>"; };
+		4EDCCCCC2878B16B007E0F02 /* SwiftUI-Introspect-0.1.4 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "SwiftUI-Introspect-0.1.4"; path = "../vendor/SwiftUI-Introspect-0.1.4"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EDCCCCF2878B22D007E0F02 /* Introspect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,6 +92,7 @@
 		4E58B5122870EE5D00567826 = {
 			isa = PBXGroup;
 			children = (
+				4EDCCCCB2878B16B007E0F02 /* Packages */,
 				4ED03D1B28769ECA00A0D461 /* Resources */,
 				4E611B072870FC2C00CF484B /* Page */,
 				4E611B032870FC2C00CF484B /* Shoebox */,
@@ -100,6 +104,7 @@
 				4E58B5222870EE5F00567826 /* Assets.xcassets */,
 				4E58B5272870EE5F00567826 /* HTML_Editor_for_AppKit.entitlements */,
 				4E58B51C2870EE5D00567826 /* Products */,
+				4EDCCCCD2878B22D007E0F02 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,6 +151,21 @@
 			path = "../HTML Editor.swiftpm/Resources";
 			sourceTree = "<group>";
 		};
+		4EDCCCCB2878B16B007E0F02 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				4EDCCCCC2878B16B007E0F02 /* SwiftUI-Introspect-0.1.4 */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		4EDCCCCD2878B22D007E0F02 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -162,6 +182,9 @@
 			dependencies = (
 			);
 			name = "HTML Editor for AppKit";
+			packageProductDependencies = (
+				4EDCCCCE2878B22D007E0F02 /* Introspect */,
+			);
 			productName = "HTML Editor for AppKit";
 			productReference = 4E58B51B2870EE5D00567826 /* HTML Editor for AppKit.app */;
 			productType = "com.apple.product-type.application";
@@ -367,7 +390,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -394,7 +417,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -432,6 +455,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4EDCCCCE2878B22D007E0F02 /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Introspect;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4E58B5132870EE5D00567826 /* Project object */;
 }
