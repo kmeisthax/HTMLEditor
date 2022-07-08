@@ -7,7 +7,13 @@ import Combine
  * 
  * There is a one-to-one correspondance between Projects and scenes in the app.
  */
-class Project : NSObject, ObservableObject, Identifiable {
+class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
+    var presentedItemURL: URL? {
+        self.projectDirectory
+    }
+    
+    var presentedItemOperationQueue: OperationQueue = .main;
+    
     var id: UUID;
     
     /**
@@ -62,11 +68,31 @@ class Project : NSObject, ObservableObject, Identifiable {
     
     private var c: [AnyCancellable] = [];
     
+    private var isRegisteredAsFilePresenter = false;
+    
+    /**
+     * Check if the project needs to be registered as a file presenter, and if so, do so.
+     *
+     * Since not all projects have an associated directory yet we only register ourselves
+     * as a presenter if we need to.
+     */
+    func checkFilePresentationStatus() {
+        if self.projectDirectory != nil && !isRegisteredAsFilePresenter {
+            NSFileCoordinator.addFilePresenter(self);
+            isRegisteredAsFilePresenter = true;
+        } else if self.projectDirectory == nil && isRegisteredAsFilePresenter {
+            NSFileCoordinator.removeFilePresenter(self);
+            isRegisteredAsFilePresenter = false;
+        }
+    }
+    
     override init() {
         id = UUID.init()
         self.openDocuments = []
         
         super.init();
+        
+        checkFilePresentationStatus();
         
         $openDocuments.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             if let self = self {
@@ -79,11 +105,18 @@ class Project : NSObject, ObservableObject, Identifiable {
         }).store(in: &c);
         
         $projectDirectory.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-            self?.shoebox?.nestedStateDidChange()
+            self?.shoebox?.nestedStateDidChange();
+            self?.checkFilePresentationStatus();
         }).store(in: &c);
         
         //NOTE: We intentionally do not hook projectDocuments as that state
         //is derived from the filesystem and not persisted in shoebox.json
+    }
+    
+    deinit {
+        if isRegisteredAsFilePresenter {
+            NSFileCoordinator.removeFilePresenter(self);
+        }
     }
     
     func intoState() -> ProjectState {
@@ -148,7 +181,7 @@ class Project : NSObject, ObservableObject, Identifiable {
     func addNewPage() {
         if let url = projectDirectory {
             let untitledPage = Page.newFileInScopedStorage(withName: "Untitled Page", accessURL: url);
-            projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, contents: untitledPage));
+            projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, pathFragment: ["Untitled Page.html"], contents: untitledPage));
         } else {
             openDocuments.append(Page.fromTemporaryStorage())
         }
@@ -156,6 +189,16 @@ class Project : NSObject, ObservableObject, Identifiable {
     
     private var picker_c: [AnyCancellable] = [];
     private var pagePickerLocation: FileLocation?;
+    
+    // ==NSFilePresenter impl
+    
+    func presentedItemDidMove(to: URL) {
+        self.projectDirectory = to;
+        
+        for var child in self.projectFiles {
+            child.projectMovedToDirectory(to: to)
+        }
+    }
 }
 
 #if os(iOS)
