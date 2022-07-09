@@ -49,15 +49,15 @@ struct PageEditor: View {
     #endif
     
     var isSplit: Bool {
-        wysiwygState == .Split && horizontalSizeClass != .compact;
+        page.type == .html && wysiwygState == .Split && horizontalSizeClass != .compact;
     }
     
     var isSource: Bool {
-        wysiwygState == .Source;
+        page.type != .html || wysiwygState == .Source;
     }
     
     var isWysiwyg: Bool {
-        wysiwygState == .WYSIWYG || (wysiwygState == .Split && horizontalSizeClass == .compact);
+        page.type == .html && (wysiwygState == .WYSIWYG || (wysiwygState == .Split && horizontalSizeClass == .compact));
     }
     
     var windowTitle: String {
@@ -91,37 +91,39 @@ struct PageEditor: View {
                 }
             }
             
-            Button {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    if self.wysiwygState != .Source {
-                        self.wysiwygState = .Source;
-                    } else {
-                        self.wysiwygState = .Split;
-                    }
-                }
-            } label: {
-                if self.wysiwygState == .Source {
-                    Image(systemName: "curlybraces.square.fill")
-                } else {
-                    Image(systemName: "curlybraces.square")
-                }
-            }
-            
-            if horizontalSizeClass != .compact {
+            if page.type == .html {
                 Button {
                     withAnimation(.easeInOut(duration: 0.25)) {
-                        if self.wysiwygState != .WYSIWYG {
-                            self.wysiwygState = .WYSIWYG;
+                        if self.wysiwygState != .Source {
+                            self.wysiwygState = .Source;
                         } else {
                             self.wysiwygState = .Split;
                         }
-                        
                     }
                 } label: {
-                    if self.wysiwygState == .WYSIWYG {
-                        Image(systemName: "doc.richtext.fill")
+                    if self.wysiwygState == .Source {
+                        Image(systemName: "curlybraces.square.fill")
                     } else {
-                        Image(systemName: "doc.richtext")
+                        Image(systemName: "curlybraces.square")
+                    }
+                }
+                
+                if horizontalSizeClass != .compact {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            if self.wysiwygState != .WYSIWYG {
+                                self.wysiwygState = .WYSIWYG;
+                            } else {
+                                self.wysiwygState = .Split;
+                            }
+                            
+                        }
+                    } label: {
+                        if self.wysiwygState == .WYSIWYG {
+                            Image(systemName: "doc.richtext.fill")
+                        } else {
+                            Image(systemName: "doc.richtext")
+                        }
                     }
                 }
             }
@@ -166,14 +168,16 @@ struct PageEditor: View {
                     editor.isAutomaticQuoteSubstitutionEnabled = false;
                     #endif
                 }
-            WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
-                .overlay(Rectangle().frame(width: 1, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
-                .offset(x: isSource ? geo_outer.size.width * 1.0 :
-                            isSplit ? geo_outer.size.width * 0.5 : 0.0)
-                .frame(maxWidth:
-                        isSplit ? geo_outer.size.width / 2 :
-                        isSource ? geo_outer.size.width : .infinity)
-                .edgesIgnoringSafeArea(.all)
+            if page.type == .html {
+                WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
+                    .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
+                    .offset(x: isSource ? geo_outer.size.width * 1.0 :
+                                isSplit ? geo_outer.size.width * 0.5 : 0.0)
+                    .frame(maxWidth:
+                            isSplit ? geo_outer.size.width / 2 :
+                            isSource ? geo_outer.size.width : .infinity)
+                    .edgesIgnoringSafeArea(.all)
+            }
         }.toolbar {
             paneToolbar
             

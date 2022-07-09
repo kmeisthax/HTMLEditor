@@ -1,6 +1,7 @@
 import SwiftUI
 import Foundation
 import Combine
+import UniformTypeIdentifiers
 
 /**
  * Who owns a given file.
@@ -74,6 +75,16 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
         
         return nil;
+    }
+    
+    var type: UTType? {
+        do {
+            return try self.presentedItemURL?.resourceValues(forKeys: [.contentTypeKey]).contentType
+        } catch {
+            print("Cannot read type of \(String(describing: self.presentedItemURL)), got error \(error)");
+            
+            return nil;
+        }
     }
     
     /**
