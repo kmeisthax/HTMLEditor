@@ -388,8 +388,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     func relinquishPresentedItem(toWriter writer: @escaping ((() -> Void)?) -> Void) {
-        print("begged to write");
-        writer(nil)
+        writer({
+            print("Got back the file from a writer. Forcing a reload.")
+            self.presentedItemDidChange();
+        })
     }
     
     private func doActualSave(url: URL, html: String) {
