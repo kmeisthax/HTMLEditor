@@ -32,7 +32,8 @@ struct ShoeboxProject: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(isSelected ? Color.accentColor : .primary, lineWidth: isSelected ? 2 : 1)
             )
-            .padding(.vertical, 10);
+            .padding(.vertical, 10)
+            .shadow(color: .secondary, radius: 10.0, x: 0.0, y: 5.0);
         } onAction: {
             if editMode {
                 if projectSelection.contains(project) {
