@@ -44,8 +44,6 @@ struct HTMLEditor: View {
     @State var wysiwygState = WYSIWYGState.Split;
     @State var pageTitle: String? = nil;
     
-    @Environment(\.dismiss) var dismiss;
-    
 #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
@@ -132,16 +130,6 @@ struct HTMLEditor: View {
             }
         }
         
-        let backToolbar = ToolbarItemGroup(placement: .cancellationAction, content: {
-            if horizontalSizeClass == .compact { //custom back buttons are borked on large for some reason
-                Button {
-                    dismiss();
-                } label: {
-                    Image(systemName: "folder")
-                }
-            }
-        });
-        
         GeometryReader { geo_outer in
             SourceView(text: $page.html)
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
@@ -157,13 +145,6 @@ struct HTMLEditor: View {
                 .edgesIgnoringSafeArea(.all)
         }.toolbar {
             paneToolbar
-            backToolbar
         }.pageTitlebar(for: page, customTitle: pageTitle)
-#if os(iOS)
-        .navigationBarBackButtonHidden(true)
-        .introspectNavigationController { navigationController in
-            navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
-        }
-#endif
     }
 }

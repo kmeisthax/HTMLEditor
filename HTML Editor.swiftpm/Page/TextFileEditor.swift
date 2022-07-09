@@ -7,8 +7,6 @@ import Introspect
 struct TextFileEditor: View {
     @ObservedObject var page: Page;
     
-    @Environment(\.dismiss) var dismiss;
-    
 #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
@@ -34,27 +32,13 @@ struct TextFileEditor: View {
             }
         }
         
-        let backToolbar = ToolbarItemGroup(placement: .cancellationAction, content: {
-            if horizontalSizeClass == .compact { //custom back buttons are borked on large for some reason
-                Button {
-                    dismiss();
-                } label: {
-                    Image(systemName: "folder")
-                }
-            }
-        });
-        
         SourceView(text: $page.html)
         .toolbar {
             paneToolbar
-            backToolbar
         }
         .pageTitlebar(for: page)
 #if os(iOS)
         .navigationBarBackButtonHidden(true)
-        .introspectNavigationController { navigationController in
-            navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
-        }
 #endif
     }
 }

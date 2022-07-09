@@ -1,4 +1,5 @@
 import SwiftUI
+import Introspect
 
 /**
  * View modifier that adds a page title and subtitle to a page editor.
@@ -8,6 +9,11 @@ import SwiftUI
  * and subtitle as appropriate.
  */
 struct PageTitlebar: ViewModifier {
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass;
+    @Environment(\.dismiss) var dismiss;
+    #endif
+    
     var page: Page?;
     var pageTitle: String? = nil;
     
@@ -38,6 +44,20 @@ struct PageTitlebar: ViewModifier {
                     }
                 }
             })
+            
+            ToolbarItemGroup(placement: .cancellationAction, content: {
+                if horizontalSizeClass == .compact { //custom back buttons are borked on large for some reason
+                    Button {
+                        dismiss();
+                    } label: {
+                        Image(systemName: "folder")
+                    }
+                }
+            })
+        }
+        .navigationBarBackButtonHidden(true)
+        .introspectNavigationController { navigationController in
+            navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
         }
         #elseif os(macOS)
         content
