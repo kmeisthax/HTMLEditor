@@ -12,6 +12,10 @@
 		4E1867742870F9A800046C66 /* FileLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E18676E2870F9A800046C66 /* FileLocation.swift */; };
 		4E1867762870F9A800046C66 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1867702870F9A800046C66 /* MyApp.swift */; };
 		4E58B5232870EE5F00567826 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E58B5222870EE5F00567826 /* Assets.xcassets */; };
+		4E60E68E2879DFA60068D7DD /* HTMLEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E60E68B2879DFA60068D7DD /* HTMLEditor.swift */; };
+		4E60E68F2879DFA60068D7DD /* TextFileEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E60E68C2879DFA60068D7DD /* TextFileEditor.swift */; };
+		4E60E6902879DFA60068D7DD /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E60E68D2879DFA60068D7DD /* SourceView.swift */; };
+		4E60E6922879E5460068D7DD /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E60E6912879E5460068D7DD /* ErrorView.swift */; };
 		4E611B0F2870FC2C00CF484B /* PageState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E611B082870FC2C00CF484B /* PageState.swift */; };
 		4E611B102870FC2C00CF484B /* WebPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E611B092870FC2C00CF484B /* WebPreview.swift */; };
 		4E611B112870FC2C00CF484B /* PageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E611B0A2870FC2C00CF484B /* PageEditor.swift */; };
@@ -41,6 +45,10 @@
 		4E58B51B2870EE5D00567826 /* HTML Editor for AppKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HTML Editor for AppKit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E58B5222870EE5F00567826 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4E58B5272870EE5F00567826 /* HTML_Editor_for_AppKit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HTML_Editor_for_AppKit.entitlements; sourceTree = "<group>"; };
+		4E60E68B2879DFA60068D7DD /* HTMLEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTMLEditor.swift; sourceTree = "<group>"; };
+		4E60E68C2879DFA60068D7DD /* TextFileEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFileEditor.swift; sourceTree = "<group>"; };
+		4E60E68D2879DFA60068D7DD /* SourceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
+		4E60E6912879E5460068D7DD /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		4E611B082870FC2C00CF484B /* PageState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageState.swift; sourceTree = "<group>"; };
 		4E611B092870FC2C00CF484B /* WebPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebPreview.swift; sourceTree = "<group>"; };
 		4E611B0A2870FC2C00CF484B /* PageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageEditor.swift; sourceTree = "<group>"; };
@@ -132,6 +140,10 @@
 		4E611B072870FC2C00CF484B /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				4E60E6912879E5460068D7DD /* ErrorView.swift */,
+				4E60E68B2879DFA60068D7DD /* HTMLEditor.swift */,
+				4E60E68D2879DFA60068D7DD /* SourceView.swift */,
+				4E60E68C2879DFA60068D7DD /* TextFileEditor.swift */,
 				4E611B082870FC2C00CF484B /* PageState.swift */,
 				4E611B092870FC2C00CF484B /* WebPreview.swift */,
 				4E611B0A2870FC2C00CF484B /* PageEditor.swift */,
@@ -248,15 +260,19 @@
 				4E1867742870F9A800046C66 /* FileLocation.swift in Sources */,
 				4E1867762870F9A800046C66 /* MyApp.swift in Sources */,
 				4E611B122870FC2C00CF484B /* Page.swift in Sources */,
+				4E60E6922879E5460068D7DD /* ErrorView.swift in Sources */,
 				4ED03D132876935D00A0D461 /* Project.swift in Sources */,
 				4E1867712870F9A800046C66 /* CornerRadius.swift in Sources */,
+				4E60E68E2879DFA60068D7DD /* HTMLEditor.swift in Sources */,
 				4ED03D082876923F00A0D461 /* ShoeboxProject.swift in Sources */,
 				4ED03D152876935D00A0D461 /* ProjectSettings.swift in Sources */,
 				4ED03D072876923F00A0D461 /* Shoebox.swift in Sources */,
 				4ED03D162876935D00A0D461 /* ProjectFileEntry.swift in Sources */,
+				4E60E6902879DFA60068D7DD /* SourceView.swift in Sources */,
 				4E611B102870FC2C00CF484B /* WebPreview.swift in Sources */,
 				4E611B0F2870FC2C00CF484B /* PageState.swift in Sources */,
 				4ED03D122876935D00A0D461 /* ProjectState.swift in Sources */,
+				4E60E68F2879DFA60068D7DD /* TextFileEditor.swift in Sources */,
 				4ED03D142876935D00A0D461 /* ProjectEditor.swift in Sources */,
 				4ED03D0A2876923F00A0D461 /* ShoeboxState.swift in Sources */,
 				4ED03D172876935D00A0D461 /* DirectoryItem.swift in Sources */,

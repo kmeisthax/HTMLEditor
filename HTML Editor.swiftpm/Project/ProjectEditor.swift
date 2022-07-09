@@ -90,18 +90,7 @@ struct ProjectEditor: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
-            ZStack {
-                #if os(iOS)
-                Color(UIColor.secondarySystemBackground)
-                #endif
-                VStack {
-                    Image(systemName: "questionmark.folder").font(.system(size: 180, weight: .medium))
-                    Text("Please select a file.")
-                }
-            }
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
+            ErrorView(error: "Please select a file.")
         }.navigationViewStyle(.columns).sheet(isPresented: $showSettings) {
             ProjectSettings(project: project, directory: project.projectLocation)
         }
