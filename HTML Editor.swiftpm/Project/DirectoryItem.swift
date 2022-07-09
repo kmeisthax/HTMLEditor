@@ -32,7 +32,7 @@ struct DirectoryItem: View {
                         }
                     }
                 } else {
-                    Label(contents.filename, systemImage: "doc.richtext")
+                    Label(contents.filename, systemImage: contents.icon)
                 }
             }
             .contextMenu{

@@ -25,7 +25,7 @@ struct ProjectEditor: View {
                                     .navigationBarTitleDisplayMode(.inline)
                                     #endif
                             } label: {
-                                Label(doc.filename, systemImage: "doc.richtext")
+                                Label(doc.filename, systemImage: doc.icon)
                             }
                         }
                     }
