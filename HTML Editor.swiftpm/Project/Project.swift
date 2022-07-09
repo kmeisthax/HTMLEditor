@@ -187,6 +187,40 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
     }
     
+    /**
+     * Import picked or dragged items into the project root.
+     */
+    func importItems(items: [NSItemProvider]) {
+        for (i, item) in items.enumerated() {
+            for type in item.registeredTypeIdentifiers {
+                let suggestedName = item.suggestedName ?? "item_\(i)";
+                
+                if let url = projectDirectory {
+                    let suggestedUrl = url.appendingPathComponent(suggestedName).appendingPathExtension(for: UTType(exportedAs: type));
+                    
+                    item.loadFileRepresentation(forTypeIdentifier: type, completionHandler: { fileUrl, error in
+                        print ("importing format \(type)");
+                        if let fileUrl = fileUrl {
+                            do {
+                                CFURLStartAccessingSecurityScopedResource(url as CFURL);
+                                
+                                try FileManager.default.copyItem(at: fileUrl, to: suggestedUrl);
+                                
+                                CFURLStopAccessingSecurityScopedResource(url as CFURL);
+                            } catch {
+                                print("Could not import \(suggestedUrl): \(error)");
+                            }
+                        }
+                        
+                        if let error = error {
+                            print("Could not import \(suggestedUrl): \(error)");
+                        }
+                    });
+                }
+            }
+        }
+    }
+    
     private var picker_c: [AnyCancellable] = [];
     private var pagePickerLocation: FileLocation?;
     

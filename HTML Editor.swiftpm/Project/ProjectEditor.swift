@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ProjectEditor: View {
     @ObservedObject var project: Project;
@@ -8,6 +9,8 @@ struct ProjectEditor: View {
     #endif
     
     @State var showSettings: Bool = false;
+    @State var showPhotoPicker: Bool = false;
+    
     @SceneStorage("ProjectEditor.openPageID") var openPageID: String?;
     
     var goBack: (() -> Void)?;
@@ -69,6 +72,7 @@ struct ProjectEditor: View {
                             Text("New page")
                             Image(systemName: "doc.badge.plus")
                         }
+                        Divider()
                         Button {
                             #if os(iOS)
                             project.openPage(scene: sceneDelegate.scene!);
@@ -77,6 +81,14 @@ struct ProjectEditor: View {
                             Text("Open file...")
                             Image(systemName: "doc.text")
                         }
+                        #if os(iOS)
+                        Divider()
+                        Button {
+                            showPhotoPicker = true;
+                        } label: {
+                            Label("Import photo...", systemImage: "photo")
+                        }
+                        #endif
                     } label: {
                         Image(systemName: "doc.badge.plus")
                     }
@@ -91,8 +103,17 @@ struct ProjectEditor: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             ErrorView(error: "Please select a file.")
-        }.navigationViewStyle(.columns).sheet(isPresented: $showSettings) {
+        }
+        .navigationViewStyle(.columns)
+        .sheet(isPresented: $showSettings) {
             ProjectSettings(project: project, directory: project.projectLocation)
+        }
+        .sheet(isPresented: $showPhotoPicker) {
+            SystemImagePicker { photos in
+                self.showPhotoPicker = false;
+                
+                self.project.importItems(items: photos.map({ photo in photo.itemProvider}))
+            }
         }
     }
 }
