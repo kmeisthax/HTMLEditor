@@ -12,6 +12,8 @@ struct PageEditor: View {
             HTMLEditor(page: page)
         } else if page.type == .text || page.type?.isSubtype(of: .text) ?? false {
             TextFileEditor(page: page)
+        } else if page.type?.isSubtype(of: .image) ?? false {
+            ImagePreview(page: page)
         } else if let desc = page.type?.localizedDescription {
             ErrorView(error: "Unknown file type: \(desc)")
         } else {
