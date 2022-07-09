@@ -88,6 +88,13 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     /**
+     * Determine if this Page is representable as text (e.g. it's a text or HTML file).
+     */
+    var isTextRepresentable: Bool {
+        self.type == .html || self.type == .text || self.type?.isSubtype(of: .text) ?? false
+    }
+    
+    /**
      * Get a string that uniquely identifies this file.
      */
     var linkIdentity: String {
@@ -126,8 +133,11 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * This is a published property intended to be used by UI code to both
      * display and modify file contents. When this string is modified, an
      * autosave is triggered.
+     *
+     * This property is only used for HTML and text and should not be used
+     * for non-text file types.
      */
-    @Published var html: String = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+    @Published var html: String = "";
     
     /**
      * The contents of the file on disk.
@@ -138,8 +148,11 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * The default value of this parameter must match html; otherwise the
      * default value of that parameter will overwrite every file we open and
      * lose user data.
+     *
+     * This property is only used for HTML and text and should not be used
+     * for non-text file types.
      */
-    var htmlOnDisk: String? = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+    var htmlOnDisk: String? = nil;
     
     /**
      * Autosave event storage
@@ -153,30 +166,34 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         
         super.init()
         
-        $html.throttle(for: 1.0, scheduler: presentedItemOperationQueue, latest: true).sink(receiveValue: { [weak self] _ in
-            if let url = self?.presentedItemURL {
-                let coordinator = NSFileCoordinator.init(filePresenter: self);
-                let scheduled_html = self!.html;
-                
-                if scheduled_html != self!.htmlOnDisk {
-                    coordinator.coordinate(with: [.writingIntent(with: url)], queue: self!.presentedItemOperationQueue) { [self] error in
-                        if let error = error {
-                            print (error);
+        if self.isTextRepresentable {
+            self.htmlOnDisk = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+            self.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+            
+            $html.throttle(for: 1.0, scheduler: presentedItemOperationQueue, latest: true).sink(receiveValue: { [weak self] _ in
+                if let url = self?.presentedItemURL, let scheduled_html = self?.html {
+                    let coordinator = NSFileCoordinator.init(filePresenter: self);
+                    
+                    if scheduled_html != self!.htmlOnDisk {
+                        coordinator.coordinate(with: [.writingIntent(with: url)], queue: self!.presentedItemOperationQueue) { [self] error in
+                            if let error = error {
+                                print (error);
+                            }
+                            
+                            self!.doActualSave(url: url, html: scheduled_html);
                         }
-                        
-                        self!.doActualSave(url: url, html: scheduled_html);
                     }
                 }
-            }
-        }).store(in: &c);
-        
-        $ownership.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-            self?.shoebox?.nestedStateDidChange()
-        }).store(in: &c);
-        
-        $presentedItemURL.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-            self?.shoebox?.nestedStateDidChange()
-        }).store(in: &c);
+            }).store(in: &c);
+            
+            $ownership.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
+                self?.shoebox?.nestedStateDidChange()
+            }).store(in: &c);
+            
+            $presentedItemURL.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
+                self?.shoebox?.nestedStateDidChange()
+            }).store(in: &c);
+        }
     }
     
     deinit {
@@ -350,32 +367,34 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     func presentedItemDidChange() {
-        if let url = self.presentedItemURL {
-            if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
-                //panic! at the disco
-                print("Cannot access URL")
-            }
-            
-            do {
-                let new_html = try String(contentsOf: url);
-                
-                // We only update HTML if the file contents have actually
-                // changed. Otherwise, we can wind up in a loop of constantly
-                // updating SwiftUI and pinging ourselves about the file change
-                if new_html != html {
-                    htmlOnDisk = new_html;
-                    html = new_html;
+        if self.isTextRepresentable {
+            if let url = self.presentedItemURL {
+                if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
+                    //panic! at the disco
+                    print("Cannot access URL")
                 }
-            } catch {
-                //panic?!
-                print("Error reading URL: \(error)")
+                
+                do {
+                    let new_html = try String(contentsOf: url);
+                    
+                    // We only update HTML if the file contents have actually
+                    // changed. Otherwise, we can wind up in a loop of constantly
+                    // updating SwiftUI and pinging ourselves about the file change
+                    if new_html != html {
+                        htmlOnDisk = new_html;
+                        html = new_html;
+                    }
+                } catch {
+                    //panic?!
+                    print("Error reading URL: \(error)")
+                }
+                
+                if self.ownership == .SecurityScoped {
+                    CFURLStopAccessingSecurityScopedResource(self.accessURL! as CFURL);
+                }
+            } else {
+                print("No URL")
             }
-            
-            if self.ownership == .SecurityScoped {
-                CFURLStopAccessingSecurityScopedResource(self.accessURL! as CFURL);
-            }
-        } else {
-            print("No URL")
         }
     }
     
@@ -405,24 +424,37 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         })
     }
     
+    /**
+     * Save the file back to disk.
+     *
+     * The URL parameter allows saving the file to an alternate location. The
+     * given URL must be accessible within the sandbox provided by the
+     * access URL on this page.
+     *
+     * If this page is not text-representable this does nothing.
+     */
     private func doActualSave(url: URL, html: String) {
-        if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
-            //panic! at the disco
-            print("Cannot access URL")
-        }
-        
-        do {
-            print("About to save");
-            try html.write(to: url, atomically: true, encoding: .utf8);
-            htmlOnDisk = html;
-            print("Saved");
-        } catch {
-            //panic?!
-            print("Error writing URL")
-        }
-        
-        if self.ownership == .SecurityScoped {
-            CFURLStopAccessingSecurityScopedResource(self.accessURL! as CFURL);
+        if self.isTextRepresentable {
+            if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
+                //panic! at the disco
+                print("Cannot access URL")
+            }
+            
+            do {
+                print("About to save");
+                try html.write(to: url, atomically: true, encoding: .utf8);
+                htmlOnDisk = html;
+                print("Saved");
+            } catch {
+                //panic?!
+                print("Error writing URL")
+            }
+            
+            if self.ownership == .SecurityScoped {
+                CFURLStopAccessingSecurityScopedResource(self.accessURL! as CFURL);
+            }
+        } else {
+            print("Blocked attempt to save non-text file \(url) of type \(String(describing: self.type))");
         }
     }
 }
