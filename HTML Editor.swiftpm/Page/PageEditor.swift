@@ -15,9 +15,9 @@ struct PageEditor: View {
         } else if page.type?.isSubtype(of: .image) ?? false {
             ImagePreview(page: page)
         } else if let desc = page.type?.localizedDescription {
-            ErrorView(error: "Unknown file type: \(desc)")
+            ErrorView(error: "Unknown file type: \(desc)").pageTitlebar(for: page)
         } else {
-            ErrorView(error: "Unknown file type")
+            ErrorView(error: "Unknown file type").pageTitlebar(for: page)
         }
     }
 }

@@ -8,6 +8,6 @@ struct ImagePreview: View {
             image.resizable().aspectRatio(contentMode: .fit)
         } placeholder: {
             ProgressView()
-        }
+        }.pageTitlebar(for: page)
     }
 }

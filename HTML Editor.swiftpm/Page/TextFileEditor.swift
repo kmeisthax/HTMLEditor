@@ -16,20 +16,6 @@ struct TextFileEditor: View {
     @State var horizontalSizeClass = HorizontalSizeClass.normal;
 #endif
     
-    var windowTitle: String {
-        page.filename
-    }
-    
-    var windowSubtitle: String? {
-        if page.ownership == .AppOwned {
-            return "Temporary file";
-        } else if let path = page.path, path != windowTitle {
-            return path;
-        } else {
-            return nil;
-        }
-    }
-    
     var body: some View {
 #if os(iOS)
         let paneToolbarPlacement = ToolbarItemPlacement.primaryAction;
@@ -48,19 +34,6 @@ struct TextFileEditor: View {
             }
         }
         
-#if os(iOS)
-        let titleToolbar = ToolbarItemGroup(placement: .principal, content: {
-            VStack {
-                Text(windowTitle).fontWeight(.bold)
-                if let subtitle = windowSubtitle {
-                    Text(subtitle)
-                        .foregroundColor(.secondary)
-                        .font(.footnote)
-                }
-            }
-        });
-#endif
-        
         let backToolbar = ToolbarItemGroup(placement: .cancellationAction, content: {
             if horizontalSizeClass == .compact { //custom back buttons are borked on large for some reason
                 Button {
@@ -74,22 +47,14 @@ struct TextFileEditor: View {
         SourceView(text: $page.html)
         .toolbar {
             paneToolbar
-            
-#if os(iOS)
-            titleToolbar
-#endif
-            
             backToolbar
         }
+        .pageTitlebar(for: page)
 #if os(iOS)
         .navigationBarBackButtonHidden(true)
         .introspectNavigationController { navigationController in
             navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
         }
-#endif
-#if os(macOS)
-        .navigationTitle(windowTitle)
-        .navigationSubtitle(windowSubtitle ?? "")
 #endif
     }
 }
