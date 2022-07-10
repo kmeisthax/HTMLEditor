@@ -31,7 +31,6 @@
 		4ED03D132876935D00A0D461 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D0C2876935D00A0D461 /* Project.swift */; };
 		4ED03D142876935D00A0D461 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D0D2876935D00A0D461 /* ProjectEditor.swift */; };
 		4ED03D152876935D00A0D461 /* ProjectSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D0E2876935D00A0D461 /* ProjectSettings.swift */; };
-		4ED03D162876935D00A0D461 /* ProjectFileEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D0F2876935D00A0D461 /* ProjectFileEntry.swift */; };
 		4ED03D172876935D00A0D461 /* DirectoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D102876935D00A0D461 /* DirectoryItem.swift */; };
 		4ED03D182876935D00A0D461 /* DirectoryListing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D112876935D00A0D461 /* DirectoryListing.swift */; };
 		4ED03D1A287693DD00A0D461 /* NotAShoebox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED03D19287693DD00A0D461 /* NotAShoebox.swift */; };
@@ -69,7 +68,6 @@
 		4ED03D0C2876935D00A0D461 /* Project.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		4ED03D0D2876935D00A0D461 /* ProjectEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
 		4ED03D0E2876935D00A0D461 /* ProjectSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectSettings.swift; sourceTree = "<group>"; };
-		4ED03D0F2876935D00A0D461 /* ProjectFileEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectFileEntry.swift; sourceTree = "<group>"; };
 		4ED03D102876935D00A0D461 /* DirectoryItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectoryItem.swift; sourceTree = "<group>"; };
 		4ED03D112876935D00A0D461 /* DirectoryListing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectoryListing.swift; sourceTree = "<group>"; };
 		4ED03D19287693DD00A0D461 /* NotAShoebox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotAShoebox.swift; sourceTree = "<group>"; };
@@ -100,7 +98,6 @@
 				4ED03D112876935D00A0D461 /* DirectoryListing.swift */,
 				4ED03D0C2876935D00A0D461 /* Project.swift */,
 				4ED03D0D2876935D00A0D461 /* ProjectEditor.swift */,
-				4ED03D0F2876935D00A0D461 /* ProjectFileEntry.swift */,
 				4ED03D0E2876935D00A0D461 /* ProjectSettings.swift */,
 				4ED03D0B2876935D00A0D461 /* ProjectState.swift */,
 			);
@@ -293,7 +290,6 @@
 				4ED03D082876923F00A0D461 /* ShoeboxProject.swift in Sources */,
 				4ED03D152876935D00A0D461 /* ProjectSettings.swift in Sources */,
 				4ED03D072876923F00A0D461 /* Shoebox.swift in Sources */,
-				4ED03D162876935D00A0D461 /* ProjectFileEntry.swift in Sources */,
 				4EA009DA287B460E00382EE1 /* ImageImportSheet.swift in Sources */,
 				4E60E6902879DFA60068D7DD /* SourceView.swift in Sources */,
 				4E611B102870FC2C00CF484B /* WebPreview.swift in Sources */,

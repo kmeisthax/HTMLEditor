@@ -3,7 +3,7 @@ import SwiftUI
 struct DirectoryListing: View {
     @ObservedObject var project: Project;
     
-    @Binding var entries: [ProjectFileEntry];
+    @Binding var entries: [Page];
     
     @Binding var openPageID: String?;
     
@@ -11,7 +11,7 @@ struct DirectoryListing: View {
     @Binding var selectedSubpath: [String];
     
     var body: some View {
-        OutlineGroup($entries, children: \ProjectFileEntry.children) { $entry in
+        OutlineGroup($entries, children: \Page.children) { $entry in
             DirectoryItem(project: project, entry: $entry, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
         }
     }

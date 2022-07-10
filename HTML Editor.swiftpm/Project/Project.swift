@@ -54,11 +54,11 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return text;
     }
     
-    @Published var projectFiles: [ProjectFileEntry] = [];
+    @Published var projectFiles: [Page] = [];
     
     func republishDirectoryContents() {
         if let url = projectDirectory {
-            projectFiles = ProjectFileEntry.fromDirectoryContents(at: url);
+            projectFiles = Page.fromSecurityScopedProjectDirectory(url: url);
         } else {
             projectFiles = [];
         }
@@ -182,7 +182,8 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     func addNewPage(inSubpath: [String]) {
         if let url = projectDirectory {
             let untitledPage = Page.newFileInScopedStorage(inSubpath: inSubpath, withName: "Untitled Page", accessURL: url);
-            projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, pathFragment: inSubpath + ["Untitled Page.html"], contents: untitledPage));
+            //TODO: Replace with properly walking the page tree
+            //projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, pathFragment: inSubpath + ["Untitled Page.html"], contents: untitledPage));
         } else {
             openDocuments.append(Page.fromTemporaryStorage())
         }
@@ -244,8 +245,8 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     func presentedItemDidMove(to: URL) {
         self.projectDirectory = to;
         
-        for var child in self.projectFiles {
-            child.projectMovedToDirectory(to: to)
+        for child in self.projectFiles {
+            child.projectDidMove(toDirectory: to)
         }
     }
 }
@@ -285,7 +286,7 @@ extension Project {
         location.$pickedUrls.sink(receiveValue: { [weak self] urls in
             if let self = self {
                 for url in urls {
-                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url))
+                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: []))
                 }
                 
                 // Cancel ourselves now that location picking is done

@@ -3,7 +3,7 @@ import SwiftUI
 struct DirectoryItem: View {
     @ObservedObject var project: Project;
     
-    @Binding var entry: ProjectFileEntry;
+    @Binding var entry: Page;
     
     @Binding var openPageID: String?;
     
@@ -14,10 +14,10 @@ struct DirectoryItem: View {
     @State var renameTo = "";
     
     var body: some View {
-        if let contents = entry.contents {
-            NavigationLink(tag: contents.linkIdentity, selection: $openPageID) {
-                PageEditor(page: contents)
-                    .navigationTitle(contents.filename)
+        if !(entry.presentedItemURL?.hasDirectoryPath ?? true) {
+            NavigationLink(tag: entry.linkIdentity, selection: $openPageID) {
+                PageEditor(page: entry)
+                    .navigationTitle(entry.filename)
                     #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
                     #endif
@@ -30,21 +30,21 @@ struct DirectoryItem: View {
                                 isRenaming = false;
                             }
                         }, onCommit: {
-                            contents.renameFile(to: renameTo);
+                            entry.renameFile(to: renameTo);
                         })
                         .onChange(of: openPageID) { _ in
                             isRenaming = false;
                         }
                     }
                 } else {
-                    Label(contents.filename, systemImage: contents.icon)
+                    Label(entry.filename, systemImage: entry.icon)
                 }
             }
             .contextMenu{
                 FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
             }
         } else {
-            Label(entry.location.lastPathComponent, systemImage: "folder")
+            Label(entry.filename, systemImage: entry.icon)
                 .contextMenu {
                     FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath)
                 }

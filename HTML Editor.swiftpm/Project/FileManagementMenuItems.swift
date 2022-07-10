@@ -8,7 +8,7 @@ struct FileManagementMenuItems: View {
      * 
      * If nil, then this menu performs operations in the root of the project.
      */
-    var forProjectItem: ProjectFileEntry?;
+    var forProjectItem: Page?;
     
     @Binding var showPhotoPicker: Bool;
     @Binding var selectedSubpath: [String];
@@ -17,10 +17,14 @@ struct FileManagementMenuItems: View {
     var renameTo: Binding<String>?;
     
     var directoryPath: [String] {
-        if forProjectItem?.location.hasDirectoryPath ?? false {
-            return forProjectItem!.pathFragment;
+        if let page = forProjectItem, let url = page.presentedItemURL, let pathFragment = page.pathFragment {
+            if url.hasDirectoryPath {
+                return pathFragment;
+            } else {
+                return pathFragment.dropLast();
+            }
         } else {
-            return forProjectItem?.pathFragment.dropLast() ?? [];
+            return [];
         }
     }
     
@@ -31,7 +35,7 @@ struct FileManagementMenuItems: View {
             Text("New page")
             Image(systemName: "doc.badge.plus")
         }
-        if let isRenaming = isRenaming, let contents = forProjectItem?.contents, let renameTo = renameTo {
+        if let isRenaming = isRenaming, let contents = forProjectItem, let renameTo = renameTo {
             Button {
                 isRenaming.wrappedValue = true;
                 renameTo.wrappedValue = contents.filename;

@@ -49,6 +49,22 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
     };
     
+    /**
+     * The relative path fragment from the base URL of the project to this item.
+     *
+     * This is inclusive of the file or directory itself. If you want just the directory,
+     * check if the presented item is a file; if so strip off the last path component.
+     */
+    @Published var pathFragment: [String]?;
+    
+    /**
+     * List of all children of this object (if it is a directory).
+     */
+    @Published var children: [Page]? = nil;
+    
+    /**
+     * Calculate the project-relative subpath for this page.
+     */
     var path: String? {
         if let self_components = presentedItemURL?.pathComponents {
             if let access_components = accessURL?.pathComponents {
@@ -149,7 +165,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * autosave is triggered.
      *
      * This property is only used for HTML and text and should not be used
-     * for non-text file types.
+     * for non-text file types or directories.
      */
     @Published var html: String = "";
     
@@ -164,7 +180,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * lose user data.
      *
      * This property is only used for HTML and text and should not be used
-     * for non-text file types.
+     * for non-text file types or directories.
      */
     var htmlOnDisk: String? = nil;
     
@@ -211,11 +227,65 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         NSFileCoordinator.removeFilePresenter(self);
     }
     
-    class func fromSecurityScopedUrl(url: URL, accessURL: URL) -> Page {
+    static func readChildrenAtDirectory(itemURL: URL, accessURL: URL, pathFragment: [String]) -> [Page] {
+        var children: [Page] = [];
+        
+        do {
+            for child in try FileManager.default.contentsOfDirectory(at: itemURL, includingPropertiesForKeys: [.nameKey, .isDirectoryKey, .isRegularFileKey]) {
+                let childPathFragment = pathFragment + [child.lastPathComponent];
+                
+                children.append(Page.fromSecurityScopedUrl(url: child, accessURL: accessURL, pathFragment: childPathFragment));
+            }
+        } catch {
+            print("Error attempting to enumerate contents of \(itemURL): \(error)");
+        }
+        
+        return children;
+    }
+    
+    /**
+     * Populate the initial contents of an open directory.
+     *
+     * This should only be called once to populate contents; it will refuse to
+     * overwrite existing pages. Instead, you should update the children list
+     * using file presenter methods.
+     *
+     * Caller must have ensured the parent's access URL was unlocked and
+     * reads coordinated before calling this function.
+     */
+    private func populateChildren() {
+        if let itemURL = self.presentedItemURL, let accessURL = self.accessURL, let pathFragment = self.pathFragment {
+            if self.children == nil {
+                self.children = Page.readChildrenAtDirectory(itemURL: itemURL, accessURL: accessURL, pathFragment: pathFragment);
+            } else {
+                print("WARNING: Attempt to overwrite existing Page objects blocked");
+            }
+        } else {
+            print("WARNING: Premature attempt to read directory contents of nil path blocked");
+        }
+    }
+    
+    /**
+     * List out all files within a project directory and create pages for them.
+     *
+     * No page entry is created for the project itself.
+     */
+    class func fromSecurityScopedProjectDirectory(url: URL) -> [Page] {
+        CFURLStartAccessingSecurityScopedResource(url as CFURL);
+        
+        let children = Self.readChildrenAtDirectory(itemURL: url, accessURL: url, pathFragment: []);
+        
+        CFURLStopAccessingSecurityScopedResource(url as CFURL);
+        
+        return children;
+    }
+    
+    class func fromSecurityScopedUrl(url: URL, accessURL: URL, pathFragment: [String]) -> Page {
         let page = Page();
         page.accessURL = accessURL;
         page.presentedItemURL = url;
         page.ownership = .SecurityScoped;
+        page.pathFragment = pathFragment;
         
         let coordinator = NSFileCoordinator.init(filePresenter: page);
         
@@ -225,11 +295,24 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 print (error);
             }
             
+            CFURLStartAccessingSecurityScopedResource(accessURL as CFURL);
+            
             NSFileCoordinator.addFilePresenter(page);
             
-            //We have to kick off the load ourselves, so let's just
-            //pretend to be a file coordinator and notify ourselves.
-            page.presentedItemDidChange();
+            print("Coordinated initial read of \(url)");
+            
+            if !url.hasDirectoryPath {
+                //We have to kick off the load ourselves, so let's just
+                //pretend to be a file coordinator and notify ourselves.
+                page.presentedItemDidChange();
+            } else {
+                page.populateChildren();
+            }
+            
+            CFURLStopAccessingSecurityScopedResource(accessURL as CFURL);
+            
+            //TODO: Do we even care about symlinks?
+            //Can you even HAVE symlinks on iPadOS?
         };
         
         return page;
@@ -266,6 +349,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         page.ownership = .SecurityScoped;
         page.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
         page.htmlOnDisk = "";
+        page.pathFragment = inSubpath + [withName];
         
         let coordinator = NSFileCoordinator.init(filePresenter: page);
         
@@ -423,6 +507,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     
     func presentedItemDidMove(to newURL: URL) {
         self.presentedItemURL = newURL;
+    }
+    
+    func projectDidMove(toDirectory accessURL: URL) {
+        self.accessURL = accessURL;
     }
     
     func presentedItemDidChangeUbiquityAttributes(_ attributes: Set<URLResourceKey>) {
