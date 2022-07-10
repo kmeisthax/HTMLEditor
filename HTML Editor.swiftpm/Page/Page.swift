@@ -375,7 +375,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             NSFileCoordinator.addFilePresenter(page);
             
             //Forcibly save the new page so that it shows up if we reload.
-            page.doActualSave(url: untitledName, html: page.html)
+            page.doActualSave(url: untitledName, html: page.html, fileExistsOnDisk: false)
         };
         
         return page;
@@ -556,10 +556,13 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * given URL must be accessible within the sandbox provided by the
      * access URL on this page.
      *
-     * If this page is not text-representable this does nothing.
+     * If this page is not text-representable this does nothing. This causes
+     * problems for files that we are trying to *create*, as we can't get the type
+     * of a file that does not exist. Setting fileExistsOnDisk to false skips the
+     * check.
      */
-    private func doActualSave(url: URL, html: String) {
-        if self.isTextRepresentable {
+    private func doActualSave(url: URL, html: String, fileExistsOnDisk: Bool = true) {
+        if self.isTextRepresentable || !fileExistsOnDisk { //Type checks on unsaved files don't work
             if self.ownership == .SecurityScoped && !CFURLStartAccessingSecurityScopedResource(self.accessURL! as CFURL) {
                 //panic! at the disco
                 print("Cannot access URL")
