@@ -8,8 +8,10 @@ struct ProjectFileEntry: Hashable, Identifiable {
     var location: URL;
     
     /**
-     * The relative path fragment from the base URL of the project,
-     * if this is a project file.
+     * The relative path fragment from the base URL of the project.
+     * 
+     * If this entry represents a file (instead of a directory) this
+     * DOES contain the filename, too.
      */
     var pathFragment: [String];
     
