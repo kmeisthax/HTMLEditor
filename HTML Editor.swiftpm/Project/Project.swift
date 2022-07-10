@@ -58,7 +58,7 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     
     func republishDirectoryContents() {
         if let url = projectDirectory {
-            projectFiles = Page.fromSecurityScopedProjectDirectory(url: url);
+            projectFiles = Page.fromSecurityScopedProjectDirectory(url: url, project: self);
         } else {
             projectFiles = [];
         }
@@ -98,6 +98,7 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             if let self = self {
                 for openDocument in self.openDocuments {
                     openDocument.shoebox = self.shoebox;
+                    openDocument.project = self;
                 }
             }
             
@@ -156,12 +157,12 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             }
         }
         
+        let project = Project();
+        
         var openDocuments: [Page] = [];
         for pageState in state.openFiles {
-            openDocuments.append(Page.fromState(state: pageState));
+            openDocuments.append(Page.fromState(state: pageState, project: project));
         }
-        
-        let project = Project();
         
         project.id = state.id ?? UUID();
         project.projectDirectory = projectDirectory;
@@ -181,11 +182,11 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      */
     func addNewPage(inSubpath: [String]) {
         if let url = projectDirectory {
-            let untitledPage = Page.newFileInScopedStorage(inSubpath: inSubpath, withName: "Untitled Page", accessURL: url);
+            let untitledPage = Page.newFileInScopedStorage(inSubpath: inSubpath, withName: "Untitled Page", accessURL: url, project: self);
             //TODO: Replace with properly walking the page tree
             //projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, pathFragment: inSubpath + ["Untitled Page.html"], contents: untitledPage));
         } else {
-            openDocuments.append(Page.fromTemporaryStorage())
+            openDocuments.append(Page.fromTemporaryStorage(project: self))
         }
     }
     
@@ -286,7 +287,7 @@ extension Project {
         location.$pickedUrls.sink(receiveValue: { [weak self] urls in
             if let self = self {
                 for url in urls {
-                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: []))
+                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: [], project: self))
                 }
                 
                 // Cancel ourselves now that location picking is done

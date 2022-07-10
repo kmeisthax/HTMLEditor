@@ -40,7 +40,7 @@ struct ProjectEditor: View {
                 }
                 if project.projectFiles.count > 0 {
                     Section(project.projectName) {
-                        DirectoryListing(project: project, entries: $project.projectFiles, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
+                        DirectoryListing(project: project, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
                     }
                 }
             }.listStyle(.sidebar).toolbar {

@@ -191,6 +191,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     
     weak var shoebox: Shoebox?;
     
+    weak var project: Project?;
+    
     override init() {
         id = UUID.init()
         
@@ -227,14 +229,14 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         NSFileCoordinator.removeFilePresenter(self);
     }
     
-    static func readChildrenAtDirectory(itemURL: URL, accessURL: URL, pathFragment: [String]) -> [Page] {
+    static func readChildrenAtDirectory(itemURL: URL, accessURL: URL, pathFragment: [String], project: Project) -> [Page] {
         var children: [Page] = [];
         
         do {
             for child in try FileManager.default.contentsOfDirectory(at: itemURL, includingPropertiesForKeys: [.nameKey, .isDirectoryKey, .isRegularFileKey]) {
                 let childPathFragment = pathFragment + [child.lastPathComponent];
                 
-                children.append(Page.fromSecurityScopedUrl(url: child, accessURL: accessURL, pathFragment: childPathFragment));
+                children.append(Page.fromSecurityScopedUrl(url: child, accessURL: accessURL, pathFragment: childPathFragment, project: project));
             }
         } catch {
             print("Error attempting to enumerate contents of \(itemURL): \(error)");
@@ -254,9 +256,9 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * reads coordinated before calling this function.
      */
     private func populateChildren() {
-        if let itemURL = self.presentedItemURL, let accessURL = self.accessURL, let pathFragment = self.pathFragment {
+        if let itemURL = self.presentedItemURL, let accessURL = self.accessURL, let pathFragment = self.pathFragment, let project = self.project {
             if self.children == nil {
-                self.children = Page.readChildrenAtDirectory(itemURL: itemURL, accessURL: accessURL, pathFragment: pathFragment);
+                self.children = Page.readChildrenAtDirectory(itemURL: itemURL, accessURL: accessURL, pathFragment: pathFragment, project: project);
             } else {
                 print("WARNING: Attempt to overwrite existing Page objects blocked");
             }
@@ -268,24 +270,26 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     /**
      * List out all files within a project directory and create pages for them.
      *
-     * No page entry is created for the project itself.
+     * No page entry is created for the project itself. You must instead provide the project
+     * so that child pages may access it.
      */
-    class func fromSecurityScopedProjectDirectory(url: URL) -> [Page] {
+    class func fromSecurityScopedProjectDirectory(url: URL, project: Project) -> [Page] {
         CFURLStartAccessingSecurityScopedResource(url as CFURL);
         
-        let children = Self.readChildrenAtDirectory(itemURL: url, accessURL: url, pathFragment: []);
+        let children = Self.readChildrenAtDirectory(itemURL: url, accessURL: url, pathFragment: [], project: project);
         
         CFURLStopAccessingSecurityScopedResource(url as CFURL);
         
         return children;
     }
     
-    class func fromSecurityScopedUrl(url: URL, accessURL: URL, pathFragment: [String]) -> Page {
+    class func fromSecurityScopedUrl(url: URL, accessURL: URL, pathFragment: [String], project: Project) -> Page {
         let page = Page();
         page.accessURL = accessURL;
         page.presentedItemURL = url;
         page.ownership = .SecurityScoped;
         page.pathFragment = pathFragment;
+        page.project = project;
         
         let coordinator = NSFileCoordinator.init(filePresenter: page);
         
@@ -318,7 +322,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return page;
     }
     
-    class func fromTemporaryStorage() -> Page {
+    class func fromTemporaryStorage(project: Project) -> Page {
         let name = UUID().uuidString + ".html";
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0];
         
@@ -327,6 +331,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         page.ownership = .AppOwned;
         page.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
         page.htmlOnDisk = "";
+        page.project = project;
         
         //This is an app-owned file, so we don't need to coordinate
         //as we created the file and it can't exist elsewhere
@@ -335,7 +340,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return page;
     }
     
-    class func newFileInScopedStorage(inSubpath: [String], withName: String, accessURL: URL) -> Page {
+    class func newFileInScopedStorage(inSubpath: [String], withName: String, accessURL: URL, project: Project) -> Page {
         var suburl = accessURL;
         for component in inSubpath {
             suburl = suburl.appendingPathComponent(component);
@@ -350,6 +355,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         page.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
         page.htmlOnDisk = "";
         page.pathFragment = inSubpath + [withName];
+        page.project = project;
         
         let coordinator = NSFileCoordinator.init(filePresenter: page);
         
@@ -389,7 +395,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return state;
     }
     
-    class func fromState(state: PageState) -> Page {
+    class func fromState(state: PageState, project: Project) -> Page {
         let ownership = state.ownership;
         var accessUrl: URL? = nil;
         var fileUrl: URL? = nil;
@@ -417,6 +423,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         page.ownership = ownership;
         page.accessURL = accessUrl;
         page.presentedItemURL = fileUrl;
+        page.project = project;
         page.triggerFileLoad();
         
         return page;
