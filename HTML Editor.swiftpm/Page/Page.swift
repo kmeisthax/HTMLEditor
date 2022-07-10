@@ -180,15 +180,12 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         
         super.init()
         
-        if self.isTextRepresentable {
-            self.htmlOnDisk = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
-            self.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
-            
-            $html.throttle(for: 1.0, scheduler: presentedItemOperationQueue, latest: true).sink(receiveValue: { [weak self] _ in
-                if let url = self?.presentedItemURL, let scheduled_html = self?.html {
+        $html.throttle(for: 1.0, scheduler: presentedItemOperationQueue, latest: true).sink(receiveValue: { [weak self] _ in
+            if self?.isTextRepresentable ?? false {
+                if let url = self?.presentedItemURL, let scheduled_html = self?.html, let htmlOnDisk = self!.htmlOnDisk {
                     let coordinator = NSFileCoordinator.init(filePresenter: self);
                     
-                    if scheduled_html != self!.htmlOnDisk {
+                    if scheduled_html != htmlOnDisk {
                         coordinator.coordinate(with: [.writingIntent(with: url)], queue: self!.presentedItemOperationQueue) { [self] error in
                             if let error = error {
                                 print (error);
@@ -198,16 +195,16 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                         }
                     }
                 }
-            }).store(in: &c);
-            
-            $ownership.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-                self?.shoebox?.nestedStateDidChange()
-            }).store(in: &c);
-            
-            $presentedItemURL.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-                self?.shoebox?.nestedStateDidChange()
-            }).store(in: &c);
-        }
+            }
+        }).store(in: &c);
+        
+        $ownership.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
+            self?.shoebox?.nestedStateDidChange()
+        }).store(in: &c);
+        
+        $presentedItemURL.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
+            self?.shoebox?.nestedStateDidChange()
+        }).store(in: &c);
     }
     
     deinit {
@@ -245,6 +242,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         let page = Page();
         page.presentedItemURL = url.appendingPathComponent(name);
         page.ownership = .AppOwned;
+        page.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+        page.htmlOnDisk = "";
         
         //This is an app-owned file, so we don't need to coordinate
         //as we created the file and it can't exist elsewhere
@@ -260,6 +259,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         page.accessURL = accessURL;
         page.presentedItemURL = untitledName;
         page.ownership = .SecurityScoped;
+        page.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+        page.htmlOnDisk = "";
         
         let coordinator = NSFileCoordinator.init(filePresenter: page);
         
@@ -271,9 +272,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             
             NSFileCoordinator.addFilePresenter(page);
             
-            //We have to kick off the load ourselves, so let's just
-            //pretend to be a file coordinator and notify ourselves.
-            page.presentedItemDidChange();
+            //Forcibly save the new page so that it shows up if we reload.
+            page.doActualSave(url: untitledName, html: page.html)
         };
         
         return page;
@@ -390,12 +390,12 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 
                 do {
                     let new_html = try String(contentsOf: url);
+                    htmlOnDisk = new_html;
                     
                     // We only update HTML if the file contents have actually
                     // changed. Otherwise, we can wind up in a loop of constantly
                     // updating SwiftUI and pinging ourselves about the file change
                     if new_html != html {
-                        htmlOnDisk = new_html;
                         html = new_html;
                     }
                 } catch {
