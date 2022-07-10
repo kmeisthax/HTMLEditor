@@ -223,6 +223,15 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         $presentedItemURL.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             self?.shoebox?.nestedStateDidChange()
         }).store(in: &c);
+        
+        $children.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
+            // Force a project UI update any time any page in the project sees children change
+            if let self = self, let project = self.project {
+                let realFiles = project.projectFiles;
+                
+                project.projectFiles = realFiles;
+            }
+        }).store(in: &c);
     }
     
     deinit {
