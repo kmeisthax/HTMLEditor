@@ -585,6 +585,36 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             print("Blocked attempt to save non-text file \(url) of type \(String(describing: self.type))");
         }
     }
+    
+    /**
+     * Add a new page as a child of this one.
+     *
+     * This does nothing if the parent is not a directory.
+     *
+     * The subpath should be provided relative to this page.
+     */
+    func addSubitem(child: Page, inSubpath: [String]) {
+        guard let children = self.children else {
+            print("WARNING: Blocked attempt to add child item to file");
+            return;
+        }
+        
+        if inSubpath.count == 0 {
+            self.children = children + [child];
+        } else {
+            let target = inSubpath.first!;
+            
+            for myChild in children {
+                if myChild.filename == target {
+                    myChild.addSubitem(child: child, inSubpath: Array(inSubpath.dropFirst()))
+                    
+                    return;
+                }
+            }
+            
+            print("WARNING: Could not find suitable child named \(target) to place subitem into");
+        }
+    }
 }
 
 #if os(iOS)

@@ -183,8 +183,22 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     func addNewPage(inSubpath: [String]) {
         if let url = projectDirectory {
             let untitledPage = Page.newFileInScopedStorage(inSubpath: inSubpath, withName: "Untitled Page", accessURL: url, project: self);
-            //TODO: Replace with properly walking the page tree
-            //projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, pathFragment: inSubpath + ["Untitled Page.html"], contents: untitledPage));
+            
+            if inSubpath.count == 0 {
+                self.projectFiles.append(untitledPage);
+            } else {
+                let target = inSubpath.first!;
+                
+                for page in self.projectFiles {
+                    if page.filename == target {
+                        page.addSubitem(child: untitledPage, inSubpath: Array(inSubpath.dropFirst()));
+                        
+                        return;
+                    }
+                }
+                
+                print("WARNING: Could not find suitable child named \(target) to place subitem into");
+            }
         } else {
             openDocuments.append(Page.fromTemporaryStorage(project: self))
         }
