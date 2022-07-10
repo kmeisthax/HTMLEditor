@@ -108,6 +108,7 @@ struct ProjectEditor: View {
         .sheet(isPresented: $showSettings) {
             ProjectSettings(project: project, directory: project.projectLocation)
         }
+        #if os(iOS)
         .sheet(isPresented: $showPhotoPicker) {
             SystemImagePicker { photos in
                 self.showPhotoPicker = false;
@@ -115,6 +116,7 @@ struct ProjectEditor: View {
                 self.project.importItems(items: photos.map({ photo in photo.itemProvider}))
             }
         }
+        #endif
     }
 }
 
