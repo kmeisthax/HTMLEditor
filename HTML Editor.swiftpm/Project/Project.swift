@@ -263,7 +263,7 @@ extension Project {
         location.$pickedUrls.sink(receiveValue: { [weak self] urls in
             if let self = self {
                 for url in urls {
-                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url))
+                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: nil, project: self))
                 }
                 
                 // Cancel ourselves now that location picking is done
@@ -287,7 +287,7 @@ extension Project {
         location.$pickedUrls.sink(receiveValue: { [weak self] urls in
             if let self = self {
                 for url in urls {
-                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: [], project: self))
+                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: nil, project: self))
                 }
                 
                 // Cancel ourselves now that location picking is done

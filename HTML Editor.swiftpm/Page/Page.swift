@@ -292,7 +292,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return children;
     }
     
-    class func fromSecurityScopedUrl(url: URL, accessURL: URL, pathFragment: [String], project: Project) -> Page {
+    class func fromSecurityScopedUrl(url: URL, accessURL: URL, pathFragment: [String]?, project: Project) -> Page {
         let page = Page();
         page.accessURL = accessURL;
         page.presentedItemURL = url;
