@@ -173,6 +173,24 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return project;
     }
     
+    func addSubItem(item: Page, inSubpath: [String]) {
+        if inSubpath.count == 0 {
+            self.projectFiles.append(item);
+        } else {
+            let target = inSubpath.first!;
+            
+            for page in self.projectFiles {
+                if page.filename == target {
+                    page.addSubitem(child: item, inSubpath: Array(inSubpath.dropFirst()));
+                    
+                    return;
+                }
+            }
+            
+            print("WARNING: Could not find suitable child named \(target) to place subitem into");
+        }
+    }
+    
     /**
      * Add a new page to the project.
      * 
@@ -184,23 +202,61 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         if let url = projectDirectory {
             let untitledPage = Page.newFileInScopedStorage(inSubpath: inSubpath, withName: "Untitled Page", accessURL: url, project: self);
             
-            if inSubpath.count == 0 {
-                self.projectFiles.append(untitledPage);
-            } else {
-                let target = inSubpath.first!;
-                
-                for page in self.projectFiles {
-                    if page.filename == target {
-                        page.addSubitem(child: untitledPage, inSubpath: Array(inSubpath.dropFirst()));
-                        
-                        return;
-                    }
-                }
-                
-                print("WARNING: Could not find suitable child named \(target) to place subitem into");
-            }
+            self.addSubItem(item: untitledPage, inSubpath: inSubpath);
         } else {
             openDocuments.append(Page.fromTemporaryStorage(project: self))
+        }
+    }
+    
+    /**
+     * Add a new directory to the project.
+     *
+     * No attempt is made to create a directory without a project directory to store files in.
+     */
+    func addNewDirectory(inSubpath: [String]) {
+        if let url = projectDirectory {
+            var suburl = url;
+            for component in inSubpath {
+                suburl = suburl.appendingPathComponent(component);
+            }
+            
+            let untitledName = suburl.appendingPathComponent("Untitled", conformingTo: .folder);
+            
+            let coordinator = NSFileCoordinator.init(filePresenter: nil);
+            
+            // This is slightly backwards from how new page creation works.
+            // Usually we create the Page first and rely on its constructor
+            // to do a coordinated write to disk. However, if SwiftUI EVER
+            // sees a folder that hasn't been saved yet it starts tripping
+            // bounds checks and the whole process dies. So instead we
+            // create the directory first and then create a Page for it,
+            // as if someone else had made it for us.
+            coordinator.coordinate(with: [.writingIntent(with: suburl)], queue: OperationQueue.main) { error in
+                //TODO: Error handling.
+                if let error = error {
+                    print (error);
+                }
+                
+                if !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+                    //panic! at the disco
+                    print("Cannot access URL: \(String(describing: error))")
+                }
+                
+                do {
+                    print("Creating new directory")
+                    //Create a new directory corresponding to this new Page.
+                    try FileManager.default.createDirectory(at: untitledName, withIntermediateDirectories: false);
+                    
+                    let untitledDirectory = Page.fromSecurityScopedUrl(url: untitledName, accessURL: url, pathFragment: inSubpath + ["Untitled"], project: self);
+                    
+                    self.addSubItem(item: untitledDirectory, inSubpath: inSubpath);
+                } catch {
+                    //panic?!
+                    print("Error creating new directory: \(error)")
+                }
+                
+                CFURLStopAccessingSecurityScopedResource(url as CFURL);
+            }
         }
     }
     

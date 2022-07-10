@@ -35,6 +35,11 @@ struct FileManagementMenuItems: View {
             Text("New page")
             Image(systemName: "doc.badge.plus")
         }
+        Button {
+            project.addNewDirectory(inSubpath: directoryPath)
+        } label: {
+            Label("New folder", systemImage: "folder.badge.plus")
+        }
         if let isRenaming = isRenaming, let contents = forProjectItem, let renameTo = renameTo {
             Button {
                 isRenaming.wrappedValue = true;
