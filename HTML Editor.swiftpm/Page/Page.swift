@@ -280,6 +280,10 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     func intoState() throws -> PageState {
+        if self.presentedItemURL == nil {
+            throw NSError.init(domain: "NoURLError", code: 0);
+        }
+        
         if self.ownership == .SecurityScoped, let accessURL = self.accessURL {
             CFURLStartAccessingSecurityScopedResource(accessURL as CFURL);
         }
@@ -287,7 +291,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         let state = PageState(id: self.id,
                         ownership: self.ownership,
                         accessBookmark: try self.accessURL?.bookmarkData(),
-                        locationBookmark: try self.presentedItemURL!.bookmarkData())
+                        locationBookmark: try self.presentedItemURL!.bookmarkData());
         
         if self.ownership == .SecurityScoped, let accessURL = self.accessURL {
             CFURLStopAccessingSecurityScopedResource(accessURL as CFURL);
