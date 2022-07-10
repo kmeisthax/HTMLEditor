@@ -1,9 +1,14 @@
 import SwiftUI
 
 struct DirectoryItem: View {
+    @ObservedObject var project: Project;
+    
     @Binding var entry: ProjectFileEntry;
     
     @Binding var openPageID: String?;
+    
+    @Binding var showPhotoPicker: Bool;
+    @Binding var selectedSubpath: [String];
     
     @State var isRenaming = false;
     @State var renameTo = "";
@@ -45,6 +50,9 @@ struct DirectoryItem: View {
             }
         } else {
             Label(entry.location.lastPathComponent, systemImage: "folder")
+                .contextMenu {
+                    FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath)
+                }
         }
     }
 }

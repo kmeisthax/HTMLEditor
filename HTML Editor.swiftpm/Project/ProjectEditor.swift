@@ -11,6 +11,11 @@ struct ProjectEditor: View {
     @State var showSettings: Bool = false;
     @State var showPhotoPicker: Bool = false;
     
+    /**
+     * The currently selected subpath for operation sheets (e.g. photo import) 
+     */
+    @State var selectedSubpath: [String] = [];
+    
     @SceneStorage("ProjectEditor.openPageID") var openPageID: String?;
     
     var goBack: (() -> Void)?;
@@ -35,7 +40,7 @@ struct ProjectEditor: View {
                 }
                 if project.projectFiles.count > 0 {
                     Section(project.projectName) {
-                        DirectoryListing(entries: $project.projectFiles, openPageID: $openPageID)
+                        DirectoryListing(project: project, entries: $project.projectFiles, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
                     }
                 }
             }.listStyle(.sidebar).toolbar {
@@ -66,12 +71,7 @@ struct ProjectEditor: View {
                 }
                 ToolbarItemGroup(placement: primaryPlacement) {
                     Menu {
-                        Button {
-                            project.addNewPage()
-                        } label: {
-                            Text("New page")
-                            Image(systemName: "doc.badge.plus")
-                        }
+                        FileManagementMenuItems(project: project, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
                         Divider()
                         Button {
                             #if os(iOS)
@@ -81,14 +81,6 @@ struct ProjectEditor: View {
                             Text("Open file...")
                             Image(systemName: "doc.text")
                         }
-                        #if os(iOS)
-                        Divider()
-                        Button {
-                            showPhotoPicker = true;
-                        } label: {
-                            Label("Import photo...", systemImage: "photo")
-                        }
-                        #endif
                     } label: {
                         Image(systemName: "doc.badge.plus")
                     }
@@ -110,7 +102,7 @@ struct ProjectEditor: View {
         }
         #if os(iOS)
         .sheet(isPresented: $showPhotoPicker) {
-            ImageImportSheet(isPresented: $showPhotoPicker, project: project)
+            ImageImportSheet(isPresented: $showPhotoPicker, subpath: $selectedSubpath, project: project)
         }
         #endif
     }

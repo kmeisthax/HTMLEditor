@@ -24,6 +24,8 @@ struct IdentifiableType: Identifiable, Hashable {
 struct ImageImportSheet: View {
     @Binding var isPresented: Bool;
     
+    @Binding var subpath: [String];
+    
     @State var photos: [PHPickerResult]? = nil;
     @State var availableTypes: [IdentifiableType] = .init();
     @State var allowedTypes: Set<IdentifiableType> = .init();
@@ -63,7 +65,7 @@ struct ImageImportSheet: View {
                     ToolbarItemGroup(placement: .confirmationAction) {
                         Button("Import") {
                             isPresented = false;
-                            project.importItems(items: photos.map({ photo in photo.itemProvider }), allowedTypes: allowedTypes)
+                            project.importItems(items: photos.map({ photo in photo.itemProvider }), allowedTypes: allowedTypes, toSubpath: subpath)
                         }
                     }
                 }.navigationBarTitleDisplayMode(.inline)

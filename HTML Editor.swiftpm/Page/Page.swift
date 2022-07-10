@@ -252,8 +252,13 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return page;
     }
     
-    class func newFileInScopedStorage(withName: String, accessURL: URL) -> Page {
-        let untitledName = accessURL.appendingPathComponent(withName, conformingTo: .html)
+    class func newFileInScopedStorage(inSubpath: [String], withName: String, accessURL: URL) -> Page {
+        var suburl = accessURL;
+        for component in inSubpath {
+            suburl = suburl.appendingPathComponent(component);
+        }
+        
+        let untitledName = suburl.appendingPathComponent(withName, conformingTo: .html)
         
         let page = Page();
         page.accessURL = accessURL;

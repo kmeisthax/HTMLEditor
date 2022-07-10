@@ -176,12 +176,13 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * Add a new page to the project.
      * 
      * If this project is not linked to a directory yet, we create a page in
-     * temporary storage that is owned by the app.
+     * temporary storage that is owned by the app. The inSubpath parameter is
+     * ignored in this case.
      */
-    func addNewPage() {
+    func addNewPage(inSubpath: [String]) {
         if let url = projectDirectory {
-            let untitledPage = Page.newFileInScopedStorage(withName: "Untitled Page", accessURL: url);
-            projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, pathFragment: ["Untitled Page.html"], contents: untitledPage));
+            let untitledPage = Page.newFileInScopedStorage(inSubpath: inSubpath, withName: "Untitled Page", accessURL: url);
+            projectFiles.append(ProjectFileEntry(location: untitledPage.presentedItemURL!, pathFragment: inSubpath + ["Untitled Page.html"], contents: untitledPage));
         } else {
             openDocuments.append(Page.fromTemporaryStorage())
         }
@@ -190,7 +191,7 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     /**
      * Import picked or dragged items into the project root.
      */
-    func importItems(items: [NSItemProvider], allowedTypes: Set<IdentifiableType>) {
+    func importItems(items: [NSItemProvider], allowedTypes: Set<IdentifiableType>, toSubpath: [String]) {
         for (i, item) in items.enumerated() {
             for type in item.registeredTypeIdentifiers {
                 let uttype = UTType(type);
@@ -205,7 +206,12 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 let suggestedName = item.suggestedName ?? "item_\(i)";
                 
                 if let url = projectDirectory {
-                    let suggestedUrl = url.appendingPathComponent(suggestedName).appendingPathExtension(for: uttype!);
+                    var subpathUrl = url;
+                    for component in toSubpath {
+                        subpathUrl = subpathUrl.appendingPathComponent(component);
+                    }
+                    
+                    let suggestedUrl = subpathUrl.appendingPathComponent(suggestedName).appendingPathExtension(for: uttype!);
                     
                     item.loadFileRepresentation(forTypeIdentifier: type, completionHandler: { fileUrl, error in
                         print ("importing format \(type)");
