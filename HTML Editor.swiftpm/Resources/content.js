@@ -8,3 +8,7 @@ html.oninput = function() {
     
     window.webkit.messageHandlers.wysiwygChanged.postMessage(updated);
 }
+
+function quickReload(newHtml) {
+    html.innerHTML = newHtml;
+}
