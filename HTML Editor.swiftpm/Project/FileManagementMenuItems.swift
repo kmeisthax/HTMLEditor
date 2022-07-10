@@ -13,6 +13,9 @@ struct FileManagementMenuItems: View {
     @Binding var showPhotoPicker: Bool;
     @Binding var selectedSubpath: [String];
     
+    var isRenaming: Binding<Bool>?;
+    var renameTo: Binding<String>?;
+    
     var directoryPath: [String] {
         if forProjectItem?.location.hasDirectoryPath ?? false {
             return forProjectItem!.pathFragment;
@@ -27,6 +30,14 @@ struct FileManagementMenuItems: View {
         } label: {
             Text("New page")
             Image(systemName: "doc.badge.plus")
+        }
+        if let isRenaming = isRenaming, let contents = forProjectItem?.contents, let renameTo = renameTo {
+            Button {
+                isRenaming.wrappedValue = true;
+                renameTo.wrappedValue = contents.filename;
+            } label: {
+                Label("Rename", systemImage: "pencil")
+            }
         }
         #if os(iOS)
         Divider()

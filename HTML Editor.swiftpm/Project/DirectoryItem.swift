@@ -41,12 +41,7 @@ struct DirectoryItem: View {
                 }
             }
             .contextMenu{
-                Button {
-                    isRenaming = true;
-                    renameTo = contents.filename;
-                } label: {
-                    Label("Rename", systemImage: "pencil")
-                }
+                FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
             }
         } else {
             Label(entry.location.lastPathComponent, systemImage: "folder")
