@@ -190,13 +190,22 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     /**
      * Import picked or dragged items into the project root.
      */
-    func importItems(items: [NSItemProvider]) {
+    func importItems(items: [NSItemProvider], allowedTypes: Set<IdentifiableType>) {
         for (i, item) in items.enumerated() {
             for type in item.registeredTypeIdentifiers {
+                let uttype = UTType(type);
+                if uttype == nil {
+                    continue;
+                }
+                
+                if !allowedTypes.contains(IdentifiableType(type: uttype!)) {
+                    continue;
+                }
+                
                 let suggestedName = item.suggestedName ?? "item_\(i)";
                 
                 if let url = projectDirectory {
-                    let suggestedUrl = url.appendingPathComponent(suggestedName).appendingPathExtension(for: UTType(exportedAs: type));
+                    let suggestedUrl = url.appendingPathComponent(suggestedName).appendingPathExtension(for: uttype!);
                     
                     item.loadFileRepresentation(forTypeIdentifier: type, completionHandler: { fileUrl, error in
                         print ("importing format \(type)");
