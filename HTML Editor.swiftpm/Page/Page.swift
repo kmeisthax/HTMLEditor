@@ -312,8 +312,6 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             
             NSFileCoordinator.addFilePresenter(page);
             
-            print("Coordinated initial read of \(url)");
-            
             if !url.hasDirectoryPath {
                 //We have to kick off the load ourselves, so let's just
                 //pretend to be a file coordinator and notify ourselves.

@@ -194,8 +194,6 @@ class WebPreviewCoordinator : NSObject, WKScriptMessageHandler, ObservableObject
                 if !self.safariWasLoadedWithFilePermissions || forceReloadFromDisk {
                     self._viewStorage?.loadFileURL(fileURL, allowingReadAccessTo: baseURL);
                     self.safariWasLoadedWithFilePermissions = true;
-                    
-                    print(forceReloadFromDisk);
                 } else {
                     self._viewStorage?.callAsyncJavaScript("quickReload(newHtml);", arguments: ["newHtml": html], in: nil, in: self.appWorld, completionHandler: nil);
                     self.reload = ();
