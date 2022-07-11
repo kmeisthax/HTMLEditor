@@ -1,4 +1,5 @@
 import SwiftUI
+import Introspect
 
 struct DirectoryItem: View {
     @ObservedObject var project: Project;
@@ -13,6 +14,10 @@ struct DirectoryItem: View {
     @State var isRenaming = false;
     @State var renameTo = "";
     
+    //Hack to try and force the text field to get re-introspected
+    //every time we rename.
+    @State var numberOfRenames = 0;
+    
     var renamingLabel: some View {
         HStack {
             Image(systemName: entry.icon)
@@ -23,10 +28,16 @@ struct DirectoryItem: View {
             }, onCommit: {
                 entry.renameFile(to: renameTo);
             })
+            .introspectTextField(customize: { field in
+                //NOTE: This is a platform-specific type even though both types
+                //have the same method.
+                field.becomeFirstResponder()
+            })
             .onChange(of: openPageID) { _ in
                 isRenaming = false;
             }
         }
+        .id(numberOfRenames)
     }
     
     var label: some View {
@@ -51,18 +62,18 @@ struct DirectoryItem: View {
                 }
             }
             .contextMenu{
-                FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
+                FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo, numberOfRenames: $numberOfRenames)
             }
         } else {
             if isRenaming {
                 self.renamingLabel
                     .contextMenu {
-                        FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
+                        FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo, numberOfRenames: $numberOfRenames)
                     }
             } else {
                 self.label
                     .contextMenu {
-                        FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
+                        FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo, numberOfRenames: $numberOfRenames)
                     }
             }
         }

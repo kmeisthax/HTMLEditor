@@ -15,6 +15,7 @@ struct FileManagementMenuItems: View {
     
     var isRenaming: Binding<Bool>?;
     var renameTo: Binding<String>?;
+    var numberOfRenames: Binding<Int>?;
     
     /**
      * The path to the parent directory of this item.
@@ -51,6 +52,10 @@ struct FileManagementMenuItems: View {
             Button {
                 isRenaming.wrappedValue = true;
                 renameTo.wrappedValue = contents.filename;
+                
+                if let numberOfRenames = numberOfRenames {
+                    numberOfRenames.wrappedValue += 1;
+                }
             } label: {
                 Label("Rename", systemImage: "pencil")
             }
