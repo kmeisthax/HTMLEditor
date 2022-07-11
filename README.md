@@ -16,7 +16,7 @@ You can run the `.swiftpm` package contained in this repo inside of Swift Playgr
 
 This program is Free Software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. We are not liable if this eats your homework. No, seriously, it's disturbingly easy to lose data with the way this app autosaves. See the GNU General Public License for more details and remember to always use a <meta charset="utf8"> tag and make backups of everything.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. We are not liable if this eats your homework. No, seriously, it's disturbingly easy to lose data with the way this app autosaves. See the GNU General Public License for more details and remember to always use a `<meta charset="utf8">` tag and make backups of everything.
 
 We use SwiftUI Introspect as a library, which is copyright Timber Software and provided under MIT License terms.
 
