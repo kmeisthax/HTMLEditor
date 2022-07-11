@@ -524,6 +524,13 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     func presentedItemDidMove(to newURL: URL) {
         self.presentedItemURL = newURL;
         self.regeneratePathFragment();
+        
+        if let children = self.children {
+            for child in children {
+                let newChildURL = newURL.appendingPathComponent(child.filename);
+                child.presentedItemDidMove(to: newChildURL);
+            }
+        }
     }
     
     func projectDidMove(toDirectory accessURL: URL) {
