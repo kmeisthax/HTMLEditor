@@ -16,7 +16,25 @@ struct FileManagementMenuItems: View {
     var isRenaming: Binding<Bool>?;
     var renameTo: Binding<String>?;
     
-    var directoryPath: [String] {
+    /**
+     * The path to the parent directory of this item.
+     *
+     * Should be used to calculate a traversable path through the Page tree to this item, for removals.
+     */
+    var containingPath: [String] {
+        if let page = forProjectItem, let pathFragment = page.pathFragment {
+            return pathFragment.dropLast();
+        } else {
+            return [];
+        }
+    }
+    
+    /**
+     * The path to the currently selected directory.
+     *
+     * We treat directory items as selecting themselves, while files select their containing directory.
+     */
+    var selectedDirectoryPath: [String] {
         if let page = forProjectItem, let url = page.presentedItemURL, let pathFragment = page.pathFragment {
             if url.hasDirectoryPath {
                 return pathFragment;
@@ -37,19 +55,19 @@ struct FileManagementMenuItems: View {
                 Label("Rename", systemImage: "pencil")
             }
             Button(role: .destructive) {
-                project.deleteItemFromProject(item: contents, inSubpath: directoryPath);
+                project.deleteItemFromProject(item: contents, inSubpath: containingPath);
             } label: {
                 Label("Delete", systemImage: "trash")
             }
             Divider()
         }
         Button {
-            project.addNewPage(inSubpath: directoryPath)
+            project.addNewPage(inSubpath: selectedDirectoryPath)
         } label: {
             Label("New page", systemImage: "doc.badge.plus")
         }
         Button {
-            project.addNewDirectory(inSubpath: directoryPath)
+            project.addNewDirectory(inSubpath: selectedDirectoryPath)
         } label: {
             Label("New folder", systemImage: "folder.badge.plus")
         }
@@ -57,7 +75,7 @@ struct FileManagementMenuItems: View {
         Divider()
         Button {
             showPhotoPicker = true;
-            selectedSubpath = directoryPath;
+            selectedSubpath = selectedDirectoryPath;
         } label: {
             Label("Import photo...", systemImage: "photo")
         }
