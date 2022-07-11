@@ -211,6 +211,15 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
     }
     
+    private func collapse(subpath: [String], intoURL: URL) -> URL {
+        var suburl = intoURL;
+        for component in subpath {
+            suburl = suburl.appendingPathComponent(component);
+        }
+        
+        return suburl;
+    }
+    
     /**
      * Add a new page to the project.
      * 
@@ -220,9 +229,32 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      */
     func addNewPage(inSubpath: [String]) {
         if let url = projectDirectory {
-            let untitledPage = Page.newFileInScopedStorage(inSubpath: inSubpath, withName: "Untitled Page", accessURL: url, project: self);
+            let directory_url = self.collapse(subpath: inSubpath, intoURL: url);
+            let file_url = directory_url.appendingPathComponent("Untitled Page", conformingTo: .html);
             
-            self.addSubItem(item: untitledPage, inSubpath: inSubpath);
+            let coordinator = NSFileCoordinator.init(filePresenter: nil);
+            
+            coordinator.coordinate(with: [.writingIntent(with: directory_url)], queue: OperationQueue.main) { error in
+                //TODO: Error handling.
+                if let error = error {
+                    print (error);
+                }
+                
+                if !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+                    //panic! at the disco
+                    print("Cannot access URL: \(String(describing: error))")
+                }
+                
+                print("Creating new file")
+                //Pre-create a file before creating the Page around it.
+                FileManager.default.createFile(atPath: file_url.path, contents: Page.DEFAULT_FILE.data(using: .utf8)!);
+                
+                let untitledPage = Page.fromSecurityScopedUrl(url: file_url, accessURL: url, pathFragment: inSubpath + ["Untitled Page.html"], project: self, htmlOnDisk: Page.DEFAULT_FILE);
+                
+                self.addSubItem(item: untitledPage, inSubpath: inSubpath);
+                
+                CFURLStopAccessingSecurityScopedResource(url as CFURL);
+            };
         } else {
             openDocuments.append(Page.fromTemporaryStorage(project: self))
         }
@@ -235,12 +267,8 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      */
     func addNewDirectory(inSubpath: [String]) {
         if let url = projectDirectory {
-            var suburl = url;
-            for component in inSubpath {
-                suburl = suburl.appendingPathComponent(component);
-            }
-            
-            let untitledName = suburl.appendingPathComponent("Untitled", conformingTo: .folder);
+            let directory_url = self.collapse(subpath: inSubpath, intoURL: url);
+            let untitledName = directory_url.appendingPathComponent("Untitled", conformingTo: .folder);
             
             let coordinator = NSFileCoordinator.init(filePresenter: nil);
             
@@ -251,7 +279,7 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             // bounds checks and the whole process dies. So instead we
             // create the directory first and then create a Page for it,
             // as if someone else had made it for us.
-            coordinator.coordinate(with: [.writingIntent(with: suburl)], queue: OperationQueue.main) { error in
+            coordinator.coordinate(with: [.writingIntent(with: directory_url)], queue: OperationQueue.main) { error in
                 //TODO: Error handling.
                 if let error = error {
                     print (error);

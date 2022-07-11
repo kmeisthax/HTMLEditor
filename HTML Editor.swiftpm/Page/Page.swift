@@ -268,13 +268,28 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return children;
     }
     
-    class func fromSecurityScopedUrl(url: URL, accessURL: URL, pathFragment: [String]?, project: Project) -> Page {
+    /**
+     * Create a new Page from an already-existing file or folder on disk.
+     *
+     * The file pointed to by url *must exist* on disk, otherwise SwiftUI will break
+     * immediately after this Page hits the Project.
+     *
+     * You may provide the HTML from the file in this function (say, if you just
+     * created the file and want to skip the load). Otherwise we will read the file
+     * or directory contents ourselves and populate everything normally.
+     */
+    class func fromSecurityScopedUrl(url: URL, accessURL: URL, pathFragment: [String]?, project: Project, htmlOnDisk: String? = nil) -> Page {
         let page = Page();
         page.accessURL = accessURL;
         page.presentedItemURL = url;
         page.ownership = .SecurityScoped;
         page.pathFragment = pathFragment;
         page.project = project;
+        
+        if let htmlOnDisk = htmlOnDisk {
+            page.html = htmlOnDisk;
+            page.htmlOnDisk = htmlOnDisk;
+        }
         
         let coordinator = NSFileCoordinator.init(filePresenter: page);
         
@@ -288,12 +303,14 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             
             NSFileCoordinator.addFilePresenter(page);
             
-            if !url.hasDirectoryPath {
-                //We have to kick off the load ourselves, so let's just
-                //pretend to be a file coordinator and notify ourselves.
-                page.presentedItemDidChange();
-            } else {
-                page.populateChildren();
+            if htmlOnDisk == nil {
+                if !url.hasDirectoryPath {
+                    //We have to kick off the load ourselves, so let's just
+                    //pretend to be a file coordinator and notify ourselves.
+                    page.presentedItemDidChange();
+                } else {
+                    page.populateChildren();
+                }
             }
             
             CFURLStopAccessingSecurityScopedResource(accessURL as CFURL);
@@ -305,6 +322,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         return page;
     }
     
+    static let DEFAULT_FILE = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta charset=\"utf8\">";
+    
     class func fromTemporaryStorage(project: Project) -> Page {
         let name = UUID().uuidString + ".html";
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0];
@@ -312,47 +331,13 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         let page = Page();
         page.presentedItemURL = url.appendingPathComponent(name);
         page.ownership = .AppOwned;
-        page.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+        page.html = Self.DEFAULT_FILE;
         page.htmlOnDisk = "";
         page.project = project;
         
         //This is an app-owned file, so we don't need to coordinate
         //as we created the file and it can't exist elsewhere
         NSFileCoordinator.addFilePresenter(page);
-        
-        return page;
-    }
-    
-    class func newFileInScopedStorage(inSubpath: [String], withName: String, accessURL: URL, project: Project) -> Page {
-        var suburl = accessURL;
-        for component in inSubpath {
-            suburl = suburl.appendingPathComponent(component);
-        }
-        
-        let untitledName = suburl.appendingPathComponent(withName, conformingTo: .html)
-        
-        let page = Page();
-        page.accessURL = accessURL;
-        page.presentedItemURL = untitledName;
-        page.ownership = .SecurityScoped;
-        page.html = "<!DOCTYPE html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
-        page.htmlOnDisk = "";
-        page.pathFragment = inSubpath + [withName];
-        page.project = project;
-        
-        let coordinator = NSFileCoordinator.init(filePresenter: page);
-        
-        coordinator.coordinate(with: [.writingIntent(with: untitledName)], queue: page.presentedItemOperationQueue) { error in
-            //TODO: Error handling.
-            if let error = error {
-                print (error);
-            }
-            
-            NSFileCoordinator.addFilePresenter(page);
-            
-            //Forcibly save the new page so that it shows up if we reload.
-            page.doActualSave(url: untitledName, html: page.html, fileExistsOnDisk: false)
-        };
         
         return page;
     }
