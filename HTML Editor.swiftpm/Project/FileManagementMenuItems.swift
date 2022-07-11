@@ -47,6 +47,11 @@ struct FileManagementMenuItems: View {
             } label: {
                 Label("Rename", systemImage: "pencil")
             }
+            Button {
+                project.deleteItemFromProject(item: contents, inSubpath: directoryPath);
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
         }
         #if os(iOS)
         Divider()

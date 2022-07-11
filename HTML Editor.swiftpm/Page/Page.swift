@@ -593,7 +593,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      *
      * The subpath should be provided relative to this page.
      */
-    func addSubitem(child: Page, inSubpath: [String]) {
+    func addSubItem(child: Page, inSubpath: [String]) {
         guard let children = self.children else {
             print("WARNING: Blocked attempt to add child item to file");
             return;
@@ -606,13 +606,45 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             
             for myChild in children {
                 if myChild.filename == target {
-                    myChild.addSubitem(child: child, inSubpath: Array(inSubpath.dropFirst()))
+                    myChild.addSubItem(child: child, inSubpath: Array(inSubpath.dropFirst()))
                     
                     return;
                 }
             }
             
             print("WARNING: Could not find suitable child named \(target) to place subitem into");
+        }
+    }
+    
+    /**
+     * Remove a page that is a child of this one.
+     *
+     * This does nothing if the parent is not a directory.
+     *
+     * The subpath should be provided relative to this page.
+     */
+    func removeSubItem(child: Page, inSubpath: [String]) {
+        guard let children = self.children else {
+            print("WARNING: Blocked attempt to remove child item from file");
+            return;
+        }
+        
+        if inSubpath.count == 0 {
+            self.children!.removeAll(where: { otherItem in
+                child == otherItem
+            });
+        } else {
+            let target = inSubpath.first!;
+            
+            for page in children {
+                if page.filename == target {
+                    page.removeSubItem(child: child, inSubpath: Array(inSubpath.dropFirst()));
+                    
+                    return;
+                }
+            }
+            
+            print("WARNING: Could not find suitable child named \(target) to remove subitem from");
         }
     }
 }

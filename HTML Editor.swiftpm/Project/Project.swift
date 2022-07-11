@@ -181,13 +181,33 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             
             for page in self.projectFiles {
                 if page.filename == target {
-                    page.addSubitem(child: item, inSubpath: Array(inSubpath.dropFirst()));
+                    page.addSubItem(child: item, inSubpath: Array(inSubpath.dropFirst()));
                     
                     return;
                 }
             }
             
             print("WARNING: Could not find suitable child named \(target) to place subitem into");
+        }
+    }
+    
+    func removeSubItem(item: Page, inSubpath: [String]) {
+        if inSubpath.count == 0 {
+            self.projectFiles.removeAll(where: { otherItem in
+                item == otherItem
+            });
+        } else {
+            let target = inSubpath.first!;
+            
+            for page in self.projectFiles {
+                if page.filename == target {
+                    page.removeSubItem(child: item, inSubpath: Array(inSubpath.dropFirst()));
+                    
+                    return;
+                }
+            }
+            
+            print("WARNING: Could not find suitable child named \(target) to remove subitem from");
         }
     }
     
@@ -253,6 +273,44 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 } catch {
                     //panic?!
                     print("Error creating new directory: \(error)")
+                }
+                
+                CFURLStopAccessingSecurityScopedResource(url as CFURL);
+            }
+        }
+    }
+    
+    /**
+     * Delete a file from the project.
+     *
+     * The given item's path fragment, minus it's own file name (for files),
+     * must be provided so that the project can find and remove the item
+     * from the correct spot in the page tree.
+     */
+    func deleteItemFromProject(item: Page, inSubpath: [String]) {
+        if let url = projectDirectory, let itemUrl = item.presentedItemURL {
+            let coordinator = NSFileCoordinator.init(filePresenter: nil);
+            
+            let parentUrl = itemUrl.deletingLastPathComponent();
+            
+            coordinator.coordinate(with: [.writingIntent(with: parentUrl)], queue: OperationQueue.main) { error in
+                //TODO: Error handling.
+                if let error = error {
+                    print (error);
+                }
+                
+                if !CFURLStartAccessingSecurityScopedResource(url as CFURL) {
+                    //panic! at the disco
+                    print("Cannot access URL: \(String(describing: error))")
+                }
+                
+                do {
+                    print("Deleting item")
+                    try FileManager.default.removeItem(at: itemUrl);
+                    self.removeSubItem(item: item, inSubpath: inSubpath);
+                } catch {
+                    //panic?!
+                    print("Error deleting item: \(error)")
                 }
                 
                 CFURLStopAccessingSecurityScopedResource(url as CFURL);
