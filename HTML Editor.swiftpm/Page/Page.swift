@@ -66,31 +66,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * Calculate the project-relative subpath for this page.
      */
     var path: String? {
-        if let self_components = presentedItemURL?.pathComponents {
-            if let access_components = accessURL?.pathComponents {
-                var lastCommonComponent = 0;
-                
-                for (self_i, self_component) in self_components.enumerated() {
-                    if self_i < access_components.count {
-                        if self_component == access_components[self_i] {
-                            lastCommonComponent = self_i;
-                        }
-                    }
-                }
-                
-                if self_components.count > lastCommonComponent + 1 {
-                    var common_components = self_components.suffix(from: lastCommonComponent);
-                    
-                    common_components.removeFirst();
-                    
-                    if common_components.count > 0 {
-                        return common_components.joined(separator: "/");
-                    }
-                }
-            }
-        }
-        
-        return nil;
+        pathFragment?.joined(separator: "/")
     }
     
     var type: UTType? {
@@ -475,13 +451,39 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 
                 do {
                     try FileManager.default.moveItem(at: url, to: newItemUrl);
-                    self.presentedItemURL = newItemUrl;
+                    self.presentedItemDidMove(to: newItemUrl);
                 } catch let error as NSError {
                     print("Rename failed because \(error)")
                 }
                 
                 if self.ownership == .SecurityScoped {
                     CFURLStopAccessingSecurityScopedResource(self.accessURL as CFURL?);
+                }
+            }
+        }
+    }
+    
+    private func regeneratePathFragment() {
+        if let self_components = presentedItemURL?.pathComponents {
+            if let access_components = accessURL?.pathComponents {
+                var lastCommonComponent = 0;
+                
+                for (self_i, self_component) in self_components.enumerated() {
+                    if self_i < access_components.count {
+                        if self_component == access_components[self_i] {
+                            lastCommonComponent = self_i;
+                        }
+                    }
+                }
+                
+                if self_components.count > lastCommonComponent + 1 {
+                    var common_components = self_components.suffix(from: lastCommonComponent);
+                    
+                    common_components.removeFirst();
+                    
+                    print(common_components);
+                    
+                    self.pathFragment = Array(common_components);
                 }
             }
         }
@@ -521,6 +523,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     
     func presentedItemDidMove(to newURL: URL) {
         self.presentedItemURL = newURL;
+        self.regeneratePathFragment();
     }
     
     func projectDidMove(toDirectory accessURL: URL) {
