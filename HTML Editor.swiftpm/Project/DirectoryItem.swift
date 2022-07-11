@@ -13,8 +13,30 @@ struct DirectoryItem: View {
     @State var isRenaming = false;
     @State var renameTo = "";
     
+    var renamingLabel: some View {
+        HStack {
+            Image(systemName: entry.icon)
+            TextField("", text: $renameTo, onEditingChanged: { (isChanged) in
+                if !isChanged {
+                    isRenaming = false;
+                }
+            }, onCommit: {
+                entry.renameFile(to: renameTo);
+            })
+            .onChange(of: openPageID) { _ in
+                isRenaming = false;
+            }
+        }
+    }
+    
+    var label: some View {
+        Label(entry.filename, systemImage: entry.icon)
+    }
+    
     var body: some View {
-        if !(entry.presentedItemURL?.hasDirectoryPath ?? true) {
+        if entry.presentedItemURL == nil {
+            Text("ERROR")
+        } else if !(entry.presentedItemURL?.hasDirectoryPath ?? true) {
             NavigationLink(tag: entry.linkIdentity, selection: $openPageID) {
                 PageEditor(page: entry)
                     .navigationTitle(entry.filename)
@@ -23,31 +45,26 @@ struct DirectoryItem: View {
                     #endif
             } label: {
                 if isRenaming {
-                    HStack {
-                        Image(systemName: "doc.richtext")
-                        TextField("", text: $renameTo, onEditingChanged: { (isChanged) in
-                            if !isChanged {
-                                isRenaming = false;
-                            }
-                        }, onCommit: {
-                            entry.renameFile(to: renameTo);
-                        })
-                        .onChange(of: openPageID) { _ in
-                            isRenaming = false;
-                        }
-                    }
+                    self.renamingLabel
                 } else {
-                    Label(entry.filename, systemImage: entry.icon)
+                    self.label
                 }
             }
             .contextMenu{
                 FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
             }
         } else {
-            Label(entry.filename, systemImage: entry.icon)
-                .contextMenu {
-                    FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath)
-                }
+            if isRenaming {
+                self.renamingLabel
+                    .contextMenu {
+                        FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
+                    }
+            } else {
+                self.label
+                    .contextMenu {
+                        FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo)
+                    }
+            }
         }
     }
 }
