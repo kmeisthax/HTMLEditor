@@ -78,16 +78,15 @@ struct ProjectEditor: View {
                             project.openPage(scene: sceneDelegate.scene!);
                             #endif
                         } label: {
-                            Text("Open file...")
-                            Image(systemName: "doc.text")
+                            Label("Open file...", systemImage: "doc.text")
                         }
                     } label: {
-                        Image(systemName: "doc.badge.plus")
+                        Label("Add file...", systemImage: "doc.badge.plus")
                     }
                     Button {
                         self.showSettings = true;
                     } label: {
-                        Image(systemName: "gearshape")
+                        Label("Project settings...", systemImage: "gearshape")
                     }
                 }
             }

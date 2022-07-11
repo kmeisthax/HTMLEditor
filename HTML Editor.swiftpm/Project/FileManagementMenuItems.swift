@@ -29,17 +29,6 @@ struct FileManagementMenuItems: View {
     }
     
     var body: some View {
-        Button {
-            project.addNewPage(inSubpath: directoryPath)
-        } label: {
-            Text("New page")
-            Image(systemName: "doc.badge.plus")
-        }
-        Button {
-            project.addNewDirectory(inSubpath: directoryPath)
-        } label: {
-            Label("New folder", systemImage: "folder.badge.plus")
-        }
         if let isRenaming = isRenaming, let contents = forProjectItem, let renameTo = renameTo {
             Button {
                 isRenaming.wrappedValue = true;
@@ -47,11 +36,22 @@ struct FileManagementMenuItems: View {
             } label: {
                 Label("Rename", systemImage: "pencil")
             }
-            Button {
+            Button(role: .destructive) {
                 project.deleteItemFromProject(item: contents, inSubpath: directoryPath);
             } label: {
                 Label("Delete", systemImage: "trash")
             }
+            Divider()
+        }
+        Button {
+            project.addNewPage(inSubpath: directoryPath)
+        } label: {
+            Label("New page", systemImage: "doc.badge.plus")
+        }
+        Button {
+            project.addNewDirectory(inSubpath: directoryPath)
+        } label: {
+            Label("New folder", systemImage: "folder.badge.plus")
         }
         #if os(iOS)
         Divider()
