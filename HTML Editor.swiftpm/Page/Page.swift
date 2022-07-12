@@ -566,7 +566,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             do {
                 print("About to save");
                 try html.write(to: url, atomically: true, encoding: .utf8);
-                htmlOnDisk = html;
+                self.htmlOnDisk = html;
                 print("Saved");
             } catch {
                 //panic?!
