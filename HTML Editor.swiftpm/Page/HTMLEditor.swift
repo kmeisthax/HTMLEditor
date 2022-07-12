@@ -41,7 +41,7 @@ enum HorizontalSizeClass {
 struct HTMLEditor: View {
     @ObservedObject var page: Page;
     
-    @State var wysiwygState = WYSIWYGState.Split;
+    @Binding var wysiwygState : WYSIWYGState;
     @State var pageTitle: String? = nil;
     
 #if os(iOS)

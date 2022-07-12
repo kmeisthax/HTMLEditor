@@ -8,6 +8,8 @@ struct ProjectEditor: View {
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     #endif
     
+    @State var wysiwygState = WYSIWYGState.Split;
+    
     @State var showSettings: Bool = false;
     @State var showPhotoPicker: Bool = false;
     
@@ -27,7 +29,7 @@ struct ProjectEditor: View {
                     Section("Open Files") {
                         ForEach($project.openDocuments) { $doc in
                             NavigationLink(tag: doc.linkIdentity, selection: $openPageID) {
-                                PageEditor(page: doc)
+                                PageEditor(page: doc, wysiwygState: $wysiwygState)
                                     .navigationTitle(doc.filename)
                                     #if os(iOS)
                                     .navigationBarTitleDisplayMode(.inline)
@@ -40,7 +42,7 @@ struct ProjectEditor: View {
                 }
                 if project.projectFiles.count > 0 {
                     Section(project.projectName) {
-                        DirectoryListing(project: project, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
+                        DirectoryListing(project: project, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath, wysiwygState: $wysiwygState)
                     }
                 }
             }.listStyle(.sidebar).toolbar {

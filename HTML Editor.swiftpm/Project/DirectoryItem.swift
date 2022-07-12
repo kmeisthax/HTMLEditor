@@ -11,6 +11,8 @@ struct DirectoryItem: View {
     @Binding var showPhotoPicker: Bool;
     @Binding var selectedSubpath: [String];
     
+    @Binding var wysiwygState: WYSIWYGState;
+    
     @State var isRenaming = false;
     @State var renameTo = "";
     
@@ -49,7 +51,7 @@ struct DirectoryItem: View {
             Text("ERROR")
         } else if !(entry.presentedItemURL?.hasDirectoryPath ?? true) {
             NavigationLink(tag: entry.linkIdentity, selection: $openPageID) {
-                PageEditor(page: entry)
+                PageEditor(page: entry, wysiwygState: $wysiwygState)
                     .navigationTitle(entry.filename)
                     #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)

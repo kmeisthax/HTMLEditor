@@ -7,9 +7,11 @@ import Introspect
 struct PageEditor: View {
     @ObservedObject var page: Page;
     
+    @Binding var wysiwygState: WYSIWYGState;
+    
     var body: some View {
         if page.type == .html {
-            HTMLEditor(page: page)
+            HTMLEditor(page: page, wysiwygState: $wysiwygState)
         } else if page.type == .text || page.type?.isSubtype(of: .text) ?? false {
             TextFileEditor(page: page)
         } else if page.type?.isSubtype(of: .image) ?? false {
