@@ -42,7 +42,7 @@ struct PageTitlebar: ViewModifier {
                             .foregroundColor(.secondary)
                             .font(.footnote)
                     }
-                }
+                }.frame(maxWidth: .infinity)
             })
             
             ToolbarItemGroup(placement: .cancellationAction, content: {
