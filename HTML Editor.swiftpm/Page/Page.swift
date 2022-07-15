@@ -484,13 +484,31 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 
                 do {
                     let new_html = try String(contentsOf: url);
-                    htmlOnDisk = new_html;
                     
-                    // We only update HTML if the file contents have actually
-                    // changed. Otherwise, we can wind up in a loop of constantly
-                    // updating SwiftUI and pinging ourselves about the file change
-                    if new_html != html {
-                        html = new_html;
+                    // The update rules are complicated because we're trying to avoid
+                    // two different problems at the same time:
+                    //
+                    // 1. We don't want to trigger an update loop between two SwiftUI
+                    // views bound to the same page.
+                    //
+                    // 2. We didn't implement conflict resolution yet. If someone grabs
+                    // a write lock (say, ubiquityd/iCloud) we want the user to be able
+                    // to keep typing, but once the lock clears we still need to update
+                    // ourselves. We thus only update anything if the file on disk
+                    // ACTUALLY CHANGED from our last write.
+                    //
+                    // Hence we not double-check for changes, but we do so in a specific
+                    // order.
+                    if new_html != htmlOnDisk {
+                        htmlOnDisk = new_html;
+                        
+                        if new_html != html {
+                            html = new_html;
+                        } else {
+                            print("Refused update because it matches what is in memory");
+                        }
+                    } else {
+                        print("Refused update because HTML on disk did not change");
                     }
                 } catch {
                     //panic?!
@@ -538,8 +556,9 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     func relinquishPresentedItem(toWriter writer: @escaping ((() -> Void)?) -> Void) {
+        print("Write lock claimed");
         writer({
-            print("Got back the file from a writer. Forcing a reload.")
+            print("Write lock released, forcing a reload.");
             self.presentedItemDidChange();
         })
     }
