@@ -15,7 +15,7 @@ struct PageTitlebar: ViewModifier {
     #endif
     
     var page: Page?;
-    var pageTitle: String? = nil;
+    @Binding var pageTitle: String?;
     
     var windowTitle: String {
         pageTitle ?? page?.filename ?? ""
@@ -31,18 +31,39 @@ struct PageTitlebar: ViewModifier {
         }
     }
     
+    @State var isRenamingTitle = false;
+    @State var renamedTitle = "";
+    
     func body(content: Content) -> some View {
         #if os(iOS)
         content.toolbar {
             ToolbarItemGroup(placement: .navigationBarLeading, content: {
-                VStack(alignment: .leading) {
-                    Text(windowTitle).fontWeight(.bold)
-                    if let subtitle = windowSubtitle {
-                        Text(subtitle)
-                            .foregroundColor(.secondary)
-                            .font(.footnote)
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(windowTitle).fontWeight(.bold)
+                        if let subtitle = windowSubtitle {
+                            Text(subtitle)
+                                .foregroundColor(.secondary)
+                                .font(.footnote)
+                        }
+                    }.frame(maxWidth: .infinity)
+                    
+                    if page?.type == .html {
+                        Menu {
+                            Text(page?.presentedItemURL?.lastPathComponent ?? "")
+                                .fontWeight(.bold)
+                            Divider()
+                            Button {
+                                self.isRenamingTitle = true;
+                                self.renamedTitle = pageTitle ?? "";
+                            } label: {
+                                Label("Rename Page...", systemImage: "rectangle.and.pencil.and.ellipsis")
+                            }
+                        } label: {
+                            Image(systemName: "chevron.down.circle.fill").imageScale(.medium)
+                        }.foregroundColor(.secondary)
                     }
-                }.frame(maxWidth: .infinity)
+                }
             })
             
             ToolbarItemGroup(placement: .cancellationAction, content: {
@@ -60,6 +81,35 @@ struct PageTitlebar: ViewModifier {
             navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
         }
         .navigationTitle("")
+        .sheet(isPresented: $isRenamingTitle) {
+            NavigationView {
+                Form {
+                    Section {
+                        TextField("Title", text: $renamedTitle)
+                    }
+                }
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationTitle("Rename Page")
+                    .toolbar {
+                        ToolbarItemGroup(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                isRenamingTitle = false;
+                            }
+                        }
+                        ToolbarItemGroup(placement: .confirmationAction) {
+                            Button("Rename") {
+                                pageTitle = renamedTitle;
+                                isRenamingTitle = false;
+                            }
+                        }
+                    }
+            }
+        }
+        .onChange(of: renamedTitle) { newValue in
+            //We don't actually want to do anything with the value.
+            //SwiftUI doesn't properly populate the text field if
+            //we don't observe its backing state somehow.
+        }
         #elseif os(macOS)
         content
             .navigationTitle(windowTitle)
@@ -69,7 +119,7 @@ struct PageTitlebar: ViewModifier {
 }
 
 extension View {
-    func pageTitlebar(for page: Page? = nil, customTitle: String? = nil) -> some View {
+    func pageTitlebar(for page: Page? = nil, customTitle: Binding<String?> = Binding.constant(nil)) -> some View {
         modifier(PageTitlebar(page: page, pageTitle: customTitle))
     }
 }

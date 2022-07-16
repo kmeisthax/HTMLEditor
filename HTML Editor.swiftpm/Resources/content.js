@@ -9,6 +9,10 @@ html.oninput = function() {
     window.webkit.messageHandlers.wysiwygChanged.postMessage(updated);
 }
 
+/**
+ * Replace the contents of the page with a new document without
+ * triggering a full browser reload.
+ */
 function quickReload(newHtml) {
     html.innerHTML = newHtml;
     
@@ -31,5 +35,15 @@ function quickReload(newHtml) {
         for (var i = 0; i < new_attributes.length; i += 1) {
             html.setAttribute(new_attributes[i].name, new_attributes[i].value);
         }
+    }
+}
+
+/**
+ * Change the title of the document, then trigger user input.
+ */
+function changeTitle(newTitle) {
+    if (document.title != newTitle) {
+        document.title = newTitle;
+        html.oninput();
     }
 }

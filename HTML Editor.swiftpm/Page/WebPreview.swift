@@ -43,7 +43,19 @@ extension WebPreview: UIViewRepresentable {
     }
     
     func updateUIView(_ webView: WKWebView, context: Context) {
-        context.coordinator.sourceChanged(html: html, fileURL: fileURL, baseURL: baseURL)
+        // We have to distinguish between two kinds of updates here:
+        // 
+        // 1. Updates intended to cause a reload (e.g. html changing)
+        // 2. Updates intended to make Safari do our HTML edits for us
+        // 
+        // If HTML changes we can't also trigger any property updates,
+        // and if we're updating properties we have to ignore our own
+        // HTML lest we overwrite our own changes.
+        if (html != context.coordinator.htmlInSafari) {
+            context.coordinator.sourceChanged(html: html, fileURL: fileURL, baseURL: baseURL);
+        } else {
+            context.coordinator.changeTitle(newTitle: self.title);
+        }
     }
 }
 #endif
@@ -113,6 +125,8 @@ class WebPreviewCoordinator : NSObject, WKScriptMessageHandler, ObservableObject
         }
     };
     
+    private var c: [AnyCancellable] = [];
+    
     init(owner: WebPreview, html: String) {
         self.owner = owner;
         self.htmlInSafari = html;
@@ -152,5 +166,14 @@ class WebPreviewCoordinator : NSObject, WKScriptMessageHandler, ObservableObject
             }
             self.htmlInSafari = html;
         }
+    }
+    
+    /**
+     * Change the title of the current document.
+     * 
+     * This will also trigger an autosave through the standard mechanism. 
+     */
+    func changeTitle(newTitle: String?) {
+        self._viewStorage?.callAsyncJavaScript("changeTitle(newTitle);", arguments: ["newTitle": newTitle as Any], in: nil, in: self.appWorld, completionHandler: nil);
     }
 }

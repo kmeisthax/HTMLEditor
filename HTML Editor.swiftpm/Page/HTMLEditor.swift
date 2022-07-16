@@ -149,6 +149,6 @@ struct HTMLEditor: View {
                 .edgesIgnoringSafeArea(.all)
         }.toolbar {
             paneToolbar
-        }.pageTitlebar(for: page, customTitle: pageTitle)
+        }.pageTitlebar(for: page, customTitle: $pageTitle)
     }
 }
