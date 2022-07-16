@@ -91,7 +91,7 @@ struct PageTitlebar: ViewModifier {
                                 .foregroundColor(.secondary)
                                 .font(.footnote)
                         }
-                    }.frame(maxWidth: .infinity)
+                    }
                     
                     if page?.type == .html {
                         self.inlineFileMenu
