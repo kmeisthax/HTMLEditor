@@ -18,7 +18,11 @@ struct PageTitlebar: ViewModifier {
     @Binding var pageTitle: String?;
     
     var windowTitle: String {
-        pageTitle ?? page?.filename ?? ""
+        if let pageTitle = pageTitle, pageTitle != "" {
+            return pageTitle;
+        } else {
+            return page?.filename ?? "";
+        }
     }
     
     var windowSubtitle: String? {
