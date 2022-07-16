@@ -13,14 +13,13 @@ struct WebPreview {
     func makeCoordinator() -> WebPreviewCoordinator {
         WebPreviewCoordinator(owner: self, html: "")
     }
-}
-
-#if os(iOS)
-extension WebPreview: UIViewRepresentable {
-    func makeUIView(context: Context) -> WKWebView {
+    
+    func makePlatformView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration();
         
+        #if os(iOS)
         config.ignoresViewportScaleLimits = true;
+        #endif
         
         let myWorld = context.coordinator.appWorld;
         
@@ -42,12 +41,12 @@ extension WebPreview: UIViewRepresentable {
         return view;
     }
     
-    func updateUIView(_ webView: WKWebView, context: Context) {
+    func updatePlatformView(_ webView: WKWebView, context: Context) {
         // We have to distinguish between two kinds of updates here:
-        // 
+        //
         // 1. Updates intended to cause a reload (e.g. html changing)
         // 2. Updates intended to make Safari do our HTML edits for us
-        // 
+        //
         // If HTML changes we can't also trigger any property updates,
         // and if we're updating properties we have to ignore our own
         // HTML lest we overwrite our own changes.
@@ -58,35 +57,25 @@ extension WebPreview: UIViewRepresentable {
         }
     }
 }
-#endif
 
-#if os(macOS)
+#if os(iOS)
+extension WebPreview: UIViewRepresentable {
+    func makeUIView(context: Context) -> WKWebView {
+        return self.makePlatformView(context: context);
+    }
+    
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        self.updatePlatformView(webView, context: context);
+    }
+}
+#elseif os(macOS)
 extension WebPreview: NSViewRepresentable {
     func makeNSView(context: Context) -> WKWebView {
-        let config = WKWebViewConfiguration();
-        
-        let myWorld = context.coordinator.appWorld;
-        
-        do {
-            let jsurl = Bundle.main.url(forResource: "content", withExtension: "js")!;
-            let js = try String.init(contentsOf: jsurl);
-        
-            config.userContentController = WKUserContentController();
-            config.userContentController.addUserScript(WKUserScript(source: js, injectionTime: WKUserScriptInjectionTime.atDocumentStart, forMainFrameOnly: true, in: myWorld));
-            config.userContentController.add(context.coordinator, contentWorld: myWorld, name: "wysiwygChanged");
-        } catch {
-            print("what;")
-        }
-        
-        let view = WKWebView(frame: .zero, configuration: config);
-        
-        context.coordinator.view = view;
-        
-        return view;
+        return self.makePlatformView(context: context);
     }
     
     func updateNSView(_ webView: WKWebView, context: Context) {
-        context.coordinator.sourceChanged(html: html, fileURL: fileURL, baseURL: baseURL)
+        self.updatePlatformView(webView, context: context);
     }
 }
 #endif

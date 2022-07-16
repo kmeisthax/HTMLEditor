@@ -31,6 +31,51 @@ struct PageTitlebar: ViewModifier {
         }
     }
     
+    var inlineFileMenu: some View {
+        Menu {
+            Text(page?.presentedItemURL?.lastPathComponent ?? "")
+                .fontWeight(.bold)
+            Divider()
+            Button {
+                self.isRenamingTitle = true;
+                self.renamedTitle = pageTitle ?? "";
+            } label: {
+                Label("Rename Page...", systemImage: "rectangle.and.pencil.and.ellipsis")
+            }
+        } label: {
+            #if os(iOS)
+                Image(systemName: "chevron.down.circle.fill").imageScale(.medium)
+            #elseif os(macOS)
+                Image(systemName: "info.circle")
+            #endif
+        }.foregroundColor(.secondary)
+    }
+    
+    var renamingForm: some View {
+        Form {
+            Section {
+                TextField("Title", text: $renamedTitle)
+            }
+        }
+        #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+        #endif
+            .navigationTitle("Rename Page")
+            .toolbar {
+                ToolbarItemGroup(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        isRenamingTitle = false;
+                    }
+                }
+                ToolbarItemGroup(placement: .confirmationAction) {
+                    Button("Rename") {
+                        pageTitle = renamedTitle;
+                        isRenamingTitle = false;
+                    }
+                }
+            }
+    }
+    
     @State var isRenamingTitle = false;
     @State var renamedTitle = "";
     
@@ -49,19 +94,7 @@ struct PageTitlebar: ViewModifier {
                     }.frame(maxWidth: .infinity)
                     
                     if page?.type == .html {
-                        Menu {
-                            Text(page?.presentedItemURL?.lastPathComponent ?? "")
-                                .fontWeight(.bold)
-                            Divider()
-                            Button {
-                                self.isRenamingTitle = true;
-                                self.renamedTitle = pageTitle ?? "";
-                            } label: {
-                                Label("Rename Page...", systemImage: "rectangle.and.pencil.and.ellipsis")
-                            }
-                        } label: {
-                            Image(systemName: "chevron.down.circle.fill").imageScale(.medium)
-                        }.foregroundColor(.secondary)
+                        self.inlineFileMenu
                     }
                 }
             })
@@ -82,28 +115,7 @@ struct PageTitlebar: ViewModifier {
         }
         .navigationTitle("")
         .sheet(isPresented: $isRenamingTitle) {
-            NavigationView {
-                Form {
-                    Section {
-                        TextField("Title", text: $renamedTitle)
-                    }
-                }
-                    .navigationBarTitleDisplayMode(.inline)
-                    .navigationTitle("Rename Page")
-                    .toolbar {
-                        ToolbarItemGroup(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                isRenamingTitle = false;
-                            }
-                        }
-                        ToolbarItemGroup(placement: .confirmationAction) {
-                            Button("Rename") {
-                                pageTitle = renamedTitle;
-                                isRenamingTitle = false;
-                            }
-                        }
-                    }
-            }
+            NavigationView { renamingForm }
         }
         .onChange(of: renamedTitle) { newValue in
             //We don't actually want to do anything with the value.
@@ -114,6 +126,21 @@ struct PageTitlebar: ViewModifier {
         content
             .navigationTitle(windowTitle)
             .navigationSubtitle(windowSubtitle ?? "")
+            .toolbar {
+                ToolbarItemGroup(placement: .navigation) {
+                    if page?.type == .html {
+                        self.inlineFileMenu
+                    }
+                }
+            }
+            .sheet(isPresented: $isRenamingTitle) {
+                renamingForm.frame(minWidth: 300, minHeight: 100).padding()
+            }
+            .onChange(of: renamedTitle) { newValue in
+                //We don't actually want to do anything with the value.
+                //SwiftUI doesn't properly populate the text field if
+                //we don't observe its backing state somehow.
+            }
         #endif
     }
 }
