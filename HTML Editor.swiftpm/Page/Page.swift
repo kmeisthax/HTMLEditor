@@ -104,28 +104,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * Get a string that uniquely identifies this file.
      */
     var linkIdentity: String {
-        if ownership == .SecurityScoped {
-            if let self_components = presentedItemURL?.pathComponents {
-                if let access_components = accessURL?.pathComponents {
-                    var lastCommonComponent = 0;
-                    
-                    for (self_i, self_component) in self_components.enumerated() {
-                        if self_i < access_components.count {
-                            if self_component == access_components[self_i] {
-                                lastCommonComponent = self_i;
-                            }
-                        }
-                    }
-                    
-                    if self_components.count > lastCommonComponent + 1 {
-                        let common_components = self_components.suffix(from: lastCommonComponent);
-                        
-                        if common_components.count > 0 {
-                            return common_components.joined(separator: "/");
-                        }
-                    }
-                }
-            }
+        if ownership == .SecurityScoped, let pathFragment = pathFragment {
+            return pathFragment.joined(separator: "/");
         }
         
         return self.id.uuidString;
@@ -660,6 +640,24 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             
             print("WARNING: Could not find suitable child named \(target) to remove subitem from");
         }
+    }
+    
+    func findSubItem(withSubpath: [Substring]) -> Page? {
+        guard withSubpath.count > 0 else {
+            return self;
+        }
+        
+        guard let children = self.children else {
+            return nil;
+        }
+        
+        guard let subpage = children.first(where: { candidatePage in
+            candidatePage.pathFragment?.first?[...] == withSubpath.first
+        }) else {
+            return nil;
+        }
+        
+        return subpage.findSubItem(withSubpath: Array(withSubpath.dropFirst()));
     }
 }
 

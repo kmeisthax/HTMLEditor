@@ -394,6 +394,24 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
     }
     
+    func page(withLinkIdentity: String) -> Page? {
+        if let page = self.openDocuments.first(where: { candidatePage in
+            candidatePage.linkIdentity == withLinkIdentity;
+        }) {
+            return page;
+        }
+        
+        let splitComponents = withLinkIdentity.split(separator: "/");
+        
+        if let page = self.projectFiles.first(where: { candidatePage in
+            return candidatePage.pathFragment?.first?[...] == splitComponents.first;
+        }) {
+            return page.findSubItem(withSubpath: Array(splitComponents.dropFirst()));
+        }
+        
+        return nil;
+    }
+    
     private var picker_c: [AnyCancellable] = [];
     private var pagePickerLocation: FileLocation?;
     

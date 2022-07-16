@@ -20,6 +20,10 @@ struct ProjectEditor: View {
     
     @SceneStorage("ProjectEditor.openPageID") var openPageID: String?;
     
+    #if os(macOS)
+    @State var window: NSWindow?;
+    #endif
+    
     var goBack: (() -> Void)?;
     
     var body: some View {
@@ -105,6 +109,24 @@ struct ProjectEditor: View {
         .sheet(isPresented: $showPhotoPicker) {
             ImageImportSheet(isPresented: $showPhotoPicker, subpath: $selectedSubpath, project: project)
         }
+        #endif
+        
+        #if os(macOS)
+        WindowAccessor(window: $window, onLoad: {
+            if let openPageID = self.openPageID, let page = self.project.page(withLinkIdentity: openPageID) {
+                self.window?.representedURL = page.presentedItemURL;
+            } else {
+                self.window?.representedURL = nil;
+            }
+        })
+            .frame(maxWidth: 0, maxHeight: 0)
+            .onChange(of: openPageID) { newValue in
+                if let newValue = newValue, let page = self.project.page(withLinkIdentity: newValue) {
+                    self.window?.representedURL = page.presentedItemURL;
+                } else {
+                    self.window?.representedURL = nil;
+                }
+            }
         #endif
     }
 }
