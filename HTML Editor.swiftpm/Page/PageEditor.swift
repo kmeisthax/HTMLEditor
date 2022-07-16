@@ -11,7 +11,7 @@ struct PageEditor: View {
     
     var body: some View {
         if page.type == .html {
-            HTMLEditor(page: page, wysiwygState: $wysiwygState)
+            HTMLEditor(page: page, wysiwygState: $wysiwygState, fakeWysiwygState: wysiwygState)
         } else if page.type == .text || page.type?.isSubtype(of: .text) ?? false {
             TextFileEditor(page: page)
         } else if page.type?.isSubtype(of: .image) ?? false {

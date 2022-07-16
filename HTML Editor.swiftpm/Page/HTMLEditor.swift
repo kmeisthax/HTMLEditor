@@ -42,6 +42,8 @@ struct HTMLEditor: View {
     @ObservedObject var page: Page;
     
     @Binding var wysiwygState : WYSIWYGState;
+    @State var fakeWysiwygState : WYSIWYGState;
+    
     @State var pageTitle: String? = nil;
     
 #if os(iOS)
@@ -94,37 +96,39 @@ struct HTMLEditor: View {
                 }
             }
             
-            Button {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    if self.wysiwygState != .Source {
-                        self.wysiwygState = .Source;
-                    } else {
-                        self.wysiwygState = .Split;
+            if horizontalSizeClass != .compact {
+                Picker(selection: self.$fakeWysiwygState, label: Text("View")) {
+                    Image(systemName: "curlybraces.square").tag(WYSIWYGState.Source)
+                    Image(systemName: "rectangle.split.2x1").tag(WYSIWYGState.Split)
+                    Image(systemName: "doc.richtext").tag(WYSIWYGState.WYSIWYG)
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: self.fakeWysiwygState) { newState in
+                    if self.fakeWysiwygState != self.wysiwygState {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            self.wysiwygState = self.fakeWysiwygState;
+                        }
                     }
                 }
-            } label: {
-                if self.wysiwygState == .Source {
-                    Image(systemName: "curlybraces.square.fill")
-                } else {
-                    Image(systemName: "curlybraces.square")
+                .onChange(of: self.wysiwygState) { newState in
+                    if self.wysiwygState != self.fakeWysiwygState {
+                        self.fakeWysiwygState = self.wysiwygState;
+                    }
                 }
-            }
-            
-            if horizontalSizeClass != .compact {
+            } else {
                 Button {
                     withAnimation(.easeInOut(duration: 0.25)) {
-                        if self.wysiwygState != .WYSIWYG {
-                            self.wysiwygState = .WYSIWYG;
+                        if self.wysiwygState != .Source {
+                            self.wysiwygState = .Source;
                         } else {
                             self.wysiwygState = .Split;
                         }
-                        
                     }
                 } label: {
-                    if self.wysiwygState == .WYSIWYG {
-                        Image(systemName: "doc.richtext.fill")
+                    if self.wysiwygState == .Source {
+                        Image(systemName: "curlybraces.square.fill")
                     } else {
-                        Image(systemName: "doc.richtext")
+                        Image(systemName: "curlybraces.square")
                     }
                 }
             }
