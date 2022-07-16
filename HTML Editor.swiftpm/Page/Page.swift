@@ -497,8 +497,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                     // ourselves. We thus only update anything if the file on disk
                     // ACTUALLY CHANGED from our last write.
                     //
-                    // Hence we not double-check for changes, but we do so in a specific
-                    // order.
+                    // Hence we not only double-check for changes, but we do so in a
+                    // specific order.
                     if new_html != htmlOnDisk {
                         htmlOnDisk = new_html;
                         
