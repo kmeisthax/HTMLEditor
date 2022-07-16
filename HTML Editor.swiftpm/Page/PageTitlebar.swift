@@ -34,8 +34,8 @@ struct PageTitlebar: ViewModifier {
     func body(content: Content) -> some View {
         #if os(iOS)
         content.toolbar {
-            ToolbarItemGroup(placement: .principal, content: {
-                VStack {
+            ToolbarItemGroup(placement: .navigationBarLeading, content: {
+                VStack(alignment: .leading) {
                     Text(windowTitle).fontWeight(.bold)
                     if let subtitle = windowSubtitle {
                         Text(subtitle)
@@ -59,6 +59,7 @@ struct PageTitlebar: ViewModifier {
         .introspectNavigationController { navigationController in
             navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
         }
+        .navigationTitle("")
         #elseif os(macOS)
         content
             .navigationTitle(windowTitle)
