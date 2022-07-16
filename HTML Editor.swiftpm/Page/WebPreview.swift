@@ -52,8 +52,8 @@ struct WebPreview {
         // HTML lest we overwrite our own changes.
         if (html != context.coordinator.htmlInSafari) {
             context.coordinator.sourceChanged(html: html, fileURL: fileURL, baseURL: baseURL);
-        } else {
-            context.coordinator.changeTitle(newTitle: self.title);
+        } else if let title = self.title {
+            context.coordinator.changeTitle(newTitle: title);
         }
     }
 }
@@ -162,7 +162,7 @@ class WebPreviewCoordinator : NSObject, WKScriptMessageHandler, ObservableObject
      * 
      * This will also trigger an autosave through the standard mechanism. 
      */
-    func changeTitle(newTitle: String?) {
-        self._viewStorage?.callAsyncJavaScript("changeTitle(newTitle);", arguments: ["newTitle": newTitle as Any], in: nil, in: self.appWorld, completionHandler: nil);
+    func changeTitle(newTitle: String) {
+        self._viewStorage?.callAsyncJavaScript("changeTitle(newTitle);", arguments: ["newTitle": newTitle], in: nil, in: self.appWorld, completionHandler: nil);
     }
 }
