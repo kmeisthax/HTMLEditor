@@ -57,7 +57,7 @@ struct PageTitlebar: ViewModifier {
     
     var renamingForm: some View {
         Form {
-            Section {
+            Section("Page Title") {
                 TextField("Title", text: $renamedTitle)
             }
         }
