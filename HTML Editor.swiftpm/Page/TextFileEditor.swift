@@ -32,7 +32,7 @@ struct TextFileEditor: View {
             }
         }
         
-        SourceView(text: $page.html)
+        SourcePane(text: $page.html)
         .toolbar {
             paneToolbar
         }

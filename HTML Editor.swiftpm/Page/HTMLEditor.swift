@@ -135,7 +135,7 @@ struct HTMLEditor: View {
         }
         
         GeometryReader { geo_outer in
-            SourceView(text: $page.html)
+            SourcePane(text: $page.html)
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth: 
                         isSplit ? geo_outer.size.width / 2 : .infinity)
