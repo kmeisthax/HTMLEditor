@@ -10,34 +10,26 @@ struct SourcePane : View {
     @State var searchQuery: String = "";
     
     var body: some View {
-        #if os(iOS)
-        GeometryReader { geo in
+        ZStack(alignment: .top) {
             SourceEditor(source: $text, searchQuery: $searchQuery)
                 .padding(1)
+                .padding([.top], isSearching ? 60 : 1)
                 .toolbar {
                     ToolbarItemGroup(placement: .automatic) {
                         Toggle(isOn: $isSearching) {
                             Image(systemName: "magnifyingglass")
                         }.keyboardShortcut("f", modifiers: [.command])
                     }
-                }.frame(maxHeight: isSearching ? geo.size.height - 60 : .infinity)
+                }
             HStack {
                 TextField("Find in file...", text: $searchQuery)
                     .textFieldStyle(.roundedBorder)
             }
-            .padding()
-            .overlay(Rectangle().frame(width: nil, height: isSearching ? 1 : 0, alignment: .top).foregroundColor(.secondary), alignment: .top)
-            .offset(y: isSearching ? geo.size.height - 60 : geo.size.height)
-            .frame(height: 60)
+                .padding()
+                .frame(height: 60)
+                .overlay(Rectangle().frame(width: nil, height: isSearching ? 1 : 0, alignment: .bottom).foregroundColor(.secondary), alignment: .bottom)
+                .offset(y: isSearching ? 0 : -60)
+                .disabled(!isSearching)
         }
-        #elseif os(macOS)
-        TextEditor(text: $text)
-            .font(.system(.body).monospaced())
-            .disableAutocorrection(true)
-            .padding(1)
-            .introspectTextView { editor in
-                editor.isAutomaticQuoteSubstitutionEnabled = false;
-            }
-        #endif
     }
 }
