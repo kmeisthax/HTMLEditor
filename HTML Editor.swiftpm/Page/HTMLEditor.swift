@@ -44,6 +44,9 @@ struct HTMLEditor: View {
     @Binding var wysiwygState : WYSIWYGState;
     @State var fakeWysiwygState : WYSIWYGState;
     
+    @State var isSearching: Bool = false;
+    @State var searchQuery: String = "";
+    
     @State var pageTitle: String? = nil;
     
 #if os(iOS)
@@ -134,20 +137,39 @@ struct HTMLEditor: View {
             }
         }
         
-        GeometryReader { geo_outer in
-            SourcePane(text: $page.html)
-                .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
-                .frame(maxWidth: 
-                        isSplit ? geo_outer.size.width / 2 : .infinity)
-            WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
-                .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
-                .offset(x: isSource ? geo_outer.size.width * 1.0 :
-                            isSplit ? geo_outer.size.width * 0.5 : 0.0)
-                .frame(maxWidth:
-                        isSplit ? geo_outer.size.width / 2 :
-                        isSource ? geo_outer.size.width : .infinity)
-                .edgesIgnoringSafeArea(.all)
+        ZStack(alignment: .top) {
+            GeometryReader { geo_outer in
+                SourceEditor(source: $page.html, searchQuery: $searchQuery)
+                    .padding(1)
+                    .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
+                    .frame(maxWidth:
+                            isSplit ? geo_outer.size.width / 2 : .infinity)
+                WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
+                    .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
+                    .offset(x: isSource ? geo_outer.size.width * 1.0 :
+                                isSplit ? geo_outer.size.width * 0.5 : 0.0)
+                    .frame(maxWidth:
+                            isSplit ? geo_outer.size.width / 2 :
+                            isSource ? geo_outer.size.width : .infinity)
+                    .edgesIgnoringSafeArea(.all)
+            }
+            .padding([.top], isSearching ? 60 : 1)
+            HStack {
+                TextField("Find in file...", text: $searchQuery)
+                    .textFieldStyle(.roundedBorder)
+            }
+                .padding()
+                .frame(height: 60)
+                .overlay(Rectangle().frame(width: nil, height: isSearching ? 1 : 0, alignment: .bottom).foregroundColor(.secondary), alignment: .bottom)
+                .offset(y: isSearching ? 0 : -60)
+                .disabled(!isSearching)
         }.toolbar {
+            ToolbarItemGroup(placement: .automatic) {
+                Toggle(isOn: $isSearching) {
+                    Image(systemName: "magnifyingglass")
+                }.keyboardShortcut("f", modifiers: [.command])
+            }
+            
             paneToolbar
         }.pageTitlebar(for: page, customTitle: $pageTitle)
     }

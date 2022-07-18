@@ -7,6 +7,9 @@ import Introspect
 struct TextFileEditor: View {
     @ObservedObject var page: Page;
     
+    @State var isSearching: Bool = false;
+    @State var searchQuery: String = "";
+    
 #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
@@ -32,8 +35,18 @@ struct TextFileEditor: View {
             }
         }
         
-        SourcePane(text: $page.html)
+        ZStack(alignment: .top) {
+            SourceEditor(source: $page.html, searchQuery: $searchQuery)
+                .padding(1)
+                .padding([.top], isSearching ? 60 : 1)
+        }
         .toolbar {
+            ToolbarItemGroup(placement: .automatic) {
+                Toggle(isOn: $isSearching) {
+                    Image(systemName: "magnifyingglass")
+                }.keyboardShortcut("f", modifiers: [.command])
+            }
+            
             paneToolbar
         }
         .pageTitlebar(for: page)
