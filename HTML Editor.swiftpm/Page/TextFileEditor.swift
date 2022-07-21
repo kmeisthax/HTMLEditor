@@ -37,10 +37,9 @@ struct TextFileEditor: View {
             }
         }
         
-        ZStack(alignment: .top) {
-            SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
-                .padding(1)
-                .padding([.top], isSearching ? SearchBar.HEIGHT : 1)
+        SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
+            .padding(1)
+        .safeAreaInset(edge: .top) {
             SearchBar(searchQuery: $searchQuery, isSearching: $isSearching)
         }
         .toolbar {

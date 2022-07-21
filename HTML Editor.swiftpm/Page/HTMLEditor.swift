@@ -139,23 +139,21 @@ struct HTMLEditor: View {
             }
         }
         
-        ZStack(alignment: .top) {
-            GeometryReader { geo_outer in
-                SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
-                    .padding(1)
-                    .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
-                    .frame(maxWidth:
-                            isSplit ? geo_outer.size.width / 2 : .infinity)
-                WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
-                    .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
-                    .offset(x: isSource ? geo_outer.size.width * 1.0 :
-                                isSplit ? geo_outer.size.width * 0.5 : 0.0)
-                    .frame(maxWidth:
-                            isSplit ? geo_outer.size.width / 2 :
-                            isSource ? geo_outer.size.width : .infinity)
-                    .edgesIgnoringSafeArea(.all)
-            }
-            .padding([.top], isSearching ? SearchBar.HEIGHT : 1)
+        GeometryReader { geo_outer in
+            SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
+                .padding(1)
+                .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
+                .frame(maxWidth:
+                        isSplit ? geo_outer.size.width / 2 : .infinity)
+            WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
+                .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
+                .offset(x: isSource ? geo_outer.size.width * 1.0 :
+                            isSplit ? geo_outer.size.width * 0.5 : 0.0)
+                .frame(maxWidth:
+                        isSplit ? geo_outer.size.width / 2 :
+                        isSource ? geo_outer.size.width : .infinity)
+                .edgesIgnoringSafeArea(.all)
+        }.safeAreaInset(edge: .top) {
             SearchBar(searchQuery: $searchQuery, isSearching: $isSearching)
         }.toolbar {
             paneToolbar

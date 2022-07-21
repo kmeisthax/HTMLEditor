@@ -22,10 +22,11 @@ struct SearchBar: View {
             }
         }
         .padding([.leading, .trailing])
-        .frame(height: Self.HEIGHT)
+        .frame(height: isSearching ? Self.HEIGHT : 0)
+        .background(.bar)
         .overlay(Rectangle().frame(width: nil, height: isSearching ? 1 : 0, alignment: .bottom).foregroundColor(.secondary), alignment: .bottom)
-        .offset(y: isSearching ? 0 : Self.HEIGHT * -1.0)
         .disabled(!isSearching)
+        .clipped()
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
                 Button {
