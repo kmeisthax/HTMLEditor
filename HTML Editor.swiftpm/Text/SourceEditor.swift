@@ -1,15 +1,53 @@
 import SwiftUI
 
+struct SourceEditor {
+    @Binding var source: String;
+    
+    @Binding var selection: [Range<String.Index>];
+    
+    @Binding var searchQuery: String;
+    
+    func makeCoordinator() -> SourceEditorDelegate {
+        return SourceEditorDelegate(source: $source, selection: $selection);
+    }
+    
+    /**
+     * Reset the bindings on our coordinator.
+     *
+     * Occasionally this gets out of sync for some reason and this
+     * hack exists to ensure the coordinator is always bound to our
+     * variables.
+     */
+    func rebindTo(context: Context) {
+        context.coordinator.source = self.$source;
+        context.coordinator.selection = self.$selection;
+    }
+    
+    func convertSwiftRangesToObjc(ranges: [Range<String.Index>], fromString: String) -> [NSValue] {
+        var objcRanges: [NSValue] = [];
+        
+        for item in ranges {
+            objcRanges.append(NSRange(item, in: fromString) as NSValue);
+        }
+        
+        return objcRanges;
+    }
+}
+
 class SourceEditorDelegate: NSObject {
     var source: Binding<String>;
     
+    var selection: Binding<[Range<String.Index>]>;
+    
     var lastSeenSource: String?;
     var lastSeenQuery: String?;
-    
+    var lastSeenSelection: [Range<String.Index>]?;
+
     var outstandingSearchWorkItem: DispatchWorkItem?;
     
-    init(source: Binding<String>) {
+    init(source: Binding<String>, selection: Binding<[Range<String.Index>]>) {
         self.source = source;
+        self.selection = selection;
     }
     
     var wholeStringRange: NSRange {
@@ -71,6 +109,23 @@ class SourceEditorDelegate: NSObject {
         
         self.outstandingSearchWorkItem = nil;
     }
+    
+    /**
+     * Convert a string selection range from NSTextView format to Swift format.
+     */
+    func convertObjcStringRangesToSwift(range: [NSValue], fromString: String) -> [Range<String.Index>] {
+        var swiftRanges : [Range<String.Index>] = [];
+        
+        for selection in range {
+            if let swiftRange = Range(selection as! NSRange, in: fromString) {
+                swiftRanges.append(swiftRange);
+            } else {
+                print("Selection range not representable in Swift: \(selection)");
+            }
+        }
+        
+        return swiftRanges
+    }
 }
 
 #if os(iOS)
@@ -90,20 +145,28 @@ extension SourceEditorDelegate: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         self.source.wrappedValue = textView.text;
     }
+    
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        let swiftSelection = Range(textView.selectedRange, in: textView.text);
+        guard let swiftSelection = swiftSelection else {
+            print("Selection failure, \(textView.selectedRange) is invalid");
+            return;
+        }
+        
+        if [swiftSelection] != self.selection.wrappedValue {
+            self.lastSeenSelection = [swiftSelection];
+            self.selection.wrappedValue = [swiftSelection];
+        }
+    }
 }
 
 /**
  * Custom UITextField adapter that allows search, highlighted text, etc
  */
-struct SourceEditor: UIViewRepresentable {
-    @Binding var source: String;
-    @Binding var searchQuery: String;
-    
-    func makeCoordinator() -> SourceEditorDelegate {
-        return SourceEditorDelegate(source: $source);
-    }
-    
+extension SourceEditor: UIViewRepresentable {
     func makeUIView(context: Context) -> UITextView {
+        self.rebindTo(context: context);
+        
         let view = UITextView();
         
         view.delegate = context.coordinator;
@@ -117,8 +180,7 @@ struct SourceEditor: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UITextView, context: Context) {
-        // Careless hack around SourceEditorDelegate not getting the correct binding the first time
-        context.coordinator.source = self.$source;
+        self.rebindTo(context: context);
         
         let didChange = context.coordinator.lastSeenSource != self.source;
         
@@ -137,6 +199,15 @@ struct SourceEditor: UIViewRepresentable {
             
             context.coordinator.cancelAsyncTextSearch(textStorage: uiView.textStorage);
             context.coordinator.doAsyncTextSearch(searchQuery: self.searchQuery, textStorage: uiView.textStorage);
+        }
+        
+        if context.coordinator.lastSeenSelection != self.selection {
+            if let selection = self.selection.first {
+                uiView.selectedRange = NSRange(selection, in: self.source);
+            } else {
+                //'No selection' is not a valid state, so ignore it.
+                print("Ignoring no selection state");
+            }
         }
     }
 }
@@ -159,19 +230,27 @@ extension SourceEditorDelegate: NSTextViewDelegate {
         
         self.source.wrappedValue = textView.string;
     }
+    
+    func textViewDidChangeSelection(_ notification: Notification) {
+        guard let textView = notification.object as? NSTextView else { return };
+        
+        let swiftSelection = self.convertObjcStringRangesToSwift(range: textView.selectedRanges, fromString: textView.string);
+        
+        if swiftSelection != self.selection.wrappedValue || self.selection.count == 0 {
+            print("Delegate updated to \(swiftSelection)");
+            self.lastSeenSelection = swiftSelection;
+            
+            DispatchQueue.main.async {
+                self.selection.wrappedValue = swiftSelection;
+            }
+        }
+    }
 }
 
 /**
  * Custom NSTextField adapter that allows search, highlighted text, etc
  */
-struct SourceEditor: NSViewRepresentable {
-    @Binding var source: String;
-    @Binding var searchQuery: String;
-    
-    func makeCoordinator() -> SourceEditorDelegate {
-        return SourceEditorDelegate(source: self.$source);
-    }
-    
+extension SourceEditor: NSViewRepresentable {
     func makeNSView(context: Context) -> NSScrollView {
         let scrollview = NSTextView.scrollableTextView();
         let textview = scrollview.documentView as! NSTextView;
@@ -188,10 +267,9 @@ struct SourceEditor: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: NSScrollView, context: Context) {
-        let textview = nsView.documentView as! NSTextView;
+        self.rebindTo(context: context);
         
-        // Careless hack around SourceEditorDelegate not getting the correct binding the first time
-        context.coordinator.source = self.$source;
+        let textview = nsView.documentView as! NSTextView;
         
         if let textStorage = textview.textStorage {
             let didChange = context.coordinator.lastSeenSource != self.source;
@@ -211,6 +289,14 @@ struct SourceEditor: NSViewRepresentable {
                 
                 context.coordinator.cancelAsyncTextSearch(textStorage: textStorage);
                 context.coordinator.doAsyncTextSearch(searchQuery: self.searchQuery, textStorage: textStorage)
+            }
+            
+            if context.coordinator.lastSeenSelection != self.selection {
+                if self.selection.count == 0 {
+                    //Empty selection is illegal so we treat it as do nothing.
+                } else {
+                    textview.selectedRanges = self.convertSwiftRangesToObjc(ranges: self.selection, fromString: self.source);
+                }
             }
         }
     }

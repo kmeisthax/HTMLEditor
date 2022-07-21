@@ -44,6 +44,8 @@ struct HTMLEditor: View {
     @Binding var wysiwygState : WYSIWYGState;
     @State var fakeWysiwygState : WYSIWYGState;
     
+    @State var selection: [Range<String.Index>] = [];
+    
     @State var isSearching: Bool = false;
     @State var searchQuery: String = "";
     
@@ -139,7 +141,7 @@ struct HTMLEditor: View {
         
         ZStack(alignment: .top) {
             GeometryReader { geo_outer in
-                SourceEditor(source: $page.html, searchQuery: $searchQuery)
+                SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
                     .padding(1)
                     .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                     .frame(maxWidth:

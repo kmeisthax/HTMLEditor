@@ -7,6 +7,8 @@ import Introspect
 struct TextFileEditor: View {
     @ObservedObject var page: Page;
     
+    @State var selection: [Range<String.Index>] = [];
+    
     @State var isSearching: Bool = false;
     @State var searchQuery: String = "";
     
@@ -36,7 +38,7 @@ struct TextFileEditor: View {
         }
         
         ZStack(alignment: .top) {
-            SourceEditor(source: $page.html, searchQuery: $searchQuery)
+            SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
                 .padding(1)
                 .padding([.top], isSearching ? 60 : 1)
         }
