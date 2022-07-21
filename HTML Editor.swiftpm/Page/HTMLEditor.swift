@@ -154,7 +154,9 @@ struct HTMLEditor: View {
                         isSource ? geo_outer.size.width : .infinity)
                 .edgesIgnoringSafeArea(.all)
         }.safeAreaInset(edge: .top) {
-            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching)
+            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: $wysiwygState, nextSource: {
+                selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
+            })
         }.toolbar {
             paneToolbar
         }.pageTitlebar(for: page, customTitle: $pageTitle)

@@ -12,13 +12,20 @@ struct SearchBar: View {
     
     @Binding var searchQuery: String;
     @Binding var isSearching: Bool;
+    @Binding var wysiwygMode: WYSIWYGState;
+    
+    var nextSource: () -> Void = {};
+    var nextWysiwyg: () -> Void = {};
     
     var body: some View {
         HStack {
+            if wysiwygMode != .WYSIWYG {
+                Button("Next", action: nextSource)
+            }
             TextField("Find in file...", text: $searchQuery)
                 .textFieldStyle(.roundedBorder)
-            Button("Next") {
-                
+            if wysiwygMode != .Source {
+                Button("Next", action: nextWysiwyg)
             }
         }
         .padding([.leading, .trailing])
