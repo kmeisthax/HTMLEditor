@@ -206,7 +206,6 @@ extension SourceEditor: UIViewRepresentable {
                 uiView.selectedRange = NSRange(selection, in: self.source);
             } else {
                 //'No selection' is not a valid state, so ignore it.
-                print("Ignoring no selection state");
             }
         }
     }
