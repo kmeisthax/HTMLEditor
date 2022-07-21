@@ -40,15 +40,10 @@ struct TextFileEditor: View {
         ZStack(alignment: .top) {
             SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
                 .padding(1)
-                .padding([.top], isSearching ? 60 : 1)
+                .padding([.top], isSearching ? SearchBar.HEIGHT : 1)
+            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching)
         }
         .toolbar {
-            ToolbarItemGroup(placement: .automatic) {
-                Toggle(isOn: $isSearching) {
-                    Image(systemName: "magnifyingglass")
-                }.keyboardShortcut("f", modifiers: [.command])
-            }
-            
             paneToolbar
         }
         .pageTitlebar(for: page)

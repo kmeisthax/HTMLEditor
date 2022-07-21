@@ -155,23 +155,9 @@ struct HTMLEditor: View {
                             isSource ? geo_outer.size.width : .infinity)
                     .edgesIgnoringSafeArea(.all)
             }
-            .padding([.top], isSearching ? 60 : 1)
-            HStack {
-                TextField("Find in file...", text: $searchQuery)
-                    .textFieldStyle(.roundedBorder)
-            }
-                .padding()
-                .frame(height: 60)
-                .overlay(Rectangle().frame(width: nil, height: isSearching ? 1 : 0, alignment: .bottom).foregroundColor(.secondary), alignment: .bottom)
-                .offset(y: isSearching ? 0 : -60)
-                .disabled(!isSearching)
+            .padding([.top], isSearching ? SearchBar.HEIGHT : 1)
+            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching)
         }.toolbar {
-            ToolbarItemGroup(placement: .automatic) {
-                Toggle(isOn: $isSearching) {
-                    Image(systemName: "magnifyingglass")
-                }.keyboardShortcut("f", modifiers: [.command])
-            }
-            
             paneToolbar
         }.pageTitlebar(for: page, customTitle: $pageTitle)
     }
