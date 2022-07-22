@@ -175,6 +175,7 @@ extension SourceEditor: UIViewRepresentable {
         view.autocapitalizationType = .none;
         view.allowsEditingTextAttributes = false;
         view.font = context.coordinator.font;
+        view.contentInsetAdjustmentBehavior = .always;
         
         return view;
     }
