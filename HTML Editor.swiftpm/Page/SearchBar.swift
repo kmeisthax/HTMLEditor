@@ -24,8 +24,7 @@ struct SearchBar: View {
             if wysiwygMode != .WYSIWYG {
                 Button("Next", action: nextSource)
             }
-            TextField("Find in file...", text: $searchQuery)
-                .textFieldStyle(.roundedBorder)
+            SearchField(searchQuery: $searchQuery, placeholder: "Find in file...")
             if wysiwygMode != .Source {
                 Button("Next", action: nextWysiwyg)
             }
