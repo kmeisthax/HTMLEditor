@@ -159,6 +159,6 @@ struct HTMLEditor: View {
             })
         }.toolbar {
             paneToolbar
-        }.pageTitlebar(for: page, customTitle: $pageTitle)
+        }.pageTitlebar(for: page, customTitle: $pageTitle, isSearching: $isSearching)
     }
 }

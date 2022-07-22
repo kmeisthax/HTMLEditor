@@ -6,6 +6,8 @@ import SwiftUI
 struct SearchBar: View {
     #if os(iOS)
     static var HEIGHT: CGFloat = 50;
+    
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass;
     #elseif os(macOS)
     static var HEIGHT: CGFloat = 35;
     #endif
@@ -36,17 +38,19 @@ struct SearchBar: View {
         .clipped()
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        isSearching = !isSearching;
+                if self.horizontalSizeClass != .compact {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            isSearching = !isSearching;
+                        }
+                    } label: {
+                        Image(systemName: "doc.text.magnifyingglass")
                     }
-                } label: {
-                    Image(systemName: "doc.text.magnifyingglass")
+                    .background(isSearching ? Color.accentColor : .clear)
+                    .cornerRadius(5.0)
+                    .foregroundColor(isSearching ? .white : .accentColor)
+                    .keyboardShortcut("f", modifiers: [.command])
                 }
-                .background(isSearching ? Color.accentColor : .clear)
-                .cornerRadius(5.0)
-                .foregroundColor(isSearching ? .white : .accentColor)
-                .keyboardShortcut("f", modifiers: [.command])
             }
         }
     }

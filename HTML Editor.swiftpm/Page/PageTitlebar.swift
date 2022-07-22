@@ -16,6 +16,7 @@ struct PageTitlebar: ViewModifier {
     
     var page: Page?;
     @Binding var pageTitle: String?;
+    var isSearching: Binding<Bool>?;
     
     var windowTitle: String {
         if let pageTitle = pageTitle, pageTitle != "" {
@@ -45,6 +46,14 @@ struct PageTitlebar: ViewModifier {
                 self.renamedTitle = pageTitle ?? "";
             } label: {
                 Label("Rename Page...", systemImage: "rectangle.and.pencil.and.ellipsis")
+            }
+            if let searching = self.isSearching {
+                Divider()
+                Button {
+                    searching.wrappedValue = !searching.wrappedValue;
+                } label: {
+                    Label("Find in page...", systemImage: "doc.text.magnifyingglass")
+                }
             }
         } label: {
             #if os(iOS)
@@ -100,7 +109,7 @@ struct PageTitlebar: ViewModifier {
                     if page?.type == .html {
                         self.inlineFileMenu
                     }
-                }
+                }.frame(maxWidth: horizontalSizeClass == .compact ? 250 : .infinity)
             })
             
             ToolbarItemGroup(placement: .cancellationAction, content: {
@@ -150,7 +159,7 @@ struct PageTitlebar: ViewModifier {
 }
 
 extension View {
-    func pageTitlebar(for page: Page? = nil, customTitle: Binding<String?> = Binding.constant(nil)) -> some View {
-        modifier(PageTitlebar(page: page, pageTitle: customTitle))
+    func pageTitlebar(for page: Page? = nil, customTitle: Binding<String?> = Binding.constant(nil), isSearching: Binding<Bool>? = nil) -> some View {
+        modifier(PageTitlebar(page: page, pageTitle: customTitle, isSearching: isSearching))
     }
 }
