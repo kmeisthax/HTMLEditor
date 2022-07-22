@@ -155,7 +155,10 @@ struct HTMLEditor: View {
                         isSource ? geo_outer.size.width : .infinity)
                 .edgesIgnoringSafeArea(.all)
         }.safeAreaInset(edge: .bottom) {
-            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: $wysiwygState, nextSource: {
+            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: $wysiwygState, 
+                      prevSource: {
+                selectPrevResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)},
+                      nextSource: {
                 selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
             })
         }.toolbar {

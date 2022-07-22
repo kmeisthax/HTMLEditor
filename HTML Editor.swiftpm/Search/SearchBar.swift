@@ -16,17 +16,30 @@ struct SearchBar: View {
     @Binding var isSearching: Bool;
     @Binding var wysiwygMode: WYSIWYGState;
     
+    var prevSource: () -> Void = {};
     var nextSource: () -> Void = {};
+    
+    var prevWysiwyg: () -> Void = {};
     var nextWysiwyg: () -> Void = {};
     
     var body: some View {
         HStack {
             if wysiwygMode != .WYSIWYG {
-                Button("Next", action: nextSource)
+                Button(action: prevSource, label: {
+                    Image(systemName: "chevron.up")
+                })
+                Button(action: nextSource, label: {
+                    Image(systemName: "chevron.down")
+                })
             }
             SearchField(searchQuery: $searchQuery, placeholder: "Find in file...")
             if wysiwygMode != .Source {
-                Button("Next", action: nextWysiwyg)
+                Button(action: prevWysiwyg, label: {
+                    Image(systemName: "chevron.up")
+                })
+                Button(action: nextWysiwyg, label: {
+                    Image(systemName: "chevron.down")
+                })
             }
         }
         .padding([.leading, .trailing])

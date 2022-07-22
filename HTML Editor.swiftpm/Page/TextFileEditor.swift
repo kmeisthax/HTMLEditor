@@ -2,6 +2,20 @@ import SwiftUI
 import Introspect
 
 /**
+ * Select the previous result of a given search query in the given text field.
+ */
+func selectPrevResult(ofQuery: String, inString: String, selection: inout [Range<String.Index>]) {
+    let searchEndIndex = selection.first?.lowerBound ?? inString.endIndex;
+    let searchResult = inString.range(of: ofQuery, options: .backwards, range: inString.startIndex..<searchEndIndex, locale: nil);
+    
+    if let result = searchResult {
+        selection = [result];
+    } else if let result = inString.range(of: ofQuery, options: .backwards, range: inString.startIndex..<inString.endIndex, locale: nil) {
+        selection = [result];
+    }
+}
+
+/**
  * Select the next result of a given search query in the given text field.
  */
 func selectNextResult(ofQuery: String, inString: String, selection: inout [Range<String.Index>]) {
@@ -55,9 +69,12 @@ struct TextFileEditor: View {
             .padding(1)
             .edgesIgnoringSafeArea(.bottom)
         .safeAreaInset(edge: .bottom) {
-            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: Binding.constant(.Source), nextSource: {
-                    selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
-                })
+            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: Binding.constant(.Source),
+                      prevSource: {
+                selectPrevResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)},
+                      nextSource: {
+                selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
+            })
         }
         .toolbar {
             paneToolbar
