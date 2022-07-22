@@ -53,7 +53,7 @@ struct TextFileEditor: View {
         
         SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
             .padding(1)
-        .safeAreaInset(edge: .top) {
+        .safeAreaInset(edge: .bottom) {
             SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: Binding.constant(.Source), nextSource: {
                     selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
                 })

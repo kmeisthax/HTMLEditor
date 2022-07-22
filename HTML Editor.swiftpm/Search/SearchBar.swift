@@ -32,7 +32,6 @@ struct SearchBar: View {
         .padding([.leading, .trailing])
         .frame(height: isSearching ? Self.HEIGHT : 0)
         .background(.bar)
-        .overlay(Rectangle().frame(width: nil, height: isSearching ? 1 : 0, alignment: .bottom).foregroundColor(.secondary), alignment: .bottom)
         .disabled(!isSearching)
         .clipped()
         .toolbar {

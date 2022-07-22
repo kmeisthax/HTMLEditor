@@ -153,7 +153,7 @@ struct HTMLEditor: View {
                         isSplit ? geo_outer.size.width / 2 :
                         isSource ? geo_outer.size.width : .infinity)
                 .edgesIgnoringSafeArea(.all)
-        }.safeAreaInset(edge: .top) {
+        }.safeAreaInset(edge: .bottom) {
             SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: $wysiwygState, nextSource: {
                 selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
             })
