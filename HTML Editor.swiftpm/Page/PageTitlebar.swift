@@ -130,6 +130,7 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
         .navigationBarBackButtonHidden(true)
         .introspectNavigationController { navigationController in
             navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
+            navigationController.navigationBar.compactScrollEdgeAppearance = navigationController.navigationBar.compactAppearance
         }
         .navigationTitle("")
         .sheet(isPresented: $isRenamingTitle) {
