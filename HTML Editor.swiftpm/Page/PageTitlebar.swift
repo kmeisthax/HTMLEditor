@@ -8,7 +8,7 @@ import Introspect
  * designed to look like a window titlebar; on macOS it actually sets the navigation title
  * and subtitle as appropriate.
  */
-struct PageTitlebar: ViewModifier {
+struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
     #if os(iOS)
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
     @Environment(\.dismiss) var dismiss;
@@ -16,7 +16,14 @@ struct PageTitlebar: ViewModifier {
     
     var page: Page?;
     @Binding var pageTitle: String?;
-    var isSearching: Binding<Bool>?;
+    
+    private var menu: MenuContent?;
+    
+    init(page: Page?, pageTitle: Binding<String?>, menu: () -> MenuContent) {
+        self.page = page;
+        self._pageTitle = pageTitle;
+        self.menu = menu();
+    }
     
     var windowTitle: String {
         if let pageTitle = pageTitle, pageTitle != "" {
@@ -40,20 +47,20 @@ struct PageTitlebar: ViewModifier {
         Menu {
             Text(page?.presentedItemURL?.lastPathComponent ?? "")
                 .fontWeight(.bold)
-            Divider()
-            Button {
-                self.isRenamingTitle = true;
-                self.renamedTitle = pageTitle ?? "";
-            } label: {
-                Label("Rename Page...", systemImage: "rectangle.and.pencil.and.ellipsis")
-            }
-            if let searching = self.isSearching {
+            
+            if page?.type == .html {
                 Divider()
                 Button {
-                    searching.wrappedValue = !searching.wrappedValue;
+                    self.isRenamingTitle = true;
+                    self.renamedTitle = pageTitle ?? "";
                 } label: {
-                    Label("Find in page...", systemImage: "doc.text.magnifyingglass")
+                    Label("Rename Page...", systemImage: "rectangle.and.pencil.and.ellipsis")
                 }
+            }
+            
+            if let menu = menu {
+                Divider()
+                menu
             }
         } label: {
             #if os(iOS)
@@ -106,9 +113,7 @@ struct PageTitlebar: ViewModifier {
                         }
                     }
                     
-                    if page?.type == .html {
-                        self.inlineFileMenu
-                    }
+                    self.inlineFileMenu
                 }.frame(maxWidth: horizontalSizeClass == .compact ? 250 : .infinity)
             })
             
@@ -141,9 +146,7 @@ struct PageTitlebar: ViewModifier {
             .navigationSubtitle(windowSubtitle ?? "")
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
-                    if page?.type == .html {
-                        self.inlineFileMenu
-                    }
+                    self.inlineFileMenu
                 }
             }
             .sheet(isPresented: $isRenamingTitle) {
@@ -159,7 +162,13 @@ struct PageTitlebar: ViewModifier {
 }
 
 extension View {
-    func pageTitlebar(for page: Page? = nil, customTitle: Binding<String?> = Binding.constant(nil), isSearching: Binding<Bool>? = nil) -> some View {
-        modifier(PageTitlebar(page: page, pageTitle: customTitle, isSearching: isSearching))
+    func pageTitlebarMenu<MenuContent>(for page: Page? = nil, customTitle: Binding<String?> = Binding.constant(nil), @ViewBuilder menu: () -> MenuContent) -> some View where MenuContent: View {
+        modifier(PageTitlebar(page: page, pageTitle: customTitle, menu: menu))
+    }
+    
+    func pageTitlebar(for page: Page? = nil, customTitle: Binding<String?> = Binding.constant(nil)) -> some View {
+        modifier(PageTitlebar(page: page, pageTitle: customTitle, menu: {
+            EmptyView()
+        }))
     }
 }

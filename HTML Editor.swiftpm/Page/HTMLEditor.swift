@@ -163,6 +163,14 @@ struct HTMLEditor: View {
             })
         }.toolbar {
             paneToolbar
-        }.pageTitlebar(for: page, customTitle: $pageTitle, isSearching: $isSearching)
+        }.pageTitlebarMenu(for: page, customTitle: $pageTitle) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    isSearching = !isSearching;
+                }
+            } label: {
+                Label("Find in page...", systemImage: "doc.text.magnifyingglass")
+            }
+        }
     }
 }

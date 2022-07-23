@@ -79,7 +79,7 @@ struct TextFileEditor: View {
         .toolbar {
             paneToolbar
         }
-        .pageTitlebar(for: page, isSearching: $isSearching)
+        .pageTitlebar(for: page)
 #if os(iOS)
         .navigationBarBackButtonHidden(true)
 #endif
