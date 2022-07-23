@@ -10,6 +10,8 @@ struct SearchBar: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
     #elseif os(macOS)
     static var HEIGHT: CGFloat = 35;
+    
+    var horizontalSizeClass = HorizontalSizeClass.normal;
     #endif
     
     @Binding var searchQuery: String;
