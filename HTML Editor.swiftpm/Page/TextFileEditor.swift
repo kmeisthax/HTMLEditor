@@ -44,7 +44,7 @@ struct TextFileEditor: View {
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
 #elseif os(macOS)
-    @State var horizontalSizeClass = HorizontalSizeClass.normal;
+    @State var horizontalSizeClass = PaneBreakpoint.normal;
 #endif
     
     var body: some View {

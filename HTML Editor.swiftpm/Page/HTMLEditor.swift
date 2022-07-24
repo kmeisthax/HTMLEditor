@@ -23,15 +23,15 @@ enum WYSIWYGState {
     case Split;
 }
 
-#if os(macOS)
 /**
- * Fake size class variable to make AppKit happy.
+ * What width breakpoint the HTML editor panes are in.
+ *
+ * normal is guaranteed to be at least wide enough to fit two 320px mobile views.
  */
-enum HorizontalSizeClass {
+enum PaneBreakpoint {
     case normal;
     case compact;
 }
-#endif
 
 /**
  * Editor view for HTML files.
@@ -55,19 +55,31 @@ struct HTMLEditor: View {
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
 #elseif os(macOS)
-    @State var horizontalSizeClass = HorizontalSizeClass.normal;
 #endif
     
-    var isSplit: Bool {
-        wysiwygState == .Split && horizontalSizeClass != .compact;
-    }
-    
-    var isSource: Bool {
-        wysiwygState == .Source;
-    }
-    
-    var isWysiwyg: Bool {
-        wysiwygState == .WYSIWYG || (wysiwygState == .Split && horizontalSizeClass == .compact);
+    func paneBreakpoint(_ withSize: CGSize) -> PaneBreakpoint {
+        #if os(iOS)
+        switch horizontalSizeClass {
+        case .regular:
+            if withSize.width / 2 < 320 {
+                return PaneBreakpoint.compact;
+            } else {
+                return PaneBreakpoint.normal;
+            }
+        case .compact:
+            return PaneBreakpoint.compact;
+        case .none:
+            return PaneBreakpoint.compact;
+        case .some(_):
+            return PaneBreakpoint.compact;
+        }
+        #else
+        if withSize.width / 2 < 320 {
+            return PaneBreakpoint.compact;
+        } else {
+            return PaneBreakpoint.normal;
+        }
+        #endif
     }
     
     var windowTitle: String {
@@ -85,67 +97,75 @@ struct HTMLEditor: View {
     }
     
     var body: some View {
-#if os(iOS)
+        #if os(iOS)
         let paneToolbarPlacement = ToolbarItemPlacement.primaryAction;
-#elseif os(macOS)
+        #elseif os(macOS)
         let paneToolbarPlacement = ToolbarItemPlacement.confirmationAction;
-#endif
-        let paneToolbar = ToolbarItemGroup(placement: paneToolbarPlacement) {
-            if page.ownership == .AppOwned {
-                Button {
-#if os(iOS)
-                    page.pickLocationForAppOwnedFile(scene: sceneDelegate.scene!);
-#endif
-                } label: {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
+        #endif
+        
+        GeometryReader { geo_outer in
+            let isSplit = wysiwygState == .Split && self.paneBreakpoint(geo_outer.size) != .compact;
+            let isSource = wysiwygState == .Source;
+            let isWysiwyg = wysiwygState == .WYSIWYG || (wysiwygState == .Split && self.paneBreakpoint(geo_outer.size) == .compact);
+            
+            let paneToolbar = ToolbarItemGroup(placement: paneToolbarPlacement) {
+                if page.ownership == .AppOwned {
+                    Button {
+                    #if os(iOS)
+                        page.pickLocationForAppOwnedFile(scene: sceneDelegate.scene!);
+                    #endif
+                    } label: {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                    }
+                }
+                
+                if self.paneBreakpoint(geo_outer.size) != .compact {
+                    Picker(selection: self.$fakeWysiwygState, label: Text("View")) {
+                        Image(systemName: "curlybraces.square").tag(WYSIWYGState.Source)
+                        Image(systemName: "rectangle.split.2x1").tag(WYSIWYGState.Split)
+                        Image(systemName: "doc.richtext").tag(WYSIWYGState.WYSIWYG)
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: self.fakeWysiwygState) { newState in
+                        if self.fakeWysiwygState != self.wysiwygState {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                self.wysiwygState = self.fakeWysiwygState;
+                            }
+                        }
+                    }
+                    .onChange(of: self.wysiwygState) { newState in
+                        if self.wysiwygState != self.fakeWysiwygState {
+                            self.fakeWysiwygState = self.wysiwygState;
+                        }
+                    }
+                } else {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            if self.wysiwygState != .Source {
+                                self.wysiwygState = .Source;
+                            } else {
+                                self.wysiwygState = .Split;
+                            }
+                        }
+                    } label: {
+                        if self.wysiwygState == .Source {
+                            Image(systemName: "curlybraces.square.fill")
+                        } else {
+                            Image(systemName: "curlybraces.square")
+                        }
+                    }
                 }
             }
             
-            if horizontalSizeClass != .compact {
-                Picker(selection: self.$fakeWysiwygState, label: Text("View")) {
-                    Image(systemName: "curlybraces.square").tag(WYSIWYGState.Source)
-                    Image(systemName: "rectangle.split.2x1").tag(WYSIWYGState.Split)
-                    Image(systemName: "doc.richtext").tag(WYSIWYGState.WYSIWYG)
-                }
-                .pickerStyle(.segmented)
-                .onChange(of: self.fakeWysiwygState) { newState in
-                    if self.fakeWysiwygState != self.wysiwygState {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            self.wysiwygState = self.fakeWysiwygState;
-                        }
-                    }
-                }
-                .onChange(of: self.wysiwygState) { newState in
-                    if self.wysiwygState != self.fakeWysiwygState {
-                        self.fakeWysiwygState = self.wysiwygState;
-                    }
-                }
-            } else {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        if self.wysiwygState != .Source {
-                            self.wysiwygState = .Source;
-                        } else {
-                            self.wysiwygState = .Split;
-                        }
-                    }
-                } label: {
-                    if self.wysiwygState == .Source {
-                        Image(systemName: "curlybraces.square.fill")
-                    } else {
-                        Image(systemName: "curlybraces.square")
-                    }
-                }
-            }
-        }
-        
-        GeometryReader { geo_outer in
             SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
                 .padding(1)
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth:
                         isSplit ? geo_outer.size.width / 2 : .infinity)
                 .edgesIgnoringSafeArea(.bottom)
+                .toolbar {
+                    paneToolbar
+                }
             WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
                 .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
                 .offset(x: isSource ? geo_outer.size.width * 1.0 :
@@ -161,8 +181,6 @@ struct HTMLEditor: View {
                       nextSource: {
                 selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
             })
-        }.toolbar {
-            paneToolbar
         }.pageTitlebarMenu(for: page, customTitle: $pageTitle) {
             Button {
                 withAnimation(.easeInOut(duration: 0.5)) {

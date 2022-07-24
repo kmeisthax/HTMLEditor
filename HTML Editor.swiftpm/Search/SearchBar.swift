@@ -11,7 +11,7 @@ struct SearchBar: View {
     #elseif os(macOS)
     static var HEIGHT: CGFloat = 35;
     
-    var horizontalSizeClass = HorizontalSizeClass.normal;
+    var horizontalSizeClass = PaneBreakpoint.normal;
     #endif
     
     @Binding var searchQuery: String;
