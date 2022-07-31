@@ -41,7 +41,11 @@ extension SearchField: UIViewRepresentable {
 }
 #elseif os(macOS)
 extension SearchFieldCoordinator: NSSearchFieldDelegate {
-    
+    func controlTextDidChange(_ notification: Notification) {
+        guard let searchField = notification.object as? NSSearchField else { return };
+        
+        field.searchQuery = searchField.stringValue;
+    }
 }
 
 extension SearchField: NSViewRepresentable {
