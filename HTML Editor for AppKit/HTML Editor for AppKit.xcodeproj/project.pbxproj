@@ -42,6 +42,7 @@
 		4EDB5F16287A84F7006C6DC9 /* SystemImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EDB5F14287A84F6006C6DC9 /* SystemImagePicker.swift */; };
 		4EDB5F17287A84F7006C6DC9 /* ImagePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EDB5F15287A84F6006C6DC9 /* ImagePreview.swift */; };
 		4EDCCCCF2878B22D007E0F02 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 4EDCCCCE2878B22D007E0F02 /* Introspect */; };
+		4EE76FF128970C26004C0B3E /* PaneBreakpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE76FF028970C26004C0B3E /* PaneBreakpoint.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +83,7 @@
 		4EDB5F14287A84F6006C6DC9 /* SystemImagePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemImagePicker.swift; sourceTree = "<group>"; };
 		4EDB5F15287A84F6006C6DC9 /* ImagePreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePreview.swift; sourceTree = "<group>"; };
 		4EDCCCCC2878B16B007E0F02 /* SwiftUI-Introspect-0.1.4 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "SwiftUI-Introspect-0.1.4"; path = "../vendor/SwiftUI-Introspect-0.1.4"; sourceTree = "<group>"; };
+		4EE76FF028970C26004C0B3E /* PaneBreakpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PaneBreakpoint.swift; path = "../HTML Editor.swiftpm/PaneBreakpoint.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +139,7 @@
 				4E18676D2870F9A800046C66 /* FullscreenLink.swift */,
 				4E7EF15B28832F74005785B9 /* WindowAccessor.swift */,
 				4E1867702870F9A800046C66 /* MyApp.swift */,
+				4EE76FF028970C26004C0B3E /* PaneBreakpoint.swift */,
 				4E58B5222870EE5F00567826 /* Assets.xcassets */,
 				4E58B5272870EE5F00567826 /* HTML_Editor_for_AppKit.entitlements */,
 				4E58B51C2870EE5D00567826 /* Products */,
@@ -303,6 +306,7 @@
 			files = (
 				4E1867732870F9A800046C66 /* FullscreenLink.swift in Sources */,
 				4EDB5F17287A84F7006C6DC9 /* ImagePreview.swift in Sources */,
+				4EE76FF128970C26004C0B3E /* PaneBreakpoint.swift in Sources */,
 				4ED03D092876923F00A0D461 /* ShoeboxBrowser.swift in Sources */,
 				4ED03D1A287693DD00A0D461 /* NotAShoebox.swift in Sources */,
 				4EA009DC287B462300382EE1 /* FileManagementMenuItems.swift in Sources */,

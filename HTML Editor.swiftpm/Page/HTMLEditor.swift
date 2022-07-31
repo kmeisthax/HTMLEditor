@@ -24,21 +24,11 @@ enum WYSIWYGState {
 }
 
 /**
- * What width breakpoint the HTML editor panes are in.
- *
- * normal is guaranteed to be at least wide enough to fit two 320px mobile views.
- */
-enum PaneBreakpoint {
-    case normal;
-    case compact;
-}
-
-/**
  * Editor view for HTML files.
  * 
  * Provides both a source editor and editable preview of the web page.
  */
-struct HTMLEditor: View {
+struct HTMLEditor: View, BreakpointCalculator {
     @ObservedObject var page: Page;
     
     @Binding var wysiwygState : WYSIWYGState;
@@ -59,31 +49,6 @@ struct HTMLEditor: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
 #elseif os(macOS)
 #endif
-    
-    func paneBreakpoint(_ withSize: CGSize) -> PaneBreakpoint {
-        #if os(iOS)
-        switch horizontalSizeClass {
-        case .regular:
-            if withSize.width / 2 < 320 {
-                return PaneBreakpoint.compact;
-            } else {
-                return PaneBreakpoint.normal;
-            }
-        case .compact:
-            return PaneBreakpoint.compact;
-        case .none:
-            return PaneBreakpoint.compact;
-        case .some(_):
-            return PaneBreakpoint.compact;
-        }
-        #else
-        if withSize.width / 2 < 320 {
-            return PaneBreakpoint.compact;
-        } else {
-            return PaneBreakpoint.normal;
-        }
-        #endif
-    }
     
     var windowTitle: String {
         pageTitle ?? page.filename
@@ -178,7 +143,7 @@ struct HTMLEditor: View {
                         isSource ? geo_outer.size.width : .infinity)
                 .edgesIgnoringSafeArea(.all)
         }.safeAreaInset(edge: .bottom) {
-            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygMode: $wysiwygState, 
+            SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygState: $wysiwygState, 
                       prevSource: {
                 selectPrevResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)},
                       nextSource: {
