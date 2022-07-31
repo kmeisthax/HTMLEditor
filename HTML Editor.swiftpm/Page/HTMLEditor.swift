@@ -51,6 +51,9 @@ struct HTMLEditor: View {
     
     @State var pageTitle: String? = nil;
     
+    @State var lastForwardWebSearch: UInt32 = 0;
+    @State var lastBackwardWebSearch: UInt32 = 0;
+    
 #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;
     @Environment(\.horizontalSizeClass) var horizontalSizeClass;
@@ -166,7 +169,7 @@ struct HTMLEditor: View {
                 .toolbar {
                     paneToolbar
                 }
-            WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL)
+            WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL, searchQuery: $searchQuery, forwardSearch: $lastForwardWebSearch, backwardsSearch: $lastBackwardWebSearch)
                 .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
                 .offset(x: isSource ? geo_outer.size.width * 1.0 :
                             isSplit ? geo_outer.size.width * 0.5 : 0.0)
@@ -180,6 +183,12 @@ struct HTMLEditor: View {
                 selectPrevResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)},
                       nextSource: {
                 selectNextResult(ofQuery: self.searchQuery, inString: self.page.html, selection: &self.selection)
+            },
+                      prevWysiwyg: {
+                self.lastBackwardWebSearch += 1;
+            },
+                      nextWysiwyg: {
+                self.lastForwardWebSearch += 1;
             })
         }.pageTitlebarMenu(for: page, customTitle: $pageTitle) {
             Button {

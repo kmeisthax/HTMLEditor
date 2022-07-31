@@ -10,6 +10,12 @@ struct WebPreview {
     @Binding var fileURL: URL?;
     @Binding var baseURL: URL?;
     
+    @Binding var searchQuery: String;
+    
+    // Dummy binding to trigger a search
+    @Binding var forwardSearch: UInt32;
+    @Binding var backwardsSearch: UInt32;
+    
     func makeCoordinator() -> WebPreviewCoordinator {
         WebPreviewCoordinator(owner: self, html: "")
     }
@@ -55,6 +61,24 @@ struct WebPreview {
         } else if let title = self.title {
             context.coordinator.changeTitle(newTitle: title);
         }
+        
+        if (forwardSearch != context.coordinator.lastForwardsSearch) {
+            context.coordinator.lastForwardsSearch = forwardSearch;
+            webView.find(self.searchQuery, configuration: .init()) { _ in 
+                
+            };
+        }
+        
+        if (backwardsSearch != context.coordinator.lastBackwardsSearch) {
+            context.coordinator.lastBackwardsSearch = backwardsSearch;
+            
+            let backwards = WKFindConfiguration.init();
+            backwards.backwards = true;
+            
+            webView.find(self.searchQuery, configuration: backwards) { _ in 
+                
+            };
+        }
     }
 }
 
@@ -86,6 +110,9 @@ class WebPreviewCoordinator : NSObject, WKScriptMessageHandler, ObservableObject
     var htmlInSafari: String;
     var safariWasLoadedWithFilePermissions = false;
     
+    var lastBackwardsSearch: UInt32 = 0;
+    var lastForwardsSearch: UInt32 = 0;
+    
     private var _viewStorage: WKWebView? = nil;
     private var _viewKvo: NSKeyValueObservation? = nil;
     
@@ -113,8 +140,6 @@ class WebPreviewCoordinator : NSObject, WKScriptMessageHandler, ObservableObject
             owner.title = newValue?.title;
         }
     };
-    
-    private var c: [AnyCancellable] = [];
     
     init(owner: WebPreview, html: String) {
         self.owner = owner;
