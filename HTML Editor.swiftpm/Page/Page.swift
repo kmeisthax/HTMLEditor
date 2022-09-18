@@ -82,7 +82,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     var icon: String {
         if self.type == .html || self.type?.identifier == "public.xhtml" {
             return "doc.richtext"
-        } else if self.type == .xml || self.type?.isSubtype(of: .xml) ?? false {
+        } else if self.type == .xml || self.type?.isSubtype(of: .xml) ?? false || self.type?.preferredFilenameExtension == "opf" {
             return "curlybraces.square"
         } else if self.type == .folder {
             return "folder"
@@ -99,7 +99,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * Determine if this Page is representable as text (e.g. it's a text or HTML file).
      */
     var isTextRepresentable: Bool {
-        self.type == .html || self.type == .text || self.type?.isSubtype(of: .text) ?? false
+        self.type == .html || self.type == .text || self.type?.isSubtype(of: .text) ?? false || self.type?.preferredFilenameExtension == "opf"
     }
     
     /**

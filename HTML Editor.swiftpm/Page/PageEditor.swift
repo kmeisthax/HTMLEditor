@@ -12,7 +12,7 @@ struct PageEditor: View {
     var body: some View {
         if page.type == .html || page.type?.identifier == "public.xhtml" {
             HTMLEditor(page: page, wysiwygState: $wysiwygState, fakeWysiwygState: wysiwygState, highlighter: HTMLHighlighter())
-        } else if page.type == .xml || page.type?.isSubtype(of: .xml) ?? false {
+        } else if page.type == .xml || page.type?.isSubtype(of: .xml) ?? false || page.type?.preferredFilenameExtension == "opf" {
             TextFileEditor(page: page, highlighter: HTMLHighlighter())
         } else if page.type == .text || page.type?.isSubtype(of: .text) ?? false {
             TextFileEditor(page: page, highlighter: TextHighlighter())
