@@ -30,6 +30,13 @@ struct HTMLLexer {
         self.parsingIndex = source.startIndex.samePosition(in: self.source.unicodeScalars)!;
     }
     
+    /**
+     * Advance the lexer to a specific position.
+     */
+    mutating func advance(to: String.UnicodeScalarView.Index) {
+        self.parsingIndex = to;
+    }
+    
     private func acceptedRange(_ start: String.UnicodeScalarIndex, _ end: String.UnicodeScalarIndex) -> Range<String.Index>? {
         let rangeStart = start.samePosition(in: self.source);
         let rangeEnd = end.samePosition(in: self.source);

@@ -1,22 +1,40 @@
 import SwiftUI
 
+struct HTMLHighlighterFactory: SourceHighlighterFactory {
+    func construct(source: String, textStorage: NSTextStorage) -> SourceHighlighter {
+        HTMLHighlighter(source: source, textStorage: textStorage)
+    }
+}
+
 struct HTMLHighlighter: SourceHighlighter {
-    func highlightAttr(source: String, textStorage: NSTextStorage, attr: Attribute) {
-        textStorage.addAttributes([
+    var source: String;
+    var textStorage: NSTextStorage;
+    var lexer: HTMLLexer;
+    
+    init(source: String, textStorage: NSTextStorage) {
+        self.source = source;
+        self.textStorage = textStorage;
+        self.lexer = HTMLLexer(source: source);
+    }
+    
+    func highlightAttr(attr: Attribute) {
+        self.textStorage.addAttributes([
             .foregroundColor: self.attributeNameColor
-        ], range: NSRange(attr.name, in: source));
+        ], range: NSRange(attr.name, in: self.source));
         
         if let value = attr.value {
-            textStorage.addAttributes([
+            self.textStorage.addAttributes([
                 .foregroundColor: self.attributeValueColor
-            ], range: NSRange(value, in: source));
+            ], range: NSRange(value, in: self.source));
         }
     }
     
-    func highlightSource(source: String, textStorage: NSTextStorage) {
-        var lexer = HTMLLexer(source: source);
+    mutating func highlightSource() -> Bool {
+        var tokens = 0;
         
-        while let token = lexer.acceptSymbol() {
+        while let token = self.lexer.acceptSymbol() {
+            tokens += 1;
+            
             switch token.type {
             case .Whitespace, .Text:
                 textStorage.addAttributes([
@@ -39,7 +57,7 @@ struct HTMLHighlighter: SourceHighlighter {
                 ], range: NSRange(token.range, in: source));
                 
                 for attr in attrs {
-                    self.highlightAttr(source: source, textStorage: textStorage, attr: attr);
+                    self.highlightAttr(attr: attr);
                 }
             case let .StartTag(name: tagname, attributes: attrs, selfClosing: _):
                 textStorage.addAttributes([
@@ -50,7 +68,7 @@ struct HTMLHighlighter: SourceHighlighter {
                 ], range: NSRange(tagname, in: source));
                 
                 for attr in attrs {
-                    self.highlightAttr(source: source, textStorage: textStorage, attr: attr);
+                    self.highlightAttr(attr: attr);
                 }
             case let .EndTag(name: tagname):
                 textStorage.addAttributes([
@@ -64,7 +82,13 @@ struct HTMLHighlighter: SourceHighlighter {
                     .foregroundColor: self.errorColor
                 ], range: NSRange(token.range, in: source));
             }
+            
+            if tokens >= 100 {
+                return false;
+            }
         }
+        
+        return true;
     }
 }
 

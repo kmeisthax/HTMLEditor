@@ -7,10 +7,10 @@ struct SourceEditor {
     
     @Binding var searchQuery: String;
     
-    var highlighter: SourceHighlighter;
+    var highlighterFactory: SourceHighlighterFactory;
     
     func makeCoordinator() -> SourceEditorDelegate {
-        return SourceEditorDelegate(source: $source, selection: $selection);
+        return SourceEditorDelegate(source: $source, selection: $selection, highlighterFactory: highlighterFactory);
     }
     
     /**
@@ -47,9 +47,13 @@ class SourceEditorDelegate: NSObject {
 
     var outstandingSearchWorkItem: DispatchWorkItem?;
     
-    init(source: Binding<String>, selection: Binding<[Range<String.Index>]>) {
+    var highlighterFactory: SourceHighlighterFactory;
+    var highlighter: SourceHighlighter?;
+    
+    init(source: Binding<String>, selection: Binding<[Range<String.Index>]>, highlighterFactory: SourceHighlighterFactory) {
         self.source = source;
         self.selection = selection;
+        self.highlighterFactory = highlighterFactory;
     }
     
     var wholeStringRange: NSRange {
@@ -127,6 +131,31 @@ class SourceEditorDelegate: NSObject {
         }
         
         return swiftRanges
+    }
+    
+    func startAsyncHighlight(textStorage: NSTextStorage) {
+        print("Restarting highlighting run...");
+        let alreadyHighlighting = self.highlighter != nil;
+        print(alreadyHighlighting);
+        
+        self.highlighter = self.highlighterFactory.construct(source: self.source.wrappedValue, textStorage: textStorage);
+        
+        if !alreadyHighlighting {
+            self.doAsyncHighlight();
+        }
+    }
+    
+    func doAsyncHighlight() {
+        DispatchQueue.main.async(execute: DispatchWorkItem {
+            if var highlighter = self.highlighter {
+                if !highlighter.highlightSource() {
+                    self.highlighter = highlighter;
+                    return self.doAsyncHighlight();
+                }
+            }
+            
+            self.highlighter = nil;
+        });
     }
 }
 
@@ -298,7 +327,7 @@ extension SourceEditor: NSViewRepresentable {
                 
                 textview.selectedRanges = selection;
                 
-                self.highlighter.highlightSource(source: self.source, textStorage: textStorage);
+                context.coordinator.startAsyncHighlight(textStorage: textStorage);
             }
             
             if context.coordinator.lastSeenQuery != self.searchQuery || didChange {

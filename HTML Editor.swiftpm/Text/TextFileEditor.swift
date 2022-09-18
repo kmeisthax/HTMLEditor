@@ -47,7 +47,7 @@ struct TextFileEditor: View {
     @State var horizontalSizeClass = PaneBreakpoint.normal;
 #endif
     
-    var highlighter: SourceHighlighter;
+    var highlighterFactory: SourceHighlighterFactory;
     
     var body: some View {
 #if os(iOS)
@@ -67,7 +67,7 @@ struct TextFileEditor: View {
             }
         }
         
-        SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery, highlighter: highlighter)
+        SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery, highlighterFactory: highlighterFactory)
             .padding(1)
             .edgesIgnoringSafeArea(.bottom)
         .safeAreaInset(edge: .bottom) {

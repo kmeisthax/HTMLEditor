@@ -64,7 +64,7 @@ struct HTMLEditor: View, BreakpointCalculator {
         }
     }
     
-    var highlighter: SourceHighlighter;
+    var highlighterFactory: SourceHighlighterFactory;
     
     var body: some View {
         #if os(iOS)
@@ -127,7 +127,7 @@ struct HTMLEditor: View, BreakpointCalculator {
                 }
             }
             
-            SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery, highlighter: highlighter)
+            SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery, highlighterFactory: highlighterFactory)
                 .padding(1)
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth:
