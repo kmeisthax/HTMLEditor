@@ -10,6 +10,7 @@ enum LexType {
     case Text
     case Comment(text: Range<String.Index>)
     case Doctype
+    case XmlDecl(attributes: [Attribute])
     case Error
     case StartTag(name: Range<String.Index>, attributes: [Attribute], selfClosing: Bool)
     case EndTag(name: Range<String.Index>)
@@ -383,6 +384,33 @@ struct HTMLLexer {
     }
     
     /**
+     * Accept an HTML/XML attribute.
+     *
+     * The bool parameter is true if the attribute is malformed.
+     */
+    mutating func acceptAttribute() -> (Attribute?, Bool) {
+        let checkpoint = self.parsingIndex;
+        
+        guard let name = self.consumeAttributeName() else { return (nil, false) };
+        let _ = self.consumeWhitespace();
+            
+        if self.accept(substring: "=") != nil {
+            let _ = self.consumeWhitespace();
+            
+            if let value = self.consumeUnquotedAttributeValue() {
+                return (Attribute(name: name, value: value), false);
+            } else if let value = self.acceptQuotedString() {
+                return (Attribute(name: name, value: value), false);
+            } else {
+                self.parsingIndex = checkpoint;
+                return (nil, true);
+            }
+        } else {
+            return (Attribute(name: name), false);
+        }
+    }
+    
+    /**
      * Accept a start tag.
      * 
      * Returns nil if there is no start tag at the current
@@ -404,23 +432,15 @@ struct HTMLLexer {
         var attributes: Array<Attribute> = [];
         
         if self.consumeWhitespace() != nil {
-            while let name = self.consumeAttributeName() {
-                let _ = self.consumeWhitespace();
-                
-                if self.accept(substring: "=") != nil {
-                    let _ = self.consumeWhitespace();
-                    
-                    if let value = self.consumeUnquotedAttributeValue() {
-                        attributes.append(Attribute(name: name, value: value))
-                    } else if let value = self.acceptQuotedString() {
-                        attributes.append(Attribute(name: name, value: value))
-                    } else {
-                        //TODO: quoted
-                        return self.consumeMalformedTag(from: checkpoint);
-                    }
-                } else {
-                    attributes.append(Attribute(name: name));
+            while true {
+                let (attr, malformed) = self.acceptAttribute();
+                if malformed {
+                    return self.consumeMalformedTag(from: checkpoint);
                 }
+                
+                guard let attr = attr else { break; }
+                
+                attributes.append(attr);
                 
                 let _ = self.consumeWhitespace();
             }
@@ -432,6 +452,36 @@ struct HTMLLexer {
         };
         
         return Symbol(type: .StartTag(name: tagname, attributes: attributes, selfClosing: selfclosing), range: start.lowerBound..<end.upperBound);
+    }
+    
+    mutating func acceptXmlDecl() -> Symbol? {
+        let checkpoint = self.parsingIndex;
+        
+        guard let start = self.accept(substring: "<?xml") else {
+            self.parsingIndex = checkpoint;
+            return nil;
+        }
+        
+        let _ = self.consumeWhitespace();
+        
+        var attributes: Array<Attribute> = [];
+        var end = self.accept(substring: "?>");
+        
+        while end == nil {
+            let (attr, malformed) = self.acceptAttribute();
+            if malformed {
+                return self.consumeMalformedTag(from: checkpoint);
+            }
+            
+            guard let attr = attr else { break; }
+            
+            attributes.append(attr);
+            
+            let _ = self.consumeWhitespace();
+            end = self.accept(substring: "?>");
+        }
+        
+        return Symbol(type: .XmlDecl(attributes: attributes), range: start.lowerBound..<end!.upperBound);
     }
     
     /**
@@ -473,6 +523,8 @@ struct HTMLLexer {
     mutating func acceptSymbol() -> Symbol? {
         if let doctype = self.acceptDoctype() {
             return doctype;
+        } else if let xmldecl = self.acceptXmlDecl() {
+            return xmldecl;
         } else if let comment = self.acceptComment() {
             return comment;
         } else if let endtag = self.acceptEndTag() {
