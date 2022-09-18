@@ -237,7 +237,7 @@ extension SourceEditorDelegate: NSTextViewDelegate {
     }
     
     var textColor: NSColor {
-        .label
+        .textColor
     }
     
     func textDidChange(_ notification: Notification) {

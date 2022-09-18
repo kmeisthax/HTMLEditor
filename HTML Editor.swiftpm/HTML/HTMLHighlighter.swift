@@ -93,7 +93,7 @@ extension HTMLHighlighter {
 #elseif os(macOS)
 extension HTMLHighlighter {
     var textColor: NSColor {
-        .label
+        .textColor
     }
     
     var commentColor: NSColor {
