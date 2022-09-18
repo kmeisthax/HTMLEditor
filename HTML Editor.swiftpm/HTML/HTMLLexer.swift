@@ -180,6 +180,18 @@ struct HTMLLexer {
     }
     
     /**
+     * Consume a tag name, without whitespace.
+     */
+    mutating func consumeTagName() -> Range<String.Index>? {
+        self.consume(scalarCond: { elem in
+            let c = elem.value;
+            
+            // Exclude controls, space, either quote kind, greater than, forward-slash, equals, and noncharacters
+            return c > 0x20 && c != 0x22 && c != 0x27 && c != 0x3E && c != 0x2F && c != 0x3D && !(c >= 0x7F && c <= 0x9F) && !(c >= 0xFDD0 && c <= 0xFDEF) && c & 0xFFFE != 0xFFFE;
+        });
+    }
+    
+    /**
      * Consume an attribute name, without whitespace.
      */
     mutating func consumeAttributeName() -> Range<String.Index>? {
@@ -200,20 +212,6 @@ struct HTMLLexer {
             let c = elem.value;
             
             return c != 0x9 && c != 0xA && c != 0xC && c != 0xD && c != 0x20 && c != 0x22 && c != 0x27 && c != 0x3D && c != 0x3C && c != 0x3E && c != 0x60;
-        })
-    }
-    
-    /**
-     * Consume an ASCII alphanumeric string.
-     * 
-     * Returns nil if there is no such string at the current
-     * parsing index.
-     */
-    mutating func consumeAsciiAlphanumeric() -> Range<String.Index>? {
-        self.consume(scalarCond: { elem in
-            let c = elem.value;
-            
-            return (c >= 0x30 && c <= 0x39) || (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A);
         })
     }
     
@@ -399,7 +397,7 @@ struct HTMLLexer {
             return nil;
         }
         
-        guard let tagname = self.consumeAsciiAlphanumeric() else {
+        guard let tagname = self.consumeTagName() else {
             return self.consumeMalformedTag(from: checkpoint);
         }
         
@@ -451,7 +449,7 @@ struct HTMLLexer {
             return nil;
         }
         
-        guard let tagname = self.consumeAsciiAlphanumeric() else {
+        guard let tagname = self.consumeTagName() else {
             print(self.source[checkpoint..<self.parsingIndex]);
             return self.consumeMalformedTag(from: checkpoint);
         }
