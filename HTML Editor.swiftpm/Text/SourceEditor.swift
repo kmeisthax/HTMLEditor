@@ -281,10 +281,8 @@ extension SourceEditorDelegate: NSTextViewDelegate {
         let swiftSelection = self.convertObjcStringRangesToSwift(range: textView.selectedRanges, fromString: textView.string);
         
         if swiftSelection != self.selection.wrappedValue || self.selection.count == 0 {
-            print("Delegate updated to \(swiftSelection)");
-            self.lastSeenSelection = swiftSelection;
-            
             DispatchQueue.main.async {
+                self.lastSeenSelection = swiftSelection;
                 self.selection.wrappedValue = swiftSelection;
             }
         }
