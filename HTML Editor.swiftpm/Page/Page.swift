@@ -82,6 +82,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     var icon: String {
         if self.type == .html || self.type?.identifier == "public.xhtml" {
             return "doc.richtext"
+        } else if self.type == .xml || self.type?.isSubtype(of: .xml) ?? false {
+            return "curlybraces.square"
         } else if self.type == .folder {
             return "folder"
         } else if self.type == .text || self.type?.isSubtype(of: .text) ?? false {
