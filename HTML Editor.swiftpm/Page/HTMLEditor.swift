@@ -125,7 +125,7 @@ struct HTMLEditor: View, BreakpointCalculator {
                 }
             }
             
-            SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
+            SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery, highlighter: HTMLHighlighter())
                 .padding(1)
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth:

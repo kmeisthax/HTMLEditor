@@ -65,7 +65,7 @@ struct TextFileEditor: View {
             }
         }
         
-        SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery)
+        SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery, highlighter: TextHighlighter())
             .padding(1)
             .edgesIgnoringSafeArea(.bottom)
         .safeAreaInset(edge: .bottom) {

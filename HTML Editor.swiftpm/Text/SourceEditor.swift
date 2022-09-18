@@ -7,6 +7,8 @@ struct SourceEditor {
     
     @Binding var searchQuery: String;
     
+    var highlighter: SourceHighlighter;
+    
     func makeCoordinator() -> SourceEditorDelegate {
         return SourceEditorDelegate(source: $source, selection: $selection);
     }
@@ -134,6 +136,10 @@ extension SourceEditorDelegate: UITextViewDelegate {
         .monospacedSystemFont(ofSize: 16, weight: .regular)
     }
     
+    var textColor: UIColor {
+        .label
+    }
+    
     var findHighlight: UIColor {
         .systemYellow
     }
@@ -193,6 +199,11 @@ extension SourceEditor: UIViewRepresentable {
             uiView.text = self.source;
             
             uiView.selectedRange = selection;
+            
+            uiView.textStorage.addAttributes([.foregroundColor: context.coordinator.textColor], range: NSRange.init(self.source.startIndex..<self.source.endIndex, in: self.source))
+            uiView.textStorage.addAttributes([.font: context.coordinator.font], range: NSRange.init(self.source.startIndex..<self.source.endIndex, in: self.source))
+            
+            self.highlighter.highlightSource(source: self.source, textStorage: uiView.textStorage);
         }
         
         if context.coordinator.lastSeenQuery != self.searchQuery || didChange {
@@ -223,6 +234,10 @@ extension SourceEditorDelegate: NSTextViewDelegate {
     
     var noHighlight: NSColor {
         .clear
+    }
+    
+    var textColor: NSColor {
+        .label
     }
     
     func textDidChange(_ notification: Notification) {
@@ -279,9 +294,11 @@ extension SourceEditor: NSViewRepresentable {
                 
                 let selection = textview.selectedRanges;
                 
-                textStorage.setAttributedString(NSAttributedString(string: self.source, attributes: [.font: context.coordinator.font]));
+                textStorage.setAttributedString(NSAttributedString(string: self.source, attributes: [.font: context.coordinator.font, .foregroundColor: context.coordinator.textColor]));
                 
                 textview.selectedRanges = selection;
+                
+                self.highlighter.highlightSource(source: self.source, textStorage: textStorage);
             }
             
             if context.coordinator.lastSeenQuery != self.searchQuery || didChange {
