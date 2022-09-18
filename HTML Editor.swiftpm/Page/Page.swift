@@ -80,7 +80,7 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     var icon: String {
-        if self.type == .html {
+        if self.type == .html || self.type?.identifier == "public.xhtml" {
             return "doc.richtext"
         } else if self.type == .folder {
             return "folder"

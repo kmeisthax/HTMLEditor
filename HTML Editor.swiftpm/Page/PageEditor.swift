@@ -10,7 +10,7 @@ struct PageEditor: View {
     @Binding var wysiwygState: WYSIWYGState;
     
     var body: some View {
-        if page.type == .html {
+        if page.type == .html || page.type?.identifier == "public.xhtml" {
             HTMLEditor(page: page, wysiwygState: $wysiwygState, fakeWysiwygState: wysiwygState)
         } else if page.type == .text || page.type?.isSubtype(of: .text) ?? false {
             TextFileEditor(page: page)
