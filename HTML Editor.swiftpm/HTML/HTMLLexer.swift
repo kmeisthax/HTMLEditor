@@ -1,23 +1,23 @@
 import SwiftUI
 
-struct Attribute {
+struct HTMLAttribute {
     var name: Range<String.Index>;
     var value: Range<String.Index>?;
 }
 
-enum LexType {
+enum HTMLLexType {
     case Whitespace
     case Text
     case Comment(text: Range<String.Index>)
     case Doctype
-    case XmlDecl(attributes: [Attribute])
+    case XmlDecl(attributes: [HTMLAttribute])
     case Error
-    case StartTag(name: Range<String.Index>, attributes: [Attribute], selfClosing: Bool)
+    case StartTag(name: Range<String.Index>, attributes: [HTMLAttribute], selfClosing: Bool)
     case EndTag(name: Range<String.Index>)
 }
 
-struct Symbol {
-    var type: LexType
+struct HTMLSymbol {
+    var type: HTMLLexType
     var range: Range<String.Index>
 }
 
@@ -272,7 +272,7 @@ struct HTMLLexer {
      * In the event of invalid ranges, resets the checkpoint
      * and returns nil.
      */
-    mutating func consumeMalformedTag(from checkpoint: String.UnicodeScalarIndex) -> Symbol? {
+    mutating func consumeMalformedTag(from checkpoint: String.UnicodeScalarIndex) -> HTMLSymbol? {
         let _ = self.consume(until: ">");
         
         guard let accepted = self.acceptedRange(checkpoint, self.parsingIndex) else {
@@ -280,7 +280,7 @@ struct HTMLLexer {
             return nil;
         }
         
-        return Symbol(type: .Error, range: accepted);
+        return HTMLSymbol(type: .Error, range: accepted);
     }
     
     /**
@@ -289,13 +289,13 @@ struct HTMLLexer {
      * If any whitespace was consumed, it will advance the
      * parsing index and return a Symbol.
      */
-    mutating func consumeWhitespace() -> Symbol? {
+    mutating func consumeWhitespace() -> HTMLSymbol? {
         guard let range = self.consume(scalarCond: { char in
             let v = char.value;
             return v == 9 || v == 0xA || v == 0xC || v == 0xD || v == 0x20;
         }) else { return nil };
         
-        return Symbol(type: .Whitespace, range: range);
+        return HTMLSymbol(type: .Whitespace, range: range);
     }
     
     /**
@@ -303,12 +303,12 @@ struct HTMLLexer {
      * 
      * Returns a Symbol if any amount of text was accepted.
      */
-    mutating func consumeText() -> Symbol? {
+    mutating func consumeText() -> HTMLSymbol? {
         guard let range = self.consume(charCond: { char in
             char != "<" && char != ">"
         }) else { return nil; }
         
-        return Symbol(type: .Text, range: range);
+        return HTMLSymbol(type: .Text, range: range);
     }
     
     /**
@@ -316,7 +316,7 @@ struct HTMLLexer {
      * 
      * Returns a Symbol if a comment was accepted.
      */
-    mutating func acceptComment() -> Symbol? {
+    mutating func acceptComment() -> HTMLSymbol? {
         let checkpoint = self.parsingIndex;
         guard self.accept(substring: "<!--") != nil else {
             self.parsingIndex = checkpoint;
@@ -340,10 +340,10 @@ struct HTMLLexer {
             return nil;
         }
         
-        return Symbol(type: .Comment(text: consumedRange), range: acceptedRange);
+        return HTMLSymbol(type: .Comment(text: consumedRange), range: acceptedRange);
     }
     
-    mutating func acceptDoctype() -> Symbol? {
+    mutating func acceptDoctype() -> HTMLSymbol? {
         let checkpoint = self.parsingIndex;
         
         guard let start = self.accept(asciiCaseInsensitiveSubstring: "<!doctype") else {
@@ -362,7 +362,7 @@ struct HTMLLexer {
         let ws = self.consumeWhitespace();
         
         if let endRange = self.accept(substring: ">") {
-            return Symbol(type: .Doctype, range: start.lowerBound..<endRange.upperBound);
+            return HTMLSymbol(type: .Doctype, range: start.lowerBound..<endRange.upperBound);
         } else if ws == nil {
             return self.consumeMalformedTag(from: checkpoint);
         }
@@ -384,7 +384,7 @@ struct HTMLLexer {
         let _ = self.consumeWhitespace();
         
         if let endRange = self.accept(substring: ">") {
-            return Symbol(type: .Doctype, range: start.lowerBound..<endRange.upperBound);
+            return HTMLSymbol(type: .Doctype, range: start.lowerBound..<endRange.upperBound);
         }
         
         return self.consumeMalformedTag(from: checkpoint);
@@ -395,7 +395,7 @@ struct HTMLLexer {
      *
      * The bool parameter is true if the attribute is malformed.
      */
-    mutating func acceptAttribute() -> (Attribute?, Bool) {
+    mutating func acceptAttribute() -> (HTMLAttribute?, Bool) {
         let checkpoint = self.parsingIndex;
         
         guard let name = self.consumeAttributeName() else { return (nil, false) };
@@ -405,15 +405,15 @@ struct HTMLLexer {
             let _ = self.consumeWhitespace();
             
             if let value = self.consumeUnquotedAttributeValue() {
-                return (Attribute(name: name, value: value), false);
+                return (HTMLAttribute(name: name, value: value), false);
             } else if let value = self.acceptQuotedString() {
-                return (Attribute(name: name, value: value), false);
+                return (HTMLAttribute(name: name, value: value), false);
             } else {
                 self.parsingIndex = checkpoint;
                 return (nil, true);
             }
         } else {
-            return (Attribute(name: name), false);
+            return (HTMLAttribute(name: name), false);
         }
     }
     
@@ -424,7 +424,7 @@ struct HTMLLexer {
      * position. Otherwise, returns either a StartTag
      * symbol or an Error symbol.
      */
-    mutating func acceptStartTag() -> Symbol? {
+    mutating func acceptStartTag() -> HTMLSymbol? {
         let checkpoint = self.parsingIndex;
         
         guard let start = self.accept(substring: "<") else {
@@ -436,7 +436,7 @@ struct HTMLLexer {
             return self.consumeMalformedTag(from: checkpoint);
         }
         
-        var attributes: Array<Attribute> = [];
+        var attributes: Array<HTMLAttribute> = [];
         
         if self.consumeWhitespace() != nil {
             while true {
@@ -458,10 +458,10 @@ struct HTMLLexer {
             return self.consumeMalformedTag(from: checkpoint);
         };
         
-        return Symbol(type: .StartTag(name: tagname, attributes: attributes, selfClosing: selfclosing), range: start.lowerBound..<end.upperBound);
+        return HTMLSymbol(type: .StartTag(name: tagname, attributes: attributes, selfClosing: selfclosing), range: start.lowerBound..<end.upperBound);
     }
     
-    mutating func acceptXmlDecl() -> Symbol? {
+    mutating func acceptXmlDecl() -> HTMLSymbol? {
         let checkpoint = self.parsingIndex;
         
         guard let start = self.accept(substring: "<?xml") else {
@@ -471,7 +471,7 @@ struct HTMLLexer {
         
         let _ = self.consumeWhitespace();
         
-        var attributes: Array<Attribute> = [];
+        var attributes: Array<HTMLAttribute> = [];
         var end = self.accept(substring: "?>");
         
         while end == nil {
@@ -488,7 +488,7 @@ struct HTMLLexer {
             end = self.accept(substring: "?>");
         }
         
-        return Symbol(type: .XmlDecl(attributes: attributes), range: start.lowerBound..<end!.upperBound);
+        return HTMLSymbol(type: .XmlDecl(attributes: attributes), range: start.lowerBound..<end!.upperBound);
     }
     
     /**
@@ -498,7 +498,7 @@ struct HTMLLexer {
      * position. Otherwise, returns either a StartTag
      * symbol or an Error symbol.
      */
-    mutating func acceptEndTag() -> Symbol? {
+    mutating func acceptEndTag() -> HTMLSymbol? {
         let checkpoint = self.parsingIndex;
         
         guard let start = self.accept(substring: "</") else {
@@ -518,7 +518,7 @@ struct HTMLLexer {
             return self.consumeMalformedTag(from: checkpoint);
         };
         
-        return Symbol(type: .EndTag(name: tagname), range: start.lowerBound..<end.upperBound);
+        return HTMLSymbol(type: .EndTag(name: tagname), range: start.lowerBound..<end.upperBound);
     }
     
     /**
@@ -527,7 +527,7 @@ struct HTMLLexer {
      * Returns nil if there is no valid symbol or if we've
      * reached the end of the string.
      */
-    mutating func acceptSymbol() -> Symbol? {
+    mutating func acceptSymbol() -> HTMLSymbol? {
         if let doctype = self.acceptDoctype() {
             return doctype;
         } else if let xmldecl = self.acceptXmlDecl() {

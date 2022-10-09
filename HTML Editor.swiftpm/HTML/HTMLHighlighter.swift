@@ -17,7 +17,7 @@ struct HTMLHighlighter: SourceHighlighter {
         self.lexer = HTMLLexer(source: source);
     }
     
-    func highlightAttr(attr: Attribute) {
+    func highlightAttr(attr: HTMLAttribute) {
         self.textStorage.addAttributes([
             .foregroundColor: self.attributeNameColor
         ], range: NSRange(attr.name, in: self.source));
