@@ -232,7 +232,7 @@ extension SourceEditor: UIViewRepresentable {
             uiView.textStorage.addAttributes([.foregroundColor: context.coordinator.textColor], range: NSRange.init(self.source.startIndex..<self.source.endIndex, in: self.source))
             uiView.textStorage.addAttributes([.font: context.coordinator.font], range: NSRange.init(self.source.startIndex..<self.source.endIndex, in: self.source))
             
-            self.highlighter.highlightSource(source: self.source, textStorage: uiView.textStorage);
+            context.coordinator.startAsyncHighlight(textStorage: uiView.textStorage);
         }
         
         if context.coordinator.lastSeenQuery != self.searchQuery || didChange {
