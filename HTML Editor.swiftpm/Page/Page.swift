@@ -96,6 +96,8 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             return "curlybraces.square"
         } else if self.type == .folder {
             return "folder"
+        } else if self.type == .json || self.type?.isSubtype(of: .json) ?? false {
+            return "curlybraces.square"
         } else if self.type == .text || self.type?.isSubtype(of: .text) ?? false {
             return "doc.plaintext"
         } else if self.type == .image || self.type?.isSubtype(of: .image) ?? false {

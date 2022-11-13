@@ -14,12 +14,16 @@ struct PageEditor: View {
             HTMLEditor(page: page, wysiwygState: $wysiwygState, fakeWysiwygState: wysiwygState, highlighterFactory: HTMLHighlighterFactory())
         } else if page.type == .xml || page.type?.isSubtype(of: .xml) ?? false || page.type?.preferredFilenameExtension == "opf" {
             TextFileEditor(page: page, highlighterFactory: HTMLHighlighterFactory())
+        } else if page.type == .json || page.type?.isSubtype(of: .json) ?? false {
+            TextFileEditor(page: page, highlighterFactory: TextHighlighterFactory())
         } else if page.type == .text || page.type?.isSubtype(of: .text) ?? false {
             TextFileEditor(page: page, highlighterFactory: TextHighlighterFactory())
         } else if page.type?.isSubtype(of: .image) ?? false {
             ImagePreview(page: page)
         } else if let desc = page.type?.localizedDescription {
             ErrorView(error: "Unknown file type: \(desc)").pageTitlebar(for: page)
+        } else if let ident = page.type?.identifier {
+            ErrorView(error: "Unknown file type: \(ident)").pageTitlebar(for: page)
         } else {
             ErrorView(error: "Unknown file type").pageTitlebar(for: page)
         }
