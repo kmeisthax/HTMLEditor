@@ -178,6 +178,7 @@ extension SourceEditorDelegate: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
         self.source.wrappedValue = textView.text;
+        self.lastSeenSource = textView.text;
     }
     
     func textViewDidChangeSelection(_ textView: UITextView) {
@@ -226,8 +227,6 @@ extension SourceEditor: UIViewRepresentable {
             
             uiView.text = self.source;
             
-            uiView.selectedRange = selection;
-            
             context.coordinator.startAsyncHighlight(textStorage: uiView.textStorage);
         }
         
@@ -269,6 +268,7 @@ extension SourceEditorDelegate: NSTextViewDelegate {
         guard let textView = notification.object as? NSTextView else { return };
         
         self.source.wrappedValue = textView.string;
+        self.lastSeenSource = textView.string;
     }
     
     func textViewDidChangeSelection(_ notification: Notification) {
