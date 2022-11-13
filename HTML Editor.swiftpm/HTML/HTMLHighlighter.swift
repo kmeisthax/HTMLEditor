@@ -10,11 +10,13 @@ struct HTMLHighlighter: SourceHighlighter {
     var source: String;
     var textStorage: NSTextStorage;
     var lexer: HTMLLexer;
+    var lexedTokens: [HTMLSymbol];
     
     init(source: String, textStorage: NSTextStorage) {
         self.source = source;
         self.textStorage = textStorage;
         self.lexer = HTMLLexer(source: source);
+        self.lexedTokens = [];
     }
     
     func highlightAttr(attr: HTMLAttribute) {
@@ -35,25 +37,31 @@ struct HTMLHighlighter: SourceHighlighter {
         while let token = self.lexer.acceptSymbol() {
             tokens += 1;
             
+            self.lexedTokens.append(token);
+            
             switch token.type {
             case .Whitespace, .Text:
                 textStorage.addAttributes([
-                    .foregroundColor: self.textColor
+                    .foregroundColor: self.textColor,
+                    .font: self.font
                 ], range: NSRange(token.range, in: source));
             case let .Comment(text: text):
                 textStorage.addAttributes([
-                    .foregroundColor: self.commentColor
+                    .foregroundColor: self.commentColor,
+                    .font: self.font
                 ], range: NSRange(token.range, in: source));
                 textStorage.addAttributes([
                     .font: self.boldFont
                 ], range: NSRange(text, in: source));
             case .Doctype:
                 textStorage.addAttributes([
-                    .foregroundColor: self.doctypeColor
+                    .foregroundColor: self.doctypeColor,
+                    .font: self.font
                 ], range: NSRange(token.range, in: source));
             case let .XmlDecl(attributes: attrs):
                 textStorage.addAttributes([
-                    .foregroundColor: self.doctypeColor
+                    .foregroundColor: self.doctypeColor,
+                    .font: self.font
                 ], range: NSRange(token.range, in: source));
                 
                 for attr in attrs {
@@ -61,7 +69,8 @@ struct HTMLHighlighter: SourceHighlighter {
                 }
             case let .StartTag(name: tagname, attributes: attrs, selfClosing: _):
                 textStorage.addAttributes([
-                    .foregroundColor: self.tagColor
+                    .foregroundColor: self.tagColor,
+                    .font: self.font
                 ], range: NSRange(token.range, in: source));
                 textStorage.addAttributes([
                     .font: self.boldFont
@@ -72,14 +81,16 @@ struct HTMLHighlighter: SourceHighlighter {
                 }
             case let .EndTag(name: tagname):
                 textStorage.addAttributes([
-                    .foregroundColor: self.tagColor
+                    .foregroundColor: self.tagColor,
+                    .font: self.font
                 ], range: NSRange(token.range, in: source));
                 textStorage.addAttributes([
                     .font: self.boldFont
                 ], range: NSRange(tagname, in: source));
             case .Error:
                 textStorage.addAttributes([
-                    .foregroundColor: self.errorColor
+                    .foregroundColor: self.errorColor,
+                    .font: self.font
                 ], range: NSRange(token.range, in: source));
             }
             
@@ -89,6 +100,34 @@ struct HTMLHighlighter: SourceHighlighter {
         }
         
         return true;
+    }
+    
+    mutating func sourceDidChange(newSource: String) {
+        let prefix = self.source.commonPrefix(with: newSource);
+        let prefixEnd = self.source.index(self.source.startIndex, offsetBy: prefix.count);
+        var endOfTokens = 0;
+        
+        for (i, htoken) in self.lexedTokens.enumerated() {
+            if htoken.range.upperBound <= prefixEnd {
+                endOfTokens = i;
+            }
+        }
+        
+        if endOfTokens > 0 {
+            if let lexPosition = self.lexedTokens[endOfTokens].range.upperBound.samePosition(in: newSource.unicodeScalars) {
+                self.lexedTokens.removeSubrange(self.lexedTokens.index(0, offsetBy: endOfTokens)..<self.lexedTokens.endIndex);
+                self.lexer = HTMLLexer(source: newSource);
+                self.lexer.advance(to: lexPosition);
+                
+                self.source = newSource;
+                return;
+            }
+        }
+        
+        //Fail case: could not resync lexer to new string or no common prefix
+        self.lexer = HTMLLexer(source: newSource);
+        self.lexedTokens = [];
+        self.source = newSource;
     }
 }
 
@@ -125,6 +164,10 @@ extension HTMLHighlighter {
     var boldFont: UIFont {
         .monospacedSystemFont(ofSize: 16, weight: .bold)
     }
+    
+    var font: UIFont {
+        .monospacedSystemFont(ofSize: 16, weight: .regular)
+    }
 }
 #elseif os(macOS)
 extension HTMLHighlighter {
@@ -158,6 +201,10 @@ extension HTMLHighlighter {
     
     var boldFont: NSFont {
         .monospacedSystemFont(ofSize: 16, weight: .bold)
+    }
+    
+    var font: NSFont {
+        .monospacedSystemFont(ofSize: 16, weight: .regular)
     }
 }
 #endif

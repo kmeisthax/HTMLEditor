@@ -134,13 +134,14 @@ class SourceEditorDelegate: NSObject {
     }
     
     func startAsyncHighlight(textStorage: NSTextStorage) {
-        print("Restarting highlighting run...");
         let alreadyHighlighting = self.highlighter != nil;
-        print(alreadyHighlighting);
-        
-        self.highlighter = self.highlighterFactory.construct(source: self.source.wrappedValue, textStorage: textStorage);
         
         if !alreadyHighlighting {
+            self.highlighter = self.highlighterFactory.construct(source: self.source.wrappedValue, textStorage: textStorage);
+            
+            self.doAsyncHighlight();
+        } else {
+            self.highlighter!.sourceDidChange(newSource: self.source.wrappedValue);
             self.doAsyncHighlight();
         }
     }
@@ -153,8 +154,6 @@ class SourceEditorDelegate: NSObject {
                     return self.doAsyncHighlight();
                 }
             }
-            
-            self.highlighter = nil;
         });
     }
 }
@@ -228,9 +227,6 @@ extension SourceEditor: UIViewRepresentable {
             uiView.text = self.source;
             
             uiView.selectedRange = selection;
-            
-            uiView.textStorage.addAttributes([.foregroundColor: context.coordinator.textColor], range: NSRange.init(self.source.startIndex..<self.source.endIndex, in: self.source))
-            uiView.textStorage.addAttributes([.font: context.coordinator.font], range: NSRange.init(self.source.startIndex..<self.source.endIndex, in: self.source))
             
             context.coordinator.startAsyncHighlight(textStorage: uiView.textStorage);
         }
@@ -320,8 +316,6 @@ extension SourceEditor: NSViewRepresentable {
                 context.coordinator.lastSeenSource = self.source;
                 
                 let selection = textview.selectedRanges;
-                
-                textStorage.setAttributedString(NSAttributedString(string: self.source, attributes: [.font: context.coordinator.font, .foregroundColor: context.coordinator.textColor]));
                 
                 textview.selectedRanges = selection;
                 

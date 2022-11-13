@@ -24,6 +24,18 @@ protocol SourceHighlighter {
      * indicating that annotation has completed.
      */
     mutating func highlightSource() -> Bool;
+    
+    /**
+     * Indicate that the source code changed.
+     * 
+     * After calling this function, you should repeatedly call highlightSource
+     * again.
+     * 
+     * Source highlighters are responsible for retaining text annotations for
+     * parts of the source that did not change, and repairing annotations that
+     * did change.
+     */
+    mutating func sourceDidChange(newSource: String);
 }
 
 struct TextHighlighterFactory: SourceHighlighterFactory {
@@ -35,5 +47,9 @@ struct TextHighlighterFactory: SourceHighlighterFactory {
 struct TextHighlighter: SourceHighlighter {
     func highlightSource() -> Bool {
         return true; //Text has no syntax to highlight.
+    }
+    
+    func sourceDidChange(newSource: String) {
+        //We don't highlight so we don't care about the source changing.
     }
 }
