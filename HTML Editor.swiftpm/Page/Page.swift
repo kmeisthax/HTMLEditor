@@ -71,6 +71,16 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     
     var type: UTType? {
         do {
+            if self.ownership == .SecurityScoped, let accessURL = self.accessURL {
+                CFURLStartAccessingSecurityScopedResource(accessURL as CFURL);
+            }
+            
+            defer {
+                if self.ownership == .SecurityScoped, let accessURL = self.accessURL {
+                    CFURLStopAccessingSecurityScopedResource(accessURL as CFURL);
+                }
+            }
+            
             return try self.presentedItemURL?.resourceValues(forKeys: [.contentTypeKey]).contentType
         } catch {
             print("Cannot read type of \(String(describing: self.presentedItemURL)), got error \(error)");
