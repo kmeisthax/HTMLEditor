@@ -137,13 +137,17 @@ class SourceEditorDelegate: NSObject {
         let alreadyHighlighting = self.highlighter != nil;
         
         if !alreadyHighlighting {
-            self.highlighter = self.highlighterFactory.construct(source: self.source.wrappedValue, textStorage: textStorage);
-            
-            self.doAsyncHighlight();
+            self.resetAsyncHighlight(textStorage: textStorage);
         } else {
             self.highlighter!.sourceDidChange(newSource: self.source.wrappedValue);
             self.doAsyncHighlight();
         }
+    }
+    
+    func resetAsyncHighlight(textStorage: NSTextStorage) {
+        self.highlighter = self.highlighterFactory.construct(source: self.source.wrappedValue, textStorage: textStorage);
+        
+        self.doAsyncHighlight();
     }
     
     func doAsyncHighlight() {
@@ -179,6 +183,8 @@ extension SourceEditorDelegate: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         self.source.wrappedValue = textView.text;
         self.lastSeenSource = textView.text;
+        
+        self.startAsyncHighlight(textStorage: textView.textStorage)
     }
     
     func textViewDidChangeSelection(_ textView: UITextView) {
@@ -223,11 +229,9 @@ extension SourceEditor: UIViewRepresentable {
         if didChange {
             context.coordinator.lastSeenSource = self.source;
             
-            let selection = uiView.selectedRange;
-            
             uiView.text = self.source;
             
-            context.coordinator.startAsyncHighlight(textStorage: uiView.textStorage);
+            context.coordinator.resetAsyncHighlight(textStorage: uiView.textStorage);
         }
         
         if context.coordinator.lastSeenQuery != self.searchQuery || didChange {
@@ -269,6 +273,8 @@ extension SourceEditorDelegate: NSTextViewDelegate {
         
         self.source.wrappedValue = textView.string;
         self.lastSeenSource = textView.string;
+        
+        self.startAsyncHighlight(textStorage: textView.textStorage);
     }
     
     func textViewDidChangeSelection(_ notification: Notification) {
@@ -318,8 +324,9 @@ extension SourceEditor: NSViewRepresentable {
                 let selection = textview.selectedRanges;
                 
                 textview.selectedRanges = selection;
+                //TODO: Wait shouldn't this set the text
                 
-                context.coordinator.startAsyncHighlight(textStorage: textStorage);
+                context.coordinator.resetAsyncHighlight(textStorage: textStorage);
             }
             
             if context.coordinator.lastSeenQuery != self.searchQuery || didChange {
