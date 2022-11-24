@@ -33,15 +33,16 @@
 		LCJ0YXJnZXRzIjpbIkFwcE1vZHVsZSJdLCJ0eXBlIjp7ImV4ZWN1dGFibGUi
 		Om51bGx9fV0sInRhcmdldE1hcCI6eyJBcHBNb2R1bGUiOnsiZGVwZW5kZW5j
 		aWVzIjpbeyJwcm9kdWN0IjpbIkludHJvc3BlY3QiLCJTd2lmdFVJLUludHJv
-		c3BlY3QiLG51bGxdfV0sImV4Y2x1ZGUiOltdLCJuYW1lIjoiQXBwTW9kdWxl
-		IiwicGF0aCI6Ii4iLCJyZXNvdXJjZXMiOlt7InBhdGgiOiJSZXNvdXJjZXMi
-		LCJydWxlIjoicHJvY2VzcyJ9XSwic2V0dGluZ3MiOltdLCJ0eXBlIjoiZXhl
-		Y3V0YWJsZSJ9fSwidGFyZ2V0cyI6W3siZGVwZW5kZW5jaWVzIjpbeyJwcm9k
-		dWN0IjpbIkludHJvc3BlY3QiLCJTd2lmdFVJLUludHJvc3BlY3QiLG51bGxd
-		fV0sImV4Y2x1ZGUiOltdLCJuYW1lIjoiQXBwTW9kdWxlIiwicGF0aCI6Ii4i
-		LCJyZXNvdXJjZXMiOlt7InBhdGgiOiJSZXNvdXJjZXMiLCJydWxlIjoicHJv
-		Y2VzcyJ9XSwic2V0dGluZ3MiOltdLCJ0eXBlIjoiZXhlY3V0YWJsZSJ9XSwi
-		dG9vbHNWZXJzaW9uIjp7Il92ZXJzaW9uIjoiNS42LjAifX0=
+		c3BlY3QiLG51bGwsbnVsbF19XSwiZXhjbHVkZSI6W10sIm5hbWUiOiJBcHBN
+		b2R1bGUiLCJwYXRoIjoiLiIsInJlc291cmNlcyI6W3sicGF0aCI6IlJlc291
+		cmNlcyIsInJ1bGUiOnsicHJvY2VzcyI6e319fV0sInNldHRpbmdzIjpbXSwi
+		dHlwZSI6ImV4ZWN1dGFibGUifX0sInRhcmdldHMiOlt7ImRlcGVuZGVuY2ll
+		cyI6W3sicHJvZHVjdCI6WyJJbnRyb3NwZWN0IiwiU3dpZnRVSS1JbnRyb3Nw
+		ZWN0IixudWxsLG51bGxdfV0sImV4Y2x1ZGUiOltdLCJuYW1lIjoiQXBwTW9k
+		dWxlIiwicGF0aCI6Ii4iLCJyZXNvdXJjZXMiOlt7InBhdGgiOiJSZXNvdXJj
+		ZXMiLCJydWxlIjp7InByb2Nlc3MiOnt9fX1dLCJzZXR0aW5ncyI6W10sInR5
+		cGUiOiJleGVjdXRhYmxlIn1dLCJ0b29sc1ZlcnNpb24iOnsiX3ZlcnNpb24i
+		OiI1LjYuMCJ9fQ==
 		</data>
 		<key>manifestHash</key>
 		<data>
@@ -50,7 +51,7 @@
 		<key>schemaVersion</key>
 		<integer>4</integer>
 		<key>swiftPMVersionString</key>
-		<string>5.6.0-dev</string>
+		<string>5.7.1</string>
 	</dict>
 </dict>
 </plist>
