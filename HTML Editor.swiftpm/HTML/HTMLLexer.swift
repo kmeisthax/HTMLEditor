@@ -21,113 +21,13 @@ struct HTMLSymbol {
     var range: Range<String.Index>
 }
 
-struct HTMLLexer {
+struct HTMLLexer: SourceLexer {
     var source: String;
     var parsingIndex: String.UnicodeScalarIndex;
     
     init(source: String) {
         self.source = source;
         self.parsingIndex = source.startIndex.samePosition(in: self.source.unicodeScalars)!;
-    }
-    
-    /**
-     * Advance the lexer to a specific position.
-     */
-    mutating func advance(to: String.UnicodeScalarView.Index) {
-        self.parsingIndex = to;
-    }
-    
-    private func acceptedRange(_ start: String.UnicodeScalarIndex, _ end: String.UnicodeScalarIndex) -> Range<String.Index>? {
-        let rangeStart = start.samePosition(in: self.source);
-        let rangeEnd = end.samePosition(in: self.source);
-        
-        guard let rangeStart = rangeStart else {
-            return nil;
-        }
-        guard let rangeEnd = rangeEnd else {
-            return nil;
-        }
-        
-        return rangeStart..<rangeEnd;
-    }
-    
-    /**
-     * Consume one or more String characters satisfying a
-     * given condition.
-     * 
-     * Returns a range if at least one character was
-     * accepted, and updates the parsing index
-     * appropriately.
-     */
-    mutating func consume(charCond: (String.Element) -> Bool) -> Range<String.Index>? {
-        var end = self.parsingIndex;
-        let chars = self.source[end...];
-        
-        for idx in chars.indices {
-            if charCond(chars[idx]) {
-                continue;
-            }
-            
-            end = idx;
-            break;
-        }
-        
-        if end > self.parsingIndex {
-            let rangeStart = self.parsingIndex;
-            
-            self.parsingIndex = end;
-            
-            return self.acceptedRange(rangeStart, end);
-        }
-        
-        return nil;
-    }
-    
-    /**
-     * Consume one or more Unicode scalar values satisfying
-     * a given condition.
-     * 
-     * Returns a range if at least one scalar was accepted,
-     * and updates the parsing index appropriately.
-     */
-    mutating func consume(scalarCond: (String.UnicodeScalarView.Element) -> Bool) -> Range<String.Index>? {
-        var end = self.parsingIndex;
-        let chars = self.source.unicodeScalars[end...];
-        
-        for idx in chars.indices {
-            if scalarCond(chars[idx]) {
-                continue;
-            }
-            
-            end = idx;
-            break;
-        }
-        
-        if end > self.parsingIndex {
-            let rangeStart = self.parsingIndex;
-            
-            self.parsingIndex = end;
-            
-            return self.acceptedRange(rangeStart, end);
-        }
-        
-        return nil;
-    }
-    
-    mutating func accept(substring: String) -> Range<String.Index>? {
-        guard let charsStart = self.parsingIndex.samePosition(in: self.source) else { return nil };
-        guard let charsEnd = self.source.index(charsStart, offsetBy: substring.count, limitedBy: self.source.endIndex) else { return nil };
-        
-        let chars = self.source[charsStart..<charsEnd];
-        
-        let matches = chars == substring;
-        
-        if matches {
-            self.parsingIndex = charsEnd;
-            return self.acceptedRange(charsStart, charsEnd);
-        }
-        
-        return nil;
     }
     
     /**
@@ -166,25 +66,6 @@ struct HTMLLexer {
             self.parsingIndex = checkpoint;
             return nil;
         }
-    }
-    
-    /**
-     * Consume all characters up until a given substring.
-     * 
-     * The returned range contains the consumed string only
-     * and not the substring. The end index including the
-     * substring will be written to self.parsingIndex.
-     */
-    mutating func consume(until: String) -> Range<String.Index>? {
-        guard let charsStart = self.parsingIndex.samePosition(in: self.source) else { return nil; }
-        
-        let searchString = self.source[charsStart...];
-        if let foundRange = searchString.range(of: until) {
-            self.parsingIndex = foundRange.upperBound;
-            return self.acceptedRange(charsStart, foundRange.lowerBound);
-        }
-        
-        return nil;
     }
     
     /**
