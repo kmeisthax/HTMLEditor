@@ -3,12 +3,12 @@ import SwiftUI
 enum JSONValue {
     case Whitespace;
     case ObjectStart;
-    case ObjectMember(nameString: Range<String.Index>);
+    case ObjectKeySeparator;
     case ObjectEnd;
     case ArrayStart;
-    case ArrayMember;
     case ArrayEnd;
-    case StringStart;
+    case NextElementSeparator;
+    case StringStart(isObjectKey: bool);
     case LiteralChars;
     case Escape(unicodeScalar: UInt32);
     case StringEnd;
@@ -39,8 +39,41 @@ enum JSONSyntaxContext {
      * All starting symbols are accepted.
      */
     case Open;
-    case InObject;
+    
+    /**
+     * Object keys (string symbols) and ends of objects are accepted.
+     */
+    case InObjectKey;
+    
+    /**
+     * Object key separators (:) are accepted.
+     */
+    case InObjectKeySeparator;
+    
+    /**
+     * Object values are accepted.
+     */
+    case InObjectValue;
+    
+    /**
+     * Object next-element separators (,) and ends of objects are accepted.
+     */
+    case InObjectNextSeparator;
+    
+    /**
+     * Array values and ends of arrays are accepted.
+     */
     case InArray;
+    
+    /**
+     * Array next-element separator (,) and ends of objects are accepted.
+     */
+    case InArrayNextSeparator;
+    
+    /**
+     * Literals, escapes, and ends of strings are accepted.
+     */
+    case InString;
 }
 
 struct JSONLexer : SourceLexer {
@@ -73,12 +106,20 @@ struct JSONLexer : SourceLexer {
             return nil
         };
         
-        if self.syntaxCtx.last != .Open {
+        switch self.syntaxCtx.last {
+        case .Open:
+            let _ = self.syntaxCtx.popLast();
+            self.syntaxCtx.append(.InObjectKey);
+        
+        //Objects are valid array/object value types
+        case .InObjectValue:
+        case .InArray:
+            self.syntaxCtx.append(.InObjectKey);
+        
+        default:
             return JSONSymbol(type: .Error, range: start);
         }
         
-        let _ = self.syntaxCtx.popLast();
-        self.syntaxCtx.append(.InObject);
         
         return JSONSymbol(type: .ObjectStart, range: start);
     }
@@ -88,11 +129,14 @@ struct JSONLexer : SourceLexer {
             return nil
         };
         
-        if (self.syntaxCtx.last != .InObject) {
+        switch self.syntaxCtx.last {
+        case .InObjectKey:
+        case .InObjectNextSeparator:
+            let _ = self.syntaxCtx.popLast();
+        
+        default:
             return JSONSymbol(type: .Error, range: end);
         }
-        
-        let _ = self.syntaxCtx.popLast();
         
         return JSONSymbol(type: .ObjectEnd, range: end);
     }
@@ -102,14 +146,21 @@ struct JSONLexer : SourceLexer {
             return nil
         };
         
-        if self.syntaxCtx.last != .Open {
+        switch self.syntaxCtx.last {
+        case .Open:
+            let _ = self.syntaxCtx.popLast();
+            self.syntaxCtx.append(.InArray);
+            
+        // Arrays are valid object/array value types
+        case .InObjectValue:
+        case .InArray:
+            self.syntaxCtx.append(.InArray);
+        
+        default:
             return JSONSymbol(type: .Error, range: start);
         }
         
-        let _ = self.syntaxCtx.popLast();
-        self.syntaxCtx.append(.InArray);
-        
-        return JSONSymbol(type: .ObjectStart, range: start);
+        return JSONSymbol(type: .ArrayStart, range: start);
     }
     
     mutating func acceptArrayEnd() -> JSONSymbol? {
@@ -117,13 +168,57 @@ struct JSONLexer : SourceLexer {
             return nil
         };
         
-        if (self.syntaxCtx.last != .InArray) {
+        switch self.syntaxCtx.last {
+        case .InArray:
+        case .InArrayNextSeparator:
+            let _ = self.syntaxCtx.popLast();
+            
+        default:
             return JSONSymbol(type: .Error, range: end);
         }
         
         let _ = self.syntaxCtx.popLast();
         
-        return JSONSymbol(type: .ObjectEnd, range: end);
+        return JSONSymbol(type: .ArrayEnd, range: end);
+    }
+    
+    mutating func acceptStringStartOrEnd() -> JSONSymbol? {
+        guard let end = self.accept(substring: "\"") else {
+            return nil
+        };
+        
+        switch self.syntaxCtx.last {
+        case .InArray:
+        case .InObjectValue:
+            self.syntaxCtx.append(.InString);
+            return JSONSymbol(type: .StringStart(false), range: end);
+            
+        case .InObjectKey:
+            self.syntaxCtx.append(.InString);
+            return JSONSymbol(type: .StringStart(true), range: end);
+        
+        case .InString:
+            self.syntaxCtx.popLast();
+            return JSONSymbol(type: .StringEnd, range: end);
+            
+        default:
+            return JSONSymbol(type: .Error, range: end);
+        }
+    }
+    
+    mutating func consumeStringCharacters() -> JSONSymbol? {
+        if self.syntaxCtx.last != .InString {
+            return nil;
+        }
+        
+        //NOTE: This does not check for " or /, you must accept those first
+        guard let chars = self.consume(scalarCond: { sym in 
+            sym.value >= 0x20 && sym.value <= 0x10FFFF
+        }) else {
+            return nil
+        };
+        
+        return JSONSymbol(type: .LiteralChars, range: chars);
     }
     
     /**
@@ -140,6 +235,8 @@ struct JSONLexer : SourceLexer {
             return aStart;            
         } else if let aEnd = self.acceptArrayEnd() {
             return aEnd;
+        } else if let strBoundary = self.acceptStringStartOrEnd() {
+            return strBoundary;
         } else if let ws = self.consumeWhitespace() {
             return ws;
         } else {
