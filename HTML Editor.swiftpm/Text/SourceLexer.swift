@@ -130,12 +130,21 @@ extension SourceLexer {
     }
     
     mutating func accept(substring: String) -> Range<String.Index>? {
+        self.accept(substring: substring, caseSensitive: true)
+    }
+    
+    mutating func accept(substring: String, caseSensitive: Bool) -> Range<String.Index>? {
         guard let charsStart = self.parsingIndex.samePosition(in: self.source) else { return nil };
         guard let charsEnd = self.source.index(charsStart, offsetBy: substring.count, limitedBy: self.source.endIndex) else { return nil };
         
         let chars = self.source[charsStart..<charsEnd];
+        var matches = false;
         
-        let matches = chars == substring;
+        if caseSensitive {
+            matches = chars == substring;
+        } else { //case insensitive match
+            matches = chars.lowercased() == substring.lowercased();
+        }
         
         if matches {
             self.parsingIndex = charsEnd;

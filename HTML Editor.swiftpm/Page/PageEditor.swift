@@ -15,7 +15,7 @@ struct PageEditor: View {
         } else if page.type == .xml || page.type?.isSubtype(of: .xml) ?? false || page.type?.preferredFilenameExtension == "opf" {
             TextFileEditor(page: page, highlighterFactory: HTMLHighlighterFactory())
         } else if page.type == .json || page.type?.isSubtype(of: .json) ?? false {
-            TextFileEditor(page: page, highlighterFactory: TextHighlighterFactory())
+            TextFileEditor(page: page, highlighterFactory: JSONHighlighterFactory())
         } else if page.type == .text || page.type?.isSubtype(of: .text) ?? false {
             TextFileEditor(page: page, highlighterFactory: TextHighlighterFactory())
         } else if page.type?.isSubtype(of: .image) ?? false {
