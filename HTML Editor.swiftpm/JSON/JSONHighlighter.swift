@@ -118,27 +118,27 @@ extension JSONHighlighter {
     }
     
     var objectColor: UIColor {
-        .systemBlue
+        .systemPurple
     }
     
     var arrayColor: UIColor {
-        .systemOrange
+        .systemIndigo
     }
     
     var stringColor: UIColor {
-        .systemMint
+        .systemBlue
     }
     
     var stringEscapeColor: UIColor {
-        .systemCyan
-    }
-    
-    var numberColor: UIColor {
         .systemGray
     }
     
+    var numberColor: UIColor {
+        .systemCyan
+    }
+    
     var keywordColor: UIColor {
-        .systemPink
+        .systemOrange
     }
     
     var errorColor: UIColor {
@@ -160,27 +160,27 @@ extension JSONHighlighter {
     }
     
     var objectColor: NSColor {
-        .systemBlue
+        .systemPurple
     }
     
     var arrayColor: NSColor {
-        .systemOrange
+        .systemIndigo
     }
     
     var stringColor: NSColor {
-        .systemMint
+        .systemBlue
     }
     
     var stringEscapeColor: NSColor {
-        .systemCyan
-    }
-    
-    var numberColor: NSColor {
         .systemGray
     }
     
+    var numberColor: NSColor {
+        .systemCyan
+    }
+    
     var keywordColor: NSColor {
-        .systemPink
+        .systemOrange
     }
     
     var errorColor: NSColor {
