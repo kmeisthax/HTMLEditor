@@ -374,7 +374,7 @@ struct JSONLexer : SourceLexer {
         
         return self.consume(scalarCond: { elem in
             let isAllowedZero = (allowLeadingZero || !first) && elem.value == 0x30;
-            let isNonZeroDigit = elem.value >= 0x31 || elem.value < 0x3A;
+            let isNonZeroDigit = elem.value >= 0x31 && elem.value < 0x3A;
             
             first = false;
             
