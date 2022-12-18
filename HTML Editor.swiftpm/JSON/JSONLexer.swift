@@ -486,6 +486,8 @@ struct JSONLexer : SourceLexer {
                 return aStart;
             } else if let aEnd = self.acceptArrayEnd() {
                 return aEnd;
+            } else if let sep = self.acceptNextElementSeparator() {
+                return sep;
             } else if let strBoundary = self.acceptStringStartOrEnd() {
                 return strBoundary;
             } else if let bTrue = self.acceptTrue() {
