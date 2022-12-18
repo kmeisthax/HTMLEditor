@@ -234,7 +234,7 @@ struct JSONLexer : SourceLexer {
         case .InObjectValue:
             let _ = self.syntaxCtx.popLast();
             
-            self.syntaxCtx.append(.InObjectNextSeparator);            
+            self.syntaxCtx.append(.InObjectNextSeparator);
             self.syntaxCtx.append(.InString);
             return JSONSymbol(type: .StringStart(isObjectKey: false), range: end);
             
@@ -248,7 +248,7 @@ struct JSONLexer : SourceLexer {
         case .InObjectKey:
             let _ = self.syntaxCtx.popLast();
             
-            self.syntaxCtx.append(.InObjectKeySeparator);            
+            self.syntaxCtx.append(.InObjectKeySeparator);
             self.syntaxCtx.append(.InString);
             return JSONSymbol(type: .StringStart(isObjectKey: true), range: end);
         
@@ -266,11 +266,10 @@ struct JSONLexer : SourceLexer {
             return nil
         };
         
-        guard let typePos = start.upperBound.samePosition(in: self.source) else {
-            return nil
-        };
-        let typeEnd = self.source.index(typePos, offsetBy: 1);
-        let type = self.source[typePos..<typeEnd];
+        let typeEnd = self.source.index(start.upperBound, offsetBy: 1);
+        let type = self.source[start.upperBound..<typeEnd];
+        
+        self.parsingIndex = typeEnd;
         
         switch type {
         case "\"":
@@ -294,6 +293,8 @@ struct JSONLexer : SourceLexer {
             guard let unicode = UInt32(self.source[typeEnd..<unicodeEnd]) else {
                 return JSONSymbol(type: .Error, range: start.lowerBound..<unicodeEnd)
             };
+            
+            self.parsingIndex = unicodeEnd;
             return JSONSymbol(type: .Escape(unicodeScalar: UInt32(unicode)), range: start.lowerBound..<unicodeEnd)
         default:
             return JSONSymbol(type: .Error, range: start.lowerBound..<typeEnd)
