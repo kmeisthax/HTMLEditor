@@ -68,10 +68,15 @@ struct JSONHighlighter: SourceHighlighter {
                     .foregroundColor: self.stringColor,
                     .font: self.boldFont
                 ], range: NSRange(token.range, in: source));
-            case .LiteralChars, .Escape:
+            case .LiteralChars:
                 textStorage.addAttributes([
                     .foregroundColor: self.stringColor,
                     .font: self.font
+                ], range: NSRange(token.range, in: source));
+            case .Escape:
+                textStorage.addAttributes([
+                    .foregroundColor: self.stringEscapeColor,
+                    .font: self.boldFont
                 ], range: NSRange(token.range, in: source));
             case .Number:
                 textStorage.addAttributes([
@@ -99,28 +104,7 @@ struct JSONHighlighter: SourceHighlighter {
     }
     
     mutating func sourceDidChange(newSource: String) {
-        let prefix = self.source.commonPrefix(with: newSource);
-        let prefixEnd = self.source.index(self.source.startIndex, offsetBy: prefix.count);
-        var endOfTokens = 0;
-        
-        for (i, htoken) in self.lexedTokens.enumerated() {
-            if htoken.range.upperBound <= prefixEnd {
-                endOfTokens = i;
-            }
-        }
-        
-        if endOfTokens > 0 {
-            if let lexPosition = self.lexedTokens[endOfTokens].range.upperBound.samePosition(in: newSource.unicodeScalars) {
-                self.lexedTokens.removeSubrange(self.lexedTokens.index(0, offsetBy: endOfTokens)..<self.lexedTokens.endIndex);
-                self.lexer = JSONLexer(source: newSource);
-                self.lexer.advance(to: lexPosition);
-                
-                self.source = newSource;
-                return;
-            }
-        }
-        
-        //Fail case: could not resync lexer to new string or no common prefix
+        //Our lexer is stateful so we can't resync it yet
         self.lexer = JSONLexer(source: newSource);
         self.lexedTokens = [];
         self.source = newSource;
@@ -143,6 +127,10 @@ extension JSONHighlighter {
     
     var stringColor: UIColor {
         .systemMint
+    }
+    
+    var stringEscapeColor: UIColor {
+        .systemCyan
     }
     
     var numberColor: UIColor {
@@ -181,6 +169,10 @@ extension JSONHighlighter {
     
     var stringColor: NSColor {
         .systemMint
+    }
+    
+    var stringEscapeColor: NSColor {
+        .systemCyan
     }
     
     var numberColor: NSColor {
