@@ -303,7 +303,7 @@ struct JSONLexer : SourceLexer {
     mutating func consumeStringCharacters() -> JSONSymbol? {
         //NOTE: This does not check for " or /, you must accept those first
         guard let chars = self.consume(scalarCond: { sym in 
-            sym.value >= 0x20 && sym.value <= 0x10FFFF
+            return sym.value >= 0x20 && sym.value <= 0x10FFFF && sym.value != 0x5C && sym.value != 0x22;
         }) else {
             return nil
         };
