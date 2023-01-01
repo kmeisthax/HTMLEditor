@@ -40,7 +40,10 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
         set {
             projectDirectory = newValue.pickedUrls.first;
-            republishDirectoryContents();
+            
+            if self.isVisible {
+                republishDirectoryContents();
+            }
         }
     }
     
@@ -75,14 +78,18 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      *
      * Since not all projects have an associated directory yet we only register ourselves
      * as a presenter if we need to.
+     * 
+     * This function does nothing if the project is not visible.
      */
     func checkFilePresentationStatus() {
-        if self.projectDirectory != nil && !isRegisteredAsFilePresenter {
-            NSFileCoordinator.addFilePresenter(self);
-            isRegisteredAsFilePresenter = true;
-        } else if self.projectDirectory == nil && isRegisteredAsFilePresenter {
-            NSFileCoordinator.removeFilePresenter(self);
-            isRegisteredAsFilePresenter = false;
+        if self.isVisible {
+            if self.projectDirectory != nil && !isRegisteredAsFilePresenter {
+                NSFileCoordinator.addFilePresenter(self);
+                isRegisteredAsFilePresenter = true;
+            } else if self.projectDirectory == nil && isRegisteredAsFilePresenter {
+                NSFileCoordinator.removeFilePresenter(self);
+                isRegisteredAsFilePresenter = false;
+            }
         }
     }
     
@@ -168,9 +175,27 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         project.projectDirectory = projectDirectory;
         project.openDocuments = openDocuments;
         
-        project.republishDirectoryContents();
-        
         return project;
+    }
+    
+    var isVisible = false;
+    
+    func projectIsVisible() {
+        if !self.isVisible {
+            self.isVisible = true;
+            self.checkFilePresentationStatus();
+            self.republishDirectoryContents();
+        }
+    }
+    
+    func projectNoLongerVisible() {
+        if self.isVisible {
+            self.isVisible = false;
+            
+            if self.isRegisteredAsFilePresenter {
+                NSFileCoordinator.removeFilePresenter(self);
+            }
+        }
     }
     
     func addSubItem(item: Page, inSubpath: [String]) {
