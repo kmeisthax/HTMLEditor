@@ -18,6 +18,57 @@ enum FileOwnership: Codable {
     case SecurityScoped;
 }
 
+protocol PageProtocol: ObservableObject {
+    var id: UUID { get };
+    var presentedItemURL: URL? { get set };
+    var pathFragment: [String]? { get };
+    var children: [any PageProtocol]? { get };
+    var type: UTType? { get };
+    var linkIdentity: String { get };
+}
+
+extension PageProtocol {
+    var filename: String {
+        if let url = presentedItemURL {
+            return url.lastPathComponent
+        } else {
+            return "Untitled"
+        }
+    };
+    
+    /**
+     * Calculate the project-relative subpath for this page.
+     */
+    var path: String? {
+        pathFragment?.joined(separator: "/")
+    }
+    
+    var icon: String {
+        if self.type == .html || self.type?.identifier == "public.xhtml" {
+            return "doc.richtext"
+        } else if self.type == .xml || self.type?.isSubtype(of: .xml) ?? false || self.type?.preferredFilenameExtension == "opf" {
+            return "curlybraces.square"
+        } else if self.type == .folder {
+            return "folder"
+        } else if self.type == .json || self.type?.isSubtype(of: .json) ?? false {
+            return "curlybraces.square"
+        } else if self.type == .text || self.type?.isSubtype(of: .text) ?? false {
+            return "doc.plaintext"
+        } else if self.type == .image || self.type?.isSubtype(of: .image) ?? false {
+            return "photo"
+        } else {
+            return "questionmark.square"
+        }
+    }
+    
+    /**
+     * Determine if this Page is representable as text (e.g. it's a text or HTML file).
+     */
+    var isTextRepresentable: Bool {
+        self.type == .html || self.type == .text || self.type?.isSubtype(of: .text) ?? false || self.type?.preferredFilenameExtension == "opf"
+    }
+}
+
 /**
  * Viewmodel class for individual HTML files in a project.
  * 
