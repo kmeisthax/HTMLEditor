@@ -50,19 +50,19 @@ struct DirectoryItem: View {
         if entry.presentedItemURL == nil {
             Text("ERROR")
         } else if !(entry.presentedItemURL?.hasDirectoryPath ?? true) {
-            NavigationLink(tag: entry.linkIdentity, selection: $openPageID) {
+            NavigationLink(destination: {
                 PageEditor(page: entry, wysiwygState: $wysiwygState)
                     .navigationTitle(entry.filename)
                     #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
                     #endif
-            } label: {
+            }, label: {
                 if isRenaming {
                     self.renamingLabel
                 } else {
                     self.label
                 }
-            }
+            })
             .contextMenu{
                 FileManagementMenuItems(project: self.project, forProjectItem: entry, showPhotoPicker: self.$showPhotoPicker, selectedSubpath: self.$selectedSubpath, isRenaming: $isRenaming, renameTo: $renameTo, numberOfRenames: $numberOfRenames)
             }

@@ -28,19 +28,19 @@ struct ProjectEditor: View {
     
     var body: some View {
         NavigationSplitView {
-            List {
+            List(selection: $openPageID) {
                 if project.openDocuments.count > 0 {
                     Section("Open Files") {
                         ForEach($project.openDocuments) { $doc in
-                            NavigationLink(tag: doc.linkIdentity, selection: $openPageID) {
+                            NavigationLink(destination: {
                                 PageEditor(page: doc, wysiwygState: $wysiwygState)
                                     .navigationTitle(doc.filename)
                                     #if os(iOS)
                                     .navigationBarTitleDisplayMode(.inline)
                                     #endif
-                            } label: {
+                            }, label: {
                                 Label(doc.filename, systemImage: doc.icon)
-                            }
+                            })
                         }
                     }
                 }
@@ -49,7 +49,9 @@ struct ProjectEditor: View {
                         DirectoryListing(project: project, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath, wysiwygState: $wysiwygState)
                     }
                 }
-            }.listStyle(.sidebar).toolbar {
+            }
+            .listStyle(.sidebar)
+            .toolbar {
                 #if os(iOS)
                 let primaryPlacement = ToolbarItemPlacement.navigationBarTrailing;
                 #elseif os(macOS)
