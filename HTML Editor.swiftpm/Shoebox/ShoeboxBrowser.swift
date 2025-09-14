@@ -18,7 +18,7 @@ struct ShoeboxBrowser: View {
     @State var isPresentingDeletionConfirm = false;
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView(.vertical) {
                 LazyVGrid(columns: items) {
                     ForEach($shoebox.projects) { $project in

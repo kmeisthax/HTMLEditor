@@ -27,7 +27,7 @@ struct ProjectEditor: View {
     var goBack: (() -> Void)?;
     
     var body: some View {
-        NavigationView {
+        NavigationSplitView {
             List {
                 if project.openDocuments.count > 0 {
                     Section("Open Files") {
@@ -99,6 +99,7 @@ struct ProjectEditor: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
+        } detail: {
             ErrorView(error: "Please select a file.")
         }
         .navigationViewStyle(.columns)
