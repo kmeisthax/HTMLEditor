@@ -104,7 +104,6 @@ struct ProjectEditor: View {
         } detail: {
             ErrorView(error: "Please select a file.")
         }
-        .navigationViewStyle(.columns)
         .sheet(isPresented: $showSettings) {
             ProjectSettings(project: project, directory: project.projectLocation)
         }
