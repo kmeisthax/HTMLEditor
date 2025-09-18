@@ -102,7 +102,13 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
     func body(content: Content) -> some View {
         #if os(iOS)
         content.toolbar {
-            ToolbarItemGroup(placement: .navigationBarLeading, content: {
+            let titlePlacement = if #available(iOS 26.0, *) {
+                ToolbarItemPlacement.topBarLeading
+            } else {
+                ToolbarItemPlacement.navigationBarLeading
+            };
+            
+            ToolbarItem(placement: titlePlacement, content: {
                 HStack {
                     VStack(alignment: .leading) {
                         Text(windowTitle).fontWeight(.bold)
@@ -114,7 +120,9 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
                     }
                     
                     self.inlineFileMenu
-                }.frame(maxWidth: horizontalSizeClass == .compact ? 250 : .infinity)
+                }
+                .frame(maxWidth: horizontalSizeClass == .compact ? 250 : .infinity)
+                .fixedSize()
             })
             
             ToolbarItemGroup(placement: .cancellationAction, content: {
