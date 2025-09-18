@@ -95,6 +95,7 @@ struct HTMLEditor: View, BreakpointCalculator {
                         Image(systemName: "rectangle.split.2x1").tag(WYSIWYGState.Split)
                         Image(systemName: "doc.richtext").tag(WYSIWYGState.WYSIWYG)
                     }
+                    .fixedSize()
                     .pickerStyle(.segmented)
                     .onChange(of: self.fakeWysiwygState) { newState in
                         if self.fakeWysiwygState != self.wysiwygState {
