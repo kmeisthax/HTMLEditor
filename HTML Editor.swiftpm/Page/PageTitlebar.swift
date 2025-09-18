@@ -102,13 +102,7 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
     func body(content: Content) -> some View {
         #if os(iOS)
         content.toolbar {
-            let titlePlacement = if #available(iOS 26.0, *) {
-                ToolbarItemPlacement.topBarLeading
-            } else {
-                ToolbarItemPlacement.navigationBarLeading
-            };
-            
-            ToolbarItem(placement: titlePlacement, content: {
+            ToolbarItem(placement: .title, content: {
                 HStack {
                     VStack(alignment: .leading) {
                         Text(windowTitle).fontWeight(.bold)
@@ -135,6 +129,7 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
                 }
             })
         }
+        .toolbarRole(.editor)
         .navigationBarBackButtonHidden(true)
         .introspectNavigationController { navigationController in
             navigationController.navigationBar.scrollEdgeAppearance = navigationController.navigationBar.standardAppearance
