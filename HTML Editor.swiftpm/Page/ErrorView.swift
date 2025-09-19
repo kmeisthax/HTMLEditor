@@ -17,6 +17,7 @@ struct ErrorView: View {
         ZStack {
             #if os(iOS)
             Color(UIColor.secondarySystemBackground)
+                .edgesIgnoringSafeArea(.all)
             #endif
             VStack {
                 Image(systemName: "questionmark.folder").font(.system(size: 180, weight: .medium))
