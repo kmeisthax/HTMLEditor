@@ -129,22 +129,21 @@ struct HTMLEditor: View, BreakpointCalculator {
             }
             
             SourceEditor(source: $page.html, selection: $selection, searchQuery: $searchQuery, highlighterFactory: highlighterFactory)
-                .padding(1)
                 .offset(x: isWysiwyg ? geo_outer.size.width * -1.0 : 0.0)
                 .frame(maxWidth:
-                        isSplit ? geo_outer.size.width / 2 : .infinity)
+                        isSplit ? geo_outer.size.width / 2 + 1: .infinity)
                 .edgesIgnoringSafeArea(.bottom)
                 .toolbar {
                     paneToolbar
                 }
             WebPreview(html: $page.html, title: $pageTitle, fileURL: $page.presentedItemURL, baseURL: $page.accessURL, searchQuery: $searchQuery, forwardSearch: $lastForwardWebSearch, backwardsSearch: $lastBackwardWebSearch)
                 .overlay(Rectangle().frame(width: isSplit ? 1 : 0, height: nil, alignment: .leading).foregroundColor(.secondary), alignment: .leading)
-                .offset(x: isSource ? geo_outer.safeAreaInsets.leading + geo_outer.size.width * 1.0 :
-                            isSplit ? geo_outer.safeAreaInsets.leading + geo_outer.size.width * 0.5 : 0.0)
+                .offset(x: isSource ? geo_outer.size.width * 1.0 :
+                            isSplit ? geo_outer.size.width * 0.5 + 1 : 0.0)
                 .frame(maxWidth:
-                        isSplit ? geo_outer.size.width / 2 :
+                        isSplit ? geo_outer.size.width / 2 - 1 :
                         isSource ? geo_outer.size.width : .infinity)
-                .edgesIgnoringSafeArea(.all)
+                .edgesIgnoringSafeArea(.bottom)
         }.safeAreaInset(edge: .bottom) {
             SearchBar(searchQuery: $searchQuery, isSearching: $isSearching, wysiwygState: $wysiwygState, 
                       prevSource: {
