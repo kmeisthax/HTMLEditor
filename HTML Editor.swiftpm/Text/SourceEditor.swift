@@ -274,7 +274,9 @@ extension SourceEditorDelegate: NSTextViewDelegate {
         self.source.wrappedValue = textView.string;
         self.lastSeenSource = textView.string;
         
-        self.startAsyncHighlight(textStorage: textView.textStorage);
+        if let ts = textView.textStorage {
+            self.startAsyncHighlight(textStorage: ts);
+        }
     }
     
     func textViewDidChangeSelection(_ notification: Notification) {

@@ -156,7 +156,7 @@ extension JSONHighlighter {
 #elseif os(macOS)
 extension JSONHighlighter {
     var textColor: NSColor {
-        .label
+        .textColor
     }
     
     var objectColor: NSColor {
