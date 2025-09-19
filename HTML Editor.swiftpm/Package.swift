@@ -10,7 +10,7 @@ import AppleProductTypes
 let package = Package(
     name: "HTML Editor",
     platforms: [
-        .iOS("16.0"),
+        .iOS("18.0"),
         .macOS("11.0")
     ],
     products: [

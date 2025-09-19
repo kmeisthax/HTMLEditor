@@ -2,7 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ProjectEditor: View {
-    @ObservedObject var project: Project;
+    @StateObject var project: Project;
     
     #if os(iOS)
     @EnvironmentObject var sceneDelegate: OldschoolSceneDelegate;

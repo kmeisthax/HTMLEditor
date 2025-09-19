@@ -10,8 +10,8 @@ struct MyApp: App {
     
     var body: some Scene {
         #if os(iOS)
-        WindowGroup {
-            ShoeboxBrowser(shoebox: appDelegate.shoebox)
+        DocumentGroup(newDocument: ProjectDocument()) { configuration in
+            ProjectEditor(project: Project(projectDirectory: configuration.fileURL))
         }
         #elseif os(macOS)
         WindowGroup {
