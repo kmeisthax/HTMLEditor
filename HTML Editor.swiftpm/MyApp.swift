@@ -9,6 +9,11 @@ struct MyApp: App {
     #endif
     
     var body: some Scene {
+        DocumentGroupLaunchScene("HTML Editor", {
+            Text("")
+        }, background: {
+            Color.gray
+        })
         DocumentGroup(newDocument: ProjectDocument()) { configuration in
             ProjectEditor(project: Project(projectDirectory: configuration.fileURL))
         }
