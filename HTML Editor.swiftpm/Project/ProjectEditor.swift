@@ -30,12 +30,11 @@ struct ProjectEditor: View {
         NavigationSplitView {
             List(selection: $openPageID) {
                 if project.projectFiles.count > 0 {
-                    Section(project.projectName) {
-                        DirectoryListing(project: project, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath, wysiwygState: $wysiwygState)
-                    }
+                    DirectoryListing(project: project, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath, wysiwygState: $wysiwygState)
                 }
             }
             .listStyle(.sidebar)
+            .navigationTitle(project.projectName)
             .toolbar {
                 #if os(iOS)
                 let primaryPlacement = ToolbarItemPlacement.navigationBarTrailing;
