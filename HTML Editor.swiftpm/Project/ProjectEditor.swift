@@ -24,8 +24,6 @@ struct ProjectEditor: View {
     @State var window: NSWindow?;
     #endif
     
-    var goBack: (() -> Void)?;
-    
     var body: some View {
         NavigationSplitView {
             List(selection: $openPageID) {
@@ -52,15 +50,6 @@ struct ProjectEditor: View {
                 }
                 #endif
                 
-                ToolbarItemGroup(placement: .cancellationAction) {
-                    if let gb = goBack {
-                        Button {
-                            gb()
-                        } label: {
-                            Label("Back", systemImage: "xmark")
-                        }
-                    }
-                }
                 ToolbarItemGroup(placement: primaryPlacement) {
                     Menu {
                         FileManagementMenuItems(project: project, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
