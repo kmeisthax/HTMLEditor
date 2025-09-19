@@ -43,8 +43,8 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
         }
     }
     
-    var inlineFileMenu: some View {
-        Menu {
+    var inlineFileMenu: some ToolbarContent {
+        ToolbarTitleMenu {
             Text(page?.presentedItemURL?.lastPathComponent ?? "")
                 .fontWeight(.bold)
             
@@ -56,19 +56,17 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
                 } label: {
                     Label("Rename Page...", systemImage: "rectangle.and.pencil.and.ellipsis")
                 }
+            } else {
+                Divider()
             }
             
             if let menu = menu {
                 Divider()
                 menu
+            } else {
+                Divider()
             }
-        } label: {
-            #if os(iOS)
-                Image(systemName: "chevron.down.circle.fill").imageScale(.medium)
-            #elseif os(macOS)
-                Image(systemName: "info.circle")
-            #endif
-        }.foregroundColor(.secondary)
+        }
     }
     
     var renamingForm: some View {
@@ -112,8 +110,6 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
                                 .font(.footnote)
                         }
                     }
-                    
-                    self.inlineFileMenu
                 }
                 .frame(maxWidth: horizontalSizeClass == .compact ? 250 : .infinity)
                 .fixedSize()
@@ -128,6 +124,8 @@ struct PageTitlebar<MenuContent>: ViewModifier where MenuContent: View {
                     }
                 }
             })
+            
+            self.inlineFileMenu
         }
         .toolbarRole(.editor)
         .navigationBarBackButtonHidden(true)
