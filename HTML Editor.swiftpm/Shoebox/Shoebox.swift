@@ -12,10 +12,6 @@ class Shoebox: ObservableObject {
     init() {
         $projects.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             if let self = self {
-                for project in self.projects {
-                    project.shoebox = self;
-                }
-                
                 self.nestedStateDidChange()
             }
         }).store(in: &c);

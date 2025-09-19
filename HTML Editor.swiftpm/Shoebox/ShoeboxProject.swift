@@ -41,8 +41,6 @@ struct ShoeboxProject: View {
                 } else {
                     projectSelection.insert(project)
                 }
-            } else {
-                project.projectIsVisible()
             }
             
             return !editMode;

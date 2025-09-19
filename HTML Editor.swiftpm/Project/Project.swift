@@ -34,10 +34,7 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
         set {
             projectDirectory = newValue.pickedUrls.first;
-            
-            if self.isVisible {
-                republishDirectoryContents();
-            }
+            republishDirectoryContents();
         }
     }
     
@@ -61,8 +58,6 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
     }
     
-    weak var shoebox: Shoebox?;
-    
     private var c: [AnyCancellable] = [];
     
     private var isRegisteredAsFilePresenter = false;
@@ -76,18 +71,21 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      * This function does nothing if the project is not visible.
      */
     func checkFilePresentationStatus() {
-        if self.isVisible {
-            if self.projectDirectory != nil && !isRegisteredAsFilePresenter {
-                NSFileCoordinator.addFilePresenter(self);
-                isRegisteredAsFilePresenter = true;
-            } else if self.projectDirectory == nil && isRegisteredAsFilePresenter {
-                NSFileCoordinator.removeFilePresenter(self);
-                isRegisteredAsFilePresenter = false;
-            }
+        if self.projectDirectory != nil && !isRegisteredAsFilePresenter {
+            NSFileCoordinator.addFilePresenter(self);
+            isRegisteredAsFilePresenter = true;
+        } else if self.projectDirectory == nil && isRegisteredAsFilePresenter {
+            NSFileCoordinator.removeFilePresenter(self);
+            isRegisteredAsFilePresenter = false;
         }
     }
     
-    override init() {
+    override convenience init() {
+        self.init(projectDirectory: nil);
+    }
+    
+    init(projectDirectory: URL?) {
+        self.projectDirectory = projectDirectory;
         id = UUID.init()
         
         super.init();
@@ -95,12 +93,10 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         checkFilePresentationStatus();
         
         $projectDirectory.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-            self?.shoebox?.nestedStateDidChange();
             self?.checkFilePresentationStatus();
         }).store(in: &c);
         
-        //NOTE: We intentionally do not hook projectDocuments as that state
-        //is derived from the filesystem and not persisted in shoebox.json
+        republishDirectoryContents();
     }
     
     deinit {
@@ -142,26 +138,6 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         project.projectDirectory = projectDirectory;
         
         return project;
-    }
-    
-    var isVisible = false;
-    
-    func projectIsVisible() {
-        if !self.isVisible {
-            self.isVisible = true;
-            self.checkFilePresentationStatus();
-            self.republishDirectoryContents();
-        }
-    }
-    
-    func projectNoLongerVisible() {
-        if self.isVisible {
-            self.isVisible = false;
-            
-            if self.isRegisteredAsFilePresenter {
-                NSFileCoordinator.removeFilePresenter(self);
-            }
-        }
     }
     
     func addSubItem(item: Page, inSubpath: [String]) {
