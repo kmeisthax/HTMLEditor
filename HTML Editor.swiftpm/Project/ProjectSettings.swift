@@ -8,7 +8,6 @@ struct ProjectSettings: View {
     @Environment(\.presentationMode) var presentation;
     
     @ObservedObject var project: Project;
-    @StateObject var directory: FileLocation;
     
     var onSave: (() -> Void)?;
     
@@ -16,30 +15,12 @@ struct ProjectSettings: View {
         let sheetContents = VStack {
             Form {
                 Section("Project Directory") {
-                    if directory.pickedUrls.count > 0 {
-                        Text(directory.displayName)
-                    }
-                    Button(role: .destructive) {
-                        #if os(iOS)
-                        directory.pick(scene: self.sceneDelegate.scene!)
-                        #elseif os(macOS)
-                        directory.pick()
-                        #endif
-                    } label: {
-                        Text("Link new directory")
-                    }
+                    Text(project.projectName)
                 }
             }
         }.toolbar {
-            ToolbarItemGroup(placement: .cancellationAction) {
-                Button("Cancel") {
-                    self.presentation.wrappedValue.dismiss()
-                }
-            }
             ToolbarItemGroup(placement: .confirmationAction) {
-                Button("Save") {
-                    project.projectLocation = directory;
-                    
+                Button("Done") {
                     if let onSave = onSave {
                         onSave();
                     }
@@ -52,8 +33,10 @@ struct ProjectSettings: View {
         #if os(iOS)
         NavigationView {
             sheetContents
-                .navigationTitle("Project Settings")
+                .navigationTitle(project.projectName)
                 .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(true)
+                .toolbarRole(.automatic)
         }
         #elseif os(macOS)
         sheetContents

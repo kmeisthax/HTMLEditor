@@ -70,7 +70,7 @@ struct ProjectEditor: View {
                     Button {
                         self.showSettings = true;
                     } label: {
-                        Label("Project settings...", systemImage: "gearshape")
+                        Label("Get info...", systemImage: "info.circle")
                     }
                 }
             }
@@ -81,7 +81,7 @@ struct ProjectEditor: View {
             ErrorView(error: "Please select a file.")
         }
         .sheet(isPresented: $showSettings) {
-            ProjectSettings(project: project, directory: project.projectLocation)
+            ProjectSettings(project: project)
         }
         #if os(iOS)
         .sheet(isPresented: $showPhotoPicker) {
