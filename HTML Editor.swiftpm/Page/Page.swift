@@ -159,8 +159,6 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
      */
     var c: [AnyCancellable] = [];
     
-    weak var shoebox: Shoebox?;
-    
     weak var project: Project?;
     
     override init() {
@@ -184,14 +182,6 @@ class Page : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                     }
                 }
             }
-        }).store(in: &c);
-        
-        $ownership.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-            self?.shoebox?.nestedStateDidChange()
-        }).store(in: &c);
-        
-        $presentedItemURL.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-            self?.shoebox?.nestedStateDidChange()
         }).store(in: &c);
         
         $children.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
