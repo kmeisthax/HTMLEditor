@@ -29,21 +29,6 @@ struct ProjectEditor: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $openPageID) {
-                if project.openDocuments.count > 0 {
-                    Section("Open Files") {
-                        ForEach($project.openDocuments) { $doc in
-                            NavigationLink(destination: {
-                                PageEditor(page: doc, wysiwygState: $wysiwygState)
-                                    .navigationTitle(doc.filename)
-                                    #if os(iOS)
-                                    .navigationBarTitleDisplayMode(.inline)
-                                    #endif
-                            }, label: {
-                                Label(doc.filename, systemImage: doc.icon)
-                            })
-                        }
-                    }
-                }
                 if project.projectFiles.count > 0 {
                     Section(project.projectName) {
                         DirectoryListing(project: project, openPageID: $openPageID, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath, wysiwygState: $wysiwygState)
@@ -80,14 +65,6 @@ struct ProjectEditor: View {
                 ToolbarItemGroup(placement: primaryPlacement) {
                     Menu {
                         FileManagementMenuItems(project: project, showPhotoPicker: $showPhotoPicker, selectedSubpath: $selectedSubpath)
-                        Divider()
-                        Button {
-                            #if os(iOS)
-                            project.openPage(scene: sceneDelegate.scene!);
-                            #endif
-                        } label: {
-                            Label("Open file...", systemImage: "doc.text")
-                        }
                     } label: {
                         Label("Add file...", systemImage: "doc.badge.plus")
                     }

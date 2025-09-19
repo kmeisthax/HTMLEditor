@@ -17,12 +17,6 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     var id: UUID;
     
     /**
-     * All the open documents in the project, including ones that are not
-     * part of the project directory.
-     */
-    @Published var openDocuments: [Page];
-    
-    /**
      * The open project directory.
      */
     @Published var projectDirectory: URL?;
@@ -95,22 +89,10 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     
     override init() {
         id = UUID.init()
-        self.openDocuments = []
         
         super.init();
         
         checkFilePresentationStatus();
-        
-        $openDocuments.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
-            if let self = self {
-                for openDocument in self.openDocuments {
-                    openDocument.shoebox = self.shoebox;
-                    openDocument.project = self;
-                }
-            }
-            
-            self?.shoebox?.nestedStateDidChange()
-        }).store(in: &c);
         
         $projectDirectory.throttle(for: 0.5, scheduler: OperationQueue.main, latest: true).sink(receiveValue: { [weak self] _ in
             self?.shoebox?.nestedStateDidChange();
@@ -140,17 +122,7 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
             }
         }
         
-        var openFiles: [PageState] = [];
-        
-        for page in openDocuments {
-            do {
-                openFiles.append(try page.intoState());
-            } catch {
-                print("Page could not be saved due to \(error)")
-            }
-        }
-        
-        return ProjectState(id: id, projectBookmark: projectBookmark, openFiles: openFiles);
+        return ProjectState(id: id, projectBookmark: projectBookmark);
     }
     
     class func fromState(state: ProjectState) -> Project {
@@ -166,14 +138,8 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         
         let project = Project();
         
-        var openDocuments: [Page] = [];
-        for pageState in state.openFiles {
-            openDocuments.append(Page.fromState(state: pageState, project: project));
-        }
-        
         project.id = state.id ?? UUID();
         project.projectDirectory = projectDirectory;
-        project.openDocuments = openDocuments;
         
         return project;
     }
@@ -280,8 +246,6 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
                 
                 CFURLStopAccessingSecurityScopedResource(url as CFURL);
             };
-        } else {
-            openDocuments.append(Page.fromTemporaryStorage(project: self))
         }
     }
     
@@ -420,12 +384,6 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
     }
     
     func page(withLinkIdentity: String) -> Page? {
-        if let page = self.openDocuments.first(where: { candidatePage in
-            candidatePage.linkIdentity == withLinkIdentity;
-        }) {
-            return page;
-        }
-        
         let splitComponents = withLinkIdentity.split(separator: "/");
         
         if let page = self.projectFiles.first(where: { candidatePage in
@@ -450,53 +408,3 @@ class Project : NSObject, ObservableObject, Identifiable, NSFilePresenter {
         }
     }
 }
-
-#if os(iOS)
-extension Project {
-    /**
-     * Open an individual page separate from any project ownership.
-     */
-    func openPage(scene: UIWindowScene) {
-        let location = FileLocation(contentTypes: [.html]);
-        
-        location.$pickedUrls.sink(receiveValue: { [weak self] urls in
-            if let self = self {
-                for url in urls {
-                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: nil, project: self))
-                }
-                
-                // Cancel ourselves now that location picking is done
-                self.picker_c = [];
-                self.pagePickerLocation = nil;
-            }
-        }).store(in: &picker_c);
-        
-        pagePickerLocation = location;
-        location.pick(scene: scene);
-    }
-}
-#elseif os(macOS)
-extension Project {
-    /**
-     * Open an individual page separate from any project ownership.
-     */
-    func openPage() {
-        let location = FileLocation(contentTypes: [.html]);
-        
-        location.$pickedUrls.sink(receiveValue: { [weak self] urls in
-            if let self = self {
-                for url in urls {
-                    self.openDocuments.append(Page.fromSecurityScopedUrl(url: url, accessURL: url, pathFragment: nil, project: self))
-                }
-                
-                // Cancel ourselves now that location picking is done
-                self.picker_c = [];
-                self.pagePickerLocation = nil;
-            }
-        }).store(in: &picker_c);
-        
-        pagePickerLocation = location;
-        location.pick();
-    }
-}
-#endif

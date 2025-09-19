@@ -17,9 +17,4 @@ struct ProjectState : Codable {
      * Intended to be a security-scoped URL.
      */
     var projectBookmark: Data?;
-    
-    /**
-     * The location of all open non-project files.
-     */
-    var openFiles: [PageState];
 }
